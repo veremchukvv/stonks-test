@@ -14,14 +14,14 @@ tags:
     description: "Operations about user"
   - name: "portfolios"
     description: "Operations about portfolio"
-  - name: "stocks"
+  - name: "market"
     description: "Operations about stocks"
 paths:
   /login:
     post:
       tags:
         - "profile"
-      summary: "Log user into the system"
+      summary: "Log user into the system (only OAuth in MVP)"
       description: ""
       operationId: "loginUser"
       consumes:
@@ -61,7 +61,7 @@ paths:
     post:
       tags:
         - "profile"
-      summary: "Create new profile"
+      summary: "Create new profile (only OAuth in MVP)"
       description: ""
       operationId: "createProfile"
       consumes:
@@ -81,7 +81,7 @@ paths:
     put:
       tags:
         - "profile"
-      summary: "Update profile"
+      summary: "Update profile (only OAuth in MVP)"
       description: ""
       operationId: "updateProfile"
       consumes:
@@ -122,8 +122,12 @@ paths:
           description: "New portfolio object that needs to be added to profile"
           required: true
           schema:
-            $ref: "#/definitions/Portfolio"
+            $ref: "#/definitions/CreatePortfolioReq"
       responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Portfolio"
         "405":
           description: "Invalid input"
     put:
@@ -142,8 +146,12 @@ paths:
           description: "Update portfolio object"
           required: true
           schema:
-            $ref: "#/definitions/Portfolio"
+            $ref: "#/definitions/UpdatePortfolioReq"
       responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Portfolio"
         "400":
           description: "Invalid ID supplied"
         "404":
@@ -195,11 +203,11 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Portfolio not found"
-  /stocks:
+  /market/stocks:
     get:
       tags:
-        - "stocks"
-      summary: "Get information sbout stock"
+        - "market"
+      summary: "Get information about stocks"
       description: ""
       operationId: "getStocks"
       consumes:
@@ -210,26 +218,43 @@ paths:
         - in: "body"
           name: "body"
           description: "Stocks to search"
-          required: true
           schema:
-            $ref: "#/definitions/Stock"
+            $ref: "#/definitions/Search"
       responses:
+        "200":
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Stock"
         "405":
           description: "Invalid input"
         "404":
           description: "Stocks not found"
+  /market/deals:
     post:
       tags:
-        - "stocks"
-      summary: "Buy stock"
+        - "market"
+      summary: "Add deal"
       description: ""
+      operationId: "addDeal"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Deal to add"
+          schema:
+            $ref: "#/definitions/Stock"
       responses:
         "400":
           description: "General error"
         "405":
           description: "Invalid input"
         "404":
-          description: "Stocks not found"
+          description: ""
 definitions:
   LoginRequest:
     type: "object"
@@ -249,7 +274,7 @@ definitions:
   UpdateProfile:
     type: "object"
     properties:
-      JWT:
+      username:
         type: "string"
   User:
     type: "object"
@@ -263,6 +288,24 @@ definitions:
         type: "integer"
         format: "int32"
         description: "User Status"
+  CreatePortfolioReq:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      public:
+        type: "boolean"
+        default: false
+  UpdatePortfolioReq:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      public:
+        type: "boolean"
   Portfolio:
     type: "object"
     properties:
@@ -273,6 +316,7 @@ definitions:
         type: "string"
       public:
         type: "boolean"
+        default: false
       stocks:
         type: "array"
         items:
@@ -286,22 +330,35 @@ definitions:
       name:
         type: "string"
         description: "name of stock"
+      summary:
+        type: "string"
+        description: "info about the stock"
       type:
         type: "string"
         enum: [bond, stock, fond]
       cost:
         type: "number"
         format: "float"
-      lots:
-        type: "number"
-        format: "int64"
-  ApiResponse:
+      currency:
+        type: "string"
+        enum: [usd, eur, rub]
+  Search:
+    type: "string"
+    description: "search string"
+  Deal:
     type: "object"
     properties:
-      code:
-        type: "integer"
-        format: "int32"
+      id:
+        type: "number"
+        format: "int64"
+        description: "id of deal"
       type:
         type: "string"
-      message:
+        enum: [buy, sell]
+        description: "type of deal"
+      lot:
         type: "string"
+        description: "ticker"
+      quantity:
+        type: "number"
+        format: "int64"

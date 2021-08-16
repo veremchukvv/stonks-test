@@ -21,7 +21,7 @@ paths:
     post:
       tags:
         - "profile"
-      summary: "Logs user into the system"
+      summary: "Log user into the system"
       description: ""
       operationId: "loginUser"
       consumes:
@@ -48,7 +48,7 @@ paths:
     post:
       tags:
         - "profile"
-      summary: "Logs out current logged in user session"
+      summary: "Log out current user"
       description: ""
       operationId: "logoutUser"
       produces:
@@ -110,6 +110,7 @@ paths:
     post:
       tags:
         - "portfolios"
+      summary: "Create new portfolio"
       operationId: "addNewPortfolio"
       consumes:
         - "application/json"
@@ -177,7 +178,7 @@ paths:
     delete:
       tags:
         - "portfolios"
-      summary: "Deletes a portfolio"
+      summary: "Delete a portfolio"
       description: ""
       operationId: "deletePortfolio"
       produces:
@@ -270,9 +271,12 @@ definitions:
         format: "int64"
       name:
         type: "string"
-      value:
-        type: "number"
-        format: "float"
+      public:
+        type: "boolean"
+      stocks:
+        type: "array"
+        items:
+          $ref: "#/definitions/Stock"
   Stock:
     type: "object"
     properties:
@@ -284,11 +288,13 @@ definitions:
         description: "name of stock"
       type:
         type: "string"
-        enum: [0, 1, 2]
-
+        enum: [bond, stock, fond]
       cost:
         type: "number"
         format: "float"
+      lots:
+        type: "number"
+        format: "int64"
   ApiResponse:
     type: "object"
     properties:

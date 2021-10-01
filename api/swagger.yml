@@ -247,7 +247,7 @@ paths:
           name: "body"
           description: "Deal to add"
           schema:
-            $ref: "#/definitions/Stock"
+            $ref: "#/definitions/Deal"
       responses:
         "400":
           description: "General error"

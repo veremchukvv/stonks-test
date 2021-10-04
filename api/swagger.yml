@@ -321,6 +321,9 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Stock"
+      cash:
+        type: "number"
+        format: "float"
   Stock:
     type: "object"
     properties:

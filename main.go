@@ -1,3 +1,0 @@
-package stonks_test
-
-

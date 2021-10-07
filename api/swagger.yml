@@ -10,6 +10,8 @@ schemes:
   - "https"
 basePath: "/"
 tags:
+  - name: "auth"
+    description: "Operations about authorization"
   - name: "profile"
     description: "Operations about user"
   - name: "portfolios"
@@ -20,7 +22,7 @@ paths:
   /login:
     post:
       tags:
-        - "profile"
+        - "auth"
       summary: "Log user into the system (only OAuth in MVP)"
       description: ""
       operationId: "loginUser"
@@ -47,7 +49,7 @@ paths:
   /logout:
     post:
       tags:
-        - "profile"
+        - "auth"
       summary: "Log out current user"
       description: ""
       operationId: "logoutUser"

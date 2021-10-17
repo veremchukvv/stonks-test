@@ -6,7 +6,7 @@ import (
 )
 
 func (h *Handler) signup(c echo.Context) error {
-	return c.String(http.StatusNotImplemented, "not implemented yet")
+	return c.String(http.StatusNotImplemented, "not implemented in MVP. Only signing with OAuth available")
 }
 
 func (h *Handler) signin(c echo.Context) error {

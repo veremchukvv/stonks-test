@@ -1,11 +1,13 @@
 package handlers
 
-import "github.com/labstack/echo/v4"
+import (
+	"github.com/labstack/echo/v4"
+)
+
 
 //const apiVersion = "v1"
 
 type Handler struct {
-
 }
 
 func (h *Handler) InitRoutes() *echo.Echo {

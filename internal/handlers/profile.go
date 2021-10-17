@@ -1,22 +1,22 @@
-package handler
+package handlers
 
 import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
-func (h *Handler) createPortfolio (c echo.Context) error {
+func (h *Handler) createProfile(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "not implemented yet")
 }
 
-func (h *Handler) modifyPortfolio(c echo.Context) error {
+func (h *Handler) modifyProfile(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "not implemented yet")
 }
 
-func (h *Handler) getPortfolio(c echo.Context) error {
+func (h *Handler) getProfile(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "not implemented yet")
 }
 
-func (h *Handler) deletePortfolio(c echo.Context) error {
+func (h *Handler) deleteProfile(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "not implemented yet")
 }

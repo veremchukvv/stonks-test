@@ -13,11 +13,11 @@ type contextKey string
 const loggerKey = contextKey("logger")
 
 var (
-	defaultLogger     *zap.Logger
+	defaultLogger     *zap.SugaredLogger
 	defaultLoggerOnce sync.Once
 )
 
-func NewLogger(debug bool, encoding string) *zap.Logger {
+func NewLogger(debug bool, encoding string) *zap.SugaredLogger {
 	if encoding != encodingJSON {
 		encoding = encodingConsole
 	}
@@ -42,11 +42,11 @@ func NewLogger(debug bool, encoding string) *zap.Logger {
 		logger = zap.NewNop()
 	}
 
-	return logger
+	return logger.Sugar()
 }
 
 // DefaultLogger returns the default logger for the package.
-func DefaultLogger() *zap.Logger {
+func DefaultLogger() *zap.SugaredLogger {
 	defaultLoggerOnce.Do(func() {
 		defaultLogger = NewLogger(false, encodingJSON)
 	})
@@ -60,8 +60,8 @@ func WithLogger(ctx context.Context, logger *zap.SugaredLogger) context.Context 
 
 // FromContext returns the logger stored in the context. If no such logger
 // exists, a default logger is returned.
-func FromContext(ctx context.Context) *zap.Logger {
-	if logger, ok := ctx.Value(loggerKey).(*zap.Logger); ok {
+func FromContext(ctx context.Context) *zap.SugaredLogger {
+	if logger, ok := ctx.Value(loggerKey).(*zap.SugaredLogger); ok {
 		return logger
 	}
 	return DefaultLogger()

@@ -2,3 +2,5 @@
 
 server:
   port: "8000"
+client_server:
+  client_port: "8001"

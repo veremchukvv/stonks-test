@@ -1,0 +1,27 @@
+{{ define "title" }} Вход {{ end }}
+{{ define "content"}}
+	    {{if ne .User.Name ""}}
+			<form class="pure-form" method="POST" action="/logout">
+			    <fieldset>
+			        <legend>Привет, {{.User.Name}}</legend>
+			        <button type="submit" class="pure-button pure-button-primary">Выйти</button>
+			    </fieldset>
+			</form>
+		{{else}}
+			<form class="pure-form" method="POST">
+			    <fieldset>
+			        <legend>{{if (eq .Error "")}}
+			    		Вход
+			        {{else}}
+			        	<span style="color:red">{{.Error}}</span>
+			    	{{end}}</legend>
+
+			        <input type="email" name="email" placeholder="Email">
+			        <input type="password" name="pwd" placeholder="Пароль">
+
+			        <button type="submit" class="pure-button pure-button-primary">Войти</button>
+			    </fieldset>
+			</form>
+		{{end}}
+	</div>
+{{ end }}

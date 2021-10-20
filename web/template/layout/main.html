@@ -1,0 +1,32 @@
+{{ define "title" }} Список фильмов {{ end }}
+{{ define "content" }}
+	{{if .Movies}}
+		<table class="pure-table">
+	    <thead>
+	        <tr>
+	            <th>#</th>
+	            <th>Постер</th>
+	            <th>Название</th>
+	        </tr>
+		</thead>
+
+	    <tbody>
+			{{range .Movies}}
+		        <tr>
+		            <td>{{.ID}}</td>
+		            <td><img src="{{.Poster}}"></td>
+		            <td>
+		            	{{if and .IsPaid (not $.User.IsPaid) }}
+		            		{{.Name}} (платный)
+		            	{{ else }}
+		            		<a href="/movie/{{.ID}}">{{.Name}}</a>
+		            	{{end}}
+		            </td>
+		        </tr>
+			{{end}}
+		</tbody>
+		</table>
+	{{else}}
+		{{.MoviesError}}
+	{{end}}
+{{ end }}

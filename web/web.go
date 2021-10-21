@@ -157,7 +157,7 @@ func PortfolioHandler(ctx echo.Context) error {
 
 	page := MainPage{}
 
-	//isGeneralLogin, err := r.Cookie("jwt")
+	//isGeneralLogin, err := ctx.Request().Cookie("jwt")
 	isOauthLogin, err := ctx.Request().Cookie("oauthToken")
 	oauthUserName, err := ctx.Request().Cookie("oauthUserName")
 

@@ -13,7 +13,7 @@ type Handler struct {
 func (h *Handler) InitRoutes() *echo.Echo {
 	e := echo.New()
 
-	auth := e.Group("/auth")
+	auth := e.Group("/users")
 	{
 		auth.POST("/signup", h.signup)
 		auth.POST("/signin", h.signin)

@@ -1,0 +1,20 @@
+{{ define "title" }} Регистрация {{ end }}
+{{ define "content"}}
+			<form class="pure-form" method="POST">
+			    <fieldset>
+			        <legend>{{if (eq .Error "")}}
+			    		Регистрация
+			        {{else}}
+			        	<span style="color:red">{{.Error}}</span>
+			    	{{end}}</legend>
+
+			        <input type="email" name="email" placeholder="Email">
+					<input type="text" name="name" placeholder="Отображаемое имя">
+					<input type="number" name="age" placeholder="Возраст">
+					<input type="tel" name="telephone" placeholder="+79XXXXXXXXX">
+			        <input type="password" name="pwd" placeholder="Пароль">
+
+			        <button type="submit" class="pure-button pure-button-primary">Зарегистрироваться</button>
+			    </fieldset>
+			</form>
+{{ end }}

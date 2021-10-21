@@ -10,12 +10,17 @@ type Server struct {
 	Port string `yaml:"port" env:"PORT"`
 }
 
+type ClientServer struct {
+	Port string `yaml:"client_port" env:"CLIENT_PORT"`
+}
+
 type DB struct {
 
 }
 
 type Config struct {
-	Server Server
+	Server Server `yaml:"server"`
+	ClientServer ClientServer `yaml:"client_server"`
 	DB DB
 }
 
@@ -27,7 +32,7 @@ func GetConfig() *Config {
 		logger := logging.NewLogger(false, "console")
 		logger.Info("read application configuration")
 		instance = &Config{}
-		err := cleanenv.ReadConfig("../../config.yml", instance)
+		err := cleanenv.ReadConfig("../configs/main.yml", instance)
 		if err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
 			logger.Info(help)

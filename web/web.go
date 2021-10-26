@@ -110,7 +110,10 @@ type LoginResponse struct {
 
 func main() {
 
-	cfg := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Fatalf("error occured when loading configuration: %v", err)
+	}
 
 	router := echo.New()
 
@@ -126,7 +129,7 @@ func main() {
 
 	// Настройка шаблонизатора
 
-	var err error
+
 
 	TT.MovieList, err = template.ParseFiles("template/layout/base.html", "template/main.html")
 	if err != nil {
@@ -213,8 +216,11 @@ func LoginFormHandler(ctx echo.Context) error {
 	if err != nil {
 		log.Printf("No user: %v", err)
 		//В случае не валидного токена показываем страницу логина
-		TT.Login.ExecuteTemplate(ctx.Response().Writer, "base", page)
+		err = TT.Login.ExecuteTemplate(ctx.Response().Writer, "base", page)
+		if err != nil {
+			log.Print(err)}
 		return nil
+
 	}
 	TT.Login.ExecuteTemplate(ctx.Response().Writer, "base", page)
 	return nil

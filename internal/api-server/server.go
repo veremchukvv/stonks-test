@@ -3,7 +3,6 @@ package api_server
 import (
 	"context"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
-	"log"
 	"net/http"
 	"time"
 )
@@ -25,23 +24,15 @@ func NewServer(port string, handler http.Handler) *Server {
 	return &Server{httpServer: httpServer}
 }
 
-func (s *Server) Run(ctx context.Context, stopTimeout time.Duration) error {
+func (s *Server) Run(ctx context.Context) {
 	logger := logging.FromContext(ctx)
+	//TODO think about making channel for errors
 	go func() {
 		err := s.httpServer.ListenAndServe()
-		if err != nil {
+		if err != nil && err != http.ErrServerClosed {
 			logger.Fatalf("error starting server %v", err)
 		}
 	}()
-	<-ctx.Done()
-	log.Print(ctx)
-	ctxstop, cancelstop := context.WithTimeout(context.Background(), stopTimeout)
-	defer cancelstop()
-	logger.Info("Server is shutting down...")
-	if err := s.Shutdown(ctxstop); err != nil {
-		logger.Errorf("srv.Shutdown error, %s", err)
-	}
-	return nil
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {

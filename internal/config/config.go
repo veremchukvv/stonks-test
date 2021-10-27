@@ -2,12 +2,13 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"sync"
+	"time"
 )
 
 type Server struct {
 	Port string `yaml:"port" env:"PORT"`
+	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" env:"SHUTDOWN_TIMEOUT"`
 }
 
 type ClientServer struct {
@@ -26,18 +27,12 @@ type Config struct {
 
 var instance *Config
 var once sync.Once
+var configErr error
 
-func GetConfig() *Config {
+func GetConfig() (*Config, error) {
 	once.Do(func(){
-		logger := logging.NewLogger(false, "console")
-		logger.Info("read application configuration")
 		instance = &Config{}
-		err := cleanenv.ReadConfig("../configs/main.yml", instance)
-		if err != nil {
-			help, _ := cleanenv.GetDescription(instance, nil)
-			logger.Info(help)
-			logger.Fatal(err)
-		}
+		configErr = cleanenv.ReadConfig("../../configs/main.yml", instance)
 	})
-	return instance
+	return instance, configErr
 }

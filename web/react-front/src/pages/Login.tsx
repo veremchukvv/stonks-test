@@ -3,11 +3,11 @@ import googleLogo from "../assets/google_logo.png"
 import vkLogo from "../assets/vk_logo.png"
 
 const googleLogin = () => {
-    window.open("https://o-auth-video-backend.herokuapp.com/auth/google", "_self");
+    window.open("http://localhost:8000/users/oauth/google", "_self");
 }
 
 const vkLogin = () => {
-    window.open("https://o-auth-video-backend.herokuapp.com/auth/vk", "_self");
+    window.open("http://localhost:8000/users/oauth/vk", "_self");
 }
 
 const Login = () => {

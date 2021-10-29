@@ -6,3 +6,5 @@ server:
 
 client_server:
   client_port: "8001"
+
+oauth:

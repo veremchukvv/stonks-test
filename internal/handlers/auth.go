@@ -38,21 +38,20 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 		http.Redirect(c.Response(), c.Request(), "/", http.StatusTemporaryRedirect)
 		return nil
 	}
-
 	fmt.Fprintf(c.Response(), "Content: %s\n", content)
 	return nil
 }
 
 func (h *Handler) callbackVK(c echo.Context) error {
 	content, err := oauth.GetUserInfo(context.Background(), oauth.GetRandomState(), c.Request().FormValue("state"), c.Request().FormValue("code"), oauth.GetOauthConfig() )
+	log.Print(string(content))
 	if err != nil {
 		fmt.Println(err.Error())
 		http.Redirect(c.Response(), c.Request(), "/", http.StatusTemporaryRedirect)
 		return nil
 	}
-
-	fmt.Fprintf(c.Response(), "Content: %s\n", content)
-	return nil
+	//fmt.Fprintf(c.Response(), "Content: %s\n", content)
+	return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/")
 }
 
 func (h *Handler) signin(c echo.Context) error {

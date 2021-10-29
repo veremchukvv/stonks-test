@@ -3,21 +3,22 @@ package oauth
 import (
 	"context"
 	"fmt"
+	"github.com/veremchukvv/stonks-test/internal/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/vk"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
 //var VKconfig *oauth2.Config
 
 func GetOauthConfig() *oauth2.Config {
+	cfg, _ := config.GetConfig()
 	return &oauth2.Config{
-		ClientID:     os.Getenv("VK_CLIENT_ID"),
-		ClientSecret: os.Getenv("VK_CLIENT_SECRET"),
-		RedirectURL:  os.Getenv("VK_REDIRECT_URL"),
+		ClientID:     cfg.OAuth.VkClientID,
+		ClientSecret: cfg.OAuth.VkClientID,
+		RedirectURL:  cfg.OAuth.VkClientSecret,
 		Scopes:       []string{""},
 		Endpoint:     vk.Endpoint,
 }

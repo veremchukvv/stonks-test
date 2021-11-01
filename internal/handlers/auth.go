@@ -7,6 +7,7 @@ import (
 	"github.com/veremchukvv/stonks-test/internal/oauth"
 	"log"
 	"net/http"
+	"time"
 )
 
 func (h *Handler) signup(c echo.Context) error {
@@ -51,6 +52,8 @@ func (h *Handler) callbackVK(c echo.Context) error {
 		return nil
 	}
 	//fmt.Fprintf(c.Response(), "Content: %s\n", content)
+	c.SetCookie(&http.Cookie{Name: "lol", Value: "lollol", Expires: time.Now().Add(10 * time.Minute)})
+
 	return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/")
 }
 

@@ -1,0 +1,70 @@
+.form-signin {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+}
+.form-signin .checkbox {
+  font-weight: 400;
+}
+.form-signin .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.oauthComponentContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 300px;
+  height: 50px;
+  background: #4366f4;
+  position: relative;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  margin: 10px;
+}
+
+.oauthComponentContainer img {
+  width: 12.5%;
+  height: 100%;
+  object-fit: contain;
+  left: 10px;
+  border-radius: 3px;
+  position: absolute;
+}
+
+.oauthWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 600px;
+  flex-direction: column;
+  min-width: 40vw;
+}
+
+.loginPage {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+

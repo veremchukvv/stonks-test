@@ -16,8 +16,10 @@ func (h *Handler) InitRoutes() *echo.Echo {
 	auth := e.Group("/users")
 	{
 		auth.POST("/signup", h.signup)
-		auth.POST("/oauth", h.oauth)
-		auth.POST("/callback", h.callback)
+		auth.GET("/oauth/google", h.oauthGoogle)
+		auth.GET("/oauth/vk", h.oauthVK)
+		auth.GET("/callback/google", h.callbackGoogle)
+		auth.GET("/callback/vk", h.callbackVK)
 		auth.POST("/signin", h.signin)
 		auth.POST("/signout", h.signout)
 	}

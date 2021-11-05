@@ -6,15 +6,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/oauth"
+	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"net/http"
 	"time"
-	"github.com/veremchukvv/stonks-test/pkg/logging"
 )
 
 func (h *Handler) signup(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 	var user models.User
 	err := c.Bind(&user)
+	log.Error(err)
 	if err != nil {
 		c.Response().WriteHeader(http.StatusInternalServerError)
 		c.Response().Write([]byte(`{"error": "Unmarshalling data error"}`))
@@ -24,9 +25,28 @@ func (h *Handler) signup(c echo.Context) error {
 	if err != nil {
 		c.Response().WriteHeader(http.StatusInternalServerError)
 		c.Response().Write([]byte(`{"error": "Creating User error"}`))
+		return nil
 	}
-	log.Infof("Created user %s", createdUser.Id)
+	log.Infof("Created user %d", createdUser.Id)
 	return c.JSON(http.StatusCreated, createdUser)
+}
+
+func (h *Handler) signin(c echo.Context) error {
+	var user models.User
+	err := c.Bind(&user)
+	if err != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		c.Response().Write([]byte(`{"error": "Unmarshalling data error"}`))
+		return nil
+	}
+	token, err := h.services.UserService.GenerateToken(h.ctx, user.Email, user.Password)
+	if err != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		c.Response().Write([]byte(`{"error": "Authentication failure"}`))
+		return nil
+	}
+	c.SetCookie(&http.Cookie{Name: "jwt", Value: token})
+	return c.JSON(http.StatusOK, user)
 }
 
 func (h *Handler) oauthGoogle(c echo.Context) error {
@@ -67,10 +87,6 @@ func (h *Handler) callbackVK(c echo.Context) error {
 	c.SetCookie(&http.Cookie{Name: "lol", Value: "lollol", Expires: time.Now().Add(10 * time.Minute)})
 
 	return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/")
-}
-
-func (h *Handler) signin(c echo.Context) error {
-	return c.String(http.StatusOK, "signin OK")
 }
 
 func (h *Handler) signout(c echo.Context) error {

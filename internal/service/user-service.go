@@ -2,20 +2,34 @@ package service
 
 import (
 	"context"
+	"github.com/golang-jwt/jwt"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/repository"
 	"github.com/veremchukvv/stonks-test/pkg/hash"
+	"os"
+	"time"
 )
 
-type UserSignupReq struct {
-	Name     string
-	Email    string
-	Password string
-}
+//type UserSignupReq struct {
+//	Name     string
+//	Email    string
+//	Password string
+//}
+//
+//type UserSigninReq struct {
+//	Email    string
+//	Password string
+//}
 
-type UserSigninReq struct {
-	Email    string
-	Password string
+const (
+	tokenTTL = 12 * time.Hour
+)
+
+var signKey = os.Getenv("SIGN_KEY")
+
+type tokenClaims struct {
+	jwt.StandardClaims
+	UserId int
 }
 
 type UserServiceImp struct {
@@ -43,8 +57,24 @@ func (us *UserServiceImp) CreateUser(ctx context.Context, user *models.User) (*m
 	return us.repo.CreateUser(ctx, user)
 }
 
-func (us *UserServiceImp) GenerateToken(userid string, password string) (string, error) {
-	return "", nil
+func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, password string) (string, error) {
+	u, err := us.repo.GetUserByEmail(ctx, email)
+	hashedPassword := u.Password
+	chk, err := us.hasher.CheckPWD(password, hashedPassword)
+	if err != nil {
+		return "", err
+	}
+	if chk == false {
+		return "", err
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt: time.Now().Unix(),
+		},
+		u.Id,
+	})
+	return token.SignedString([]byte(signKey))
 }
 
 func (us *UserServiceImp) ParseToken(token string) (int, error) {

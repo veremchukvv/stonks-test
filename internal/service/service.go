@@ -10,7 +10,7 @@ import (
 type UserService interface {
 	GetUser(ctx context.Context, ID int) (*models.User, error)
 	CreateUser(ctx context.Context, user *models.User) (*models.User, error)
-	GenerateToken(userid string, password string) (string, error)
+	GenerateToken(ctx context.Context, email string, password string) (string, error)
 	ParseToken(token string) (int, error)
 }
 

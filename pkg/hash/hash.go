@@ -8,6 +8,7 @@ import (
 
 type PasswordHasher interface {
 	Hash(password string) (string, error)
+	CheckPWD(password string, hash string) (bool, error)
 }
 
 type BCHasher struct {
@@ -29,4 +30,14 @@ func (bch *BCHasher) Hash(password string) (string, error) {
 		return "", err
 	}
 	return string(hash), nil
+}
+
+func (bch *BCHasher) CheckPWD(password string, hash string) (bool, error) {
+	log := logging.FromContext(bch.ctx)
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		log.Infof("Password incorrect %v", err)
+		return false, err
+	}
+	return true, nil
 }

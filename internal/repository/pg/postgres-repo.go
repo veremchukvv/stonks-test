@@ -1,4 +1,4 @@
-package repo
+package pg
 
 import (
 	"context"
@@ -6,10 +6,9 @@ import (
 )
 
 type PG struct {
-	db *pgxpool.Pool
 }
 
-func NewPG(ctx context.Context, url string) (*PG, error) {
+func NewPG(ctx context.Context, url string) (*pgxpool.Pool, error) {
 	cfg, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		return nil, err
@@ -18,10 +17,10 @@ func NewPG(ctx context.Context, url string) (*PG, error) {
 	if err != nil {
 		return nil, err
 	}
-return &PG{pool}, nil
+	return pool, nil
 }
 
-func (pg *PG) Health(ctx context.Context) error {
+func HealthPG(ctx context.Context, pool *pgxpool.Pool) error {
 	var greeting string
-	return pg.db.QueryRow(ctx, "Select version();").Scan(&greeting)
+	return pool.QueryRow(ctx, "Select version();").Scan(&greeting)
 }

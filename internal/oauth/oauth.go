@@ -21,7 +21,7 @@ func GetOauthConfig() *oauth2.Config {
 		RedirectURL:  cfg.OAuth.VkRedirectURL,
 		Scopes:       []string{""},
 		Endpoint:     vk.Endpoint,
-}
+	}
 }
 
 func GetRandomState() string {
@@ -30,18 +30,18 @@ func GetRandomState() string {
 }
 
 func GetUserInfo(ctx context.Context, state string, oauthState string, code string, conf *oauth2.Config) ([]byte, error) {
-if state != oauthState {
-	return nil, fmt.Errorf("invalid oauth state")
-}
+	if state != oauthState {
+		return nil, fmt.Errorf("invalid oauth state")
+	}
 
-token, err :=  conf.Exchange(ctx, code)
-if err != nil {
-	return nil, fmt.Errorf("code exchange failed: %s", err.Error())
-}
+	token, err := conf.Exchange(ctx, code)
+	if err != nil {
+		return nil, fmt.Errorf("code exchange failed: %s", err.Error())
+	}
 
-newurl := "https://api.vk.com/method/getProfiles?v=5.131&access_token=" + token.AccessToken
-log.Print(newurl)
-response, err := http.Get(newurl)
+	newurl := "https://api.vk.com/method/getProfiles?v=5.131&access_token=" + token.AccessToken
+	log.Print(newurl)
+	response, err := http.Get(newurl)
 	if err != nil {
 		return nil, fmt.Errorf("failed getting user info: %s", err.Error())
 	}
@@ -53,7 +53,3 @@ response, err := http.Get(newurl)
 
 	return contents, nil
 }
-
-
-
-

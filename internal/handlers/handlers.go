@@ -1,13 +1,23 @@
 package handlers
 
 import (
+	"context"
 	"github.com/labstack/echo/v4"
+	"github.com/veremchukvv/stonks-test/internal/service"
 )
-
 
 //const apiVersion = "v1"
 
 type Handler struct {
+	ctx      context.Context
+	services *service.Services
+}
+
+func NewHandlers(ctx context.Context, services *service.Services) *Handler {
+	return &Handler{
+		ctx,
+		services,
+	}
 }
 
 func (h *Handler) InitRoutes() *echo.Echo {

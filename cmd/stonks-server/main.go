@@ -5,7 +5,10 @@ import (
 	"github.com/veremchukvv/stonks-test/internal/api-server"
 	"github.com/veremchukvv/stonks-test/internal/config"
 	"github.com/veremchukvv/stonks-test/internal/handlers"
-	"github.com/veremchukvv/stonks-test/internal/repo"
+	"github.com/veremchukvv/stonks-test/internal/repository"
+	"github.com/veremchukvv/stonks-test/internal/repository/pg"
+	"github.com/veremchukvv/stonks-test/internal/service"
+	"github.com/veremchukvv/stonks-test/pkg/hash"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"os"
 	"os/signal"
@@ -26,24 +29,27 @@ func main() {
 	}
 	log.Info("Configuration successfully loaded ... (2/4)")
 
-	handler := new(handlers.Handler)
-	srv := api_server.NewServer(cfg.Server.Port, handler.InitRoutes())
-
-	go srv.Run(ctx)
-
-	log.Infof("Server starting on port: %s ... (3/4)", cfg.Server.Port)
-
-	db, err := repo.NewPG(ctx, cfg.DB.URL)
+	db, err := pg.NewPG(ctx, cfg.DB.URL)
 	if err != nil {
 		log.Fatalf("Can't connect to database %v", err)
 	}
 
-	err = db.Health(ctx)
+	err = pg.HealthPG(ctx, db)
 	if err != nil {
 		log.Infof("db healtchek error: %v", err)
 	}
 
-	log.Info("Database connection OK ... (4/4)")
+	log.Info("Database connection OK ... (3/4)")
+
+	repo := repository.NewStore(db, ctx)
+	hasher := hash.NewBCPasswordHasher(ctx)
+	services := service.NewService(repo, hasher)
+	handler := handlers.NewHandlers(ctx, services)
+	srv := api_server.NewServer(cfg.Server.Port, handler.InitRoutes())
+
+	go srv.Run(ctx)
+
+	log.Infof("Server starting on port: %s ... (4/4)", cfg.Server.Port)
 
 	log.Info("App started!")
 

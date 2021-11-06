@@ -10,7 +10,7 @@ require (
 	github.com/jackc/puddle v1.1.4 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/labstack/echo/v4 v4.6.1
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkg/errors v0.9.1
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1

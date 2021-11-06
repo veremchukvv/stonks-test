@@ -2,10 +2,14 @@ package pg
 
 import (
 	"context"
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/pkg/errors"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 )
+
+var ErrVkUserNotFound = errors.New("VK user not found")
 
 type PostgresUserRepo struct {
 	db  *pgxpool.Pool
@@ -20,30 +24,63 @@ func NewPostgresUserRepo(pgpool *pgxpool.Pool, ctx context.Context) *PostgresUse
 
 func (ur *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	log := logging.FromContext(ctx)
-	const query string = `SELECT id, name, username, email, password_hash FROM users WHERE email=$1`
+	const query string = `SELECT id, name, lastname, email, password_hash FROM users WHERE email=$1`
 	var u models.User
 	err := ur.db.QueryRow(ctx, query, email).Scan(&u.Id, &u.Name,
-		&u.Username, &u.Email, &u.Password)
+		&u.Lastname, &u.Email, &u.Password)
 	if err != nil {
-		log.Errorf("User not found %v", err)
+		log.Infof("Can't get user: %v", err)
 		return nil, err
 	}
 	return &u, nil
 }
 
+func (ur *PostgresUserRepo) GetVKUserByID(ctx context.Context, vkid int) (*models.VKUser, error) {
+	log := logging.FromContext(ctx)
+	const query string = `SELECT vkid, name, lastname, email FROM vkusers WHERE vkid=$1`
+	var vu models.VKUser
+	err := ur.db.QueryRow(ctx, query, vkid).Scan(&vu.VKId, &vu.Name,
+		&vu.Lastname, &vu.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			log.Infof("Can't get VK User: %v", err)
+			return nil, ErrVkUserNotFound
+		}
+		return nil, err
+	}
+	return &vu, nil
+}
+
 func (ur *PostgresUserRepo) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	log := logging.FromContext(ctx)
 	const query string = `INSERT INTO users 
-		(name, username, email, password_hash) 
+		(name, lastname, email, password_hash) 
 		VALUES($1, $2, $3, $4)
 		returning id;`
 
 	var uid int
-	err := ur.db.QueryRow(ctx, query, user.Name, user.Username, user.Email, user.Password).Scan(&uid)
+	err := ur.db.QueryRow(ctx, query, user.Name, user.Lastname, user.Email, user.Password).Scan(&uid)
 	if err != nil {
-		log.Errorf("Error on write user to database %v", err)
+		log.Errorf("Error on write user to database: %v", err)
 		return nil, err
 	}
 	user.Id = uid
 	return user, nil
+}
+
+func (ur *PostgresUserRepo) CreateVKUser(ctx context.Context, vkuser *models.VKUser) (*models.VKUser, error) {
+	log := logging.FromContext(ctx)
+	const query string = `INSERT INTO vkusers 
+		(vkid, name, lastname, email) 
+		VALUES($1, $2, $3, $4)
+		returning vkid;`
+
+	var vkuid int
+	err := ur.db.QueryRow(ctx, query, vkuser.VKId, vkuser.Name, vkuser.Lastname, vkuser.Email).Scan(&vkuid)
+	if err != nil {
+		log.Errorf("Error on write user to database: %v", err)
+		return nil, err
+	}
+	vkuser.VKId = vkuid
+	return vkuser, nil
 }

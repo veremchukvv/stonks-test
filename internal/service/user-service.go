@@ -48,6 +48,10 @@ func (us *UserServiceImp) GetUser(ctx context.Context, ID int) (*models.User, er
 	return nil, nil
 }
 
+func (us *UserServiceImp) GetVKUserByID(ctx context.Context, vkid int) (*models.VKUser, error) {
+	return us.repo.GetVKUserByID(ctx, vkid)
+}
+
 func (us *UserServiceImp) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	var err error
 	user.Password, err = us.hasher.Hash(user.Password)
@@ -55,6 +59,10 @@ func (us *UserServiceImp) CreateUser(ctx context.Context, user *models.User) (*m
 		return nil, err
 	}
 	return us.repo.CreateUser(ctx, user)
+}
+
+func (us *UserServiceImp) CreateVKUser(ctx context.Context, vkuser *models.VKUser) (*models.VKUser, error) {
+	return us.repo.CreateVKUser(ctx, vkuser)
 }
 
 func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, password string) (string, error) {
@@ -70,9 +78,21 @@ func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, passw
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-			IssuedAt: time.Now().Unix(),
+			IssuedAt:  time.Now().Unix(),
 		},
 		u.Id,
+	})
+	return token.SignedString([]byte(signKey))
+}
+
+func (us *UserServiceImp) GenerateVKToken(ctx context.Context, vkid int) (string, error) {
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		vkid,
 	})
 	return token.SignedString([]byte(signKey))
 }

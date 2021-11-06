@@ -1,0 +1,17 @@
+package repository
+
+import (
+	"context"
+	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/veremchukvv/stonks-test/internal/repository/pg"
+)
+
+type Store struct {
+	UserRepository
+}
+
+func NewStore(db *pgxpool.Pool, ctx context.Context) *Store {
+	return &Store{
+		pg.NewPostgresUserRepo(db, ctx),
+	}
+}

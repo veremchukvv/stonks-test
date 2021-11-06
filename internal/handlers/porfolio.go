@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) createPortfolio (c echo.Context) error {
+func (h *Handler) createPortfolio(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "not implemented yet")
 }
 

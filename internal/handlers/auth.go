@@ -28,7 +28,7 @@ func (h *Handler) signup(c echo.Context) error {
 		c.Response().Write([]byte(`{"error": "Creating User error"}`))
 		return nil
 	}
-	log.Infof("Created user %d", createdUser.Id)
+	log.Infof("Created user with ID: %d", createdUser.Id)
 	return c.JSON(http.StatusCreated, createdUser)
 }
 

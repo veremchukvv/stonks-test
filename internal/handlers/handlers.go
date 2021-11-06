@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/veremchukvv/stonks-test/internal/service"
 )
 
@@ -22,6 +23,9 @@ func NewHandlers(ctx context.Context, services *service.Services) *Handler {
 
 func (h *Handler) InitRoutes() *echo.Echo {
 	e := echo.New()
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000"},
+	}))
 
 	auth := e.Group("/users")
 	{

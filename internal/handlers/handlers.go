@@ -24,12 +24,14 @@ func NewHandlers(ctx context.Context, services *service.Services) *Handler {
 func (h *Handler) InitRoutes() *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000"},
+		AllowOrigins: []string{"http://127.0.0.1:3000", "http://localhost:3000"},
+		AllowCredentials: true,
 	}))
 
 	auth := e.Group("/users")
 	{
 		auth.POST("/signup", h.signup)
+		auth.GET("/user", h.user)
 		auth.GET("/oauth/google", h.oauthGoogle)
 		auth.GET("/oauth/vk", h.oauthVK)
 		auth.GET("/callback/google", h.callbackGoogle)

@@ -44,7 +44,7 @@ func NewUserServiceImp(repo repository.UserRepository, hasher *hash.BCHasher) *U
 	}
 }
 
-func (us *UserServiceImp) GetUser(ctx context.Context, ID int) (*models.User, error) {
+func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.User, error) {
 	return nil, nil
 }
 

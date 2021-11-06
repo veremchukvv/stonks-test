@@ -8,6 +8,7 @@ const Home = () => {
             async () => {
                 const response = await fetch('http://localhost:8000/users/user', {
                     headers: {'Content-Type':'application/json'},
+                    credentials: 'include',
                     })
                 const content = await response.json()
 

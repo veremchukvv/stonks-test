@@ -74,7 +74,14 @@ func (h *Handler) user(c echo.Context) error {
 	//	c.Response().Write([]byte(`{"error": "not logined"}`))
 	//	return nil
 	//}
-	h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
+	u, vu, err  := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
+
+	if u != nil {
+		c.JSON(200, u.Name)
+	}
+	if vu != nil {
+		c.JSON(200, vu.Name)
+	}
 	return nil
 }
 

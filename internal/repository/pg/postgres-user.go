@@ -51,6 +51,19 @@ func (ur *PostgresUserRepo) GetVKUserByID(ctx context.Context, vkid int) (*model
 	return &vu, nil
 }
 
+func (ur *PostgresUserRepo) GetUserByID(ctx context.Context, id int) (*models.User, error) {
+	log := logging.FromContext(ctx)
+	const query string = `SELECT id, name, lastname, email, password_hash FROM users WHERE id=$1`
+	var u models.User
+	err := ur.db.QueryRow(ctx, query, id).Scan(&u.Id, &u.Name,
+		&u.Lastname, &u.Email)
+	if err != nil {
+			log.Infof("Can't get user: %v", err)
+			return nil, err
+		}
+	return &u, nil
+}
+
 func (ur *PostgresUserRepo) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	log := logging.FromContext(ctx)
 	const query string = `INSERT INTO users 

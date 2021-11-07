@@ -12,7 +12,7 @@ const Home = () => {
                     })
                 const content = await response.json()
 
-                setName(content.name)
+                setName(content)
 
                 }
         )()

@@ -9,7 +9,7 @@ import (
 
 type UserService interface {
 	CreateUser(ctx context.Context, user *models.User) (*models.User, error)
-	GetUser(ctx context.Context, token string) (*models.User, error)
+	GetUser(ctx context.Context, token string) (*models.User, *models.VKUser, error)
 	CreateVKUser(ctx context.Context, user *models.VKUser) (*models.VKUser, error)
 	GetVKUserByID(ctx context.Context, vkid int) (*models.VKUser, error)
 	GenerateToken(ctx context.Context, email string, password string) (string, error)

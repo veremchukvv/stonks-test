@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"github.com/golang-jwt/jwt"
+	"github.com/pkg/errors"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/repository"
 	"github.com/veremchukvv/stonks-test/pkg/hash"
+	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"os"
 	"time"
 )
@@ -25,11 +27,12 @@ const (
 	tokenTTL = 12 * time.Hour
 )
 
-var signKey = os.Getenv("SIGN_KEY")
+var SignKey = os.Getenv("SIGN_KEY")
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int
+	UserId int `json:"user_id"`
+	VKUserId int `json:"vkuser_id"`
 }
 
 type UserServiceImp struct {
@@ -44,8 +47,39 @@ func NewUserServiceImp(repo repository.UserRepository, hasher *hash.BCHasher) *U
 	}
 }
 
-func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.User, error) {
-	return nil, nil
+func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.User, *models.VKUser, error) {
+	log := logging.FromContext(ctx)
+
+	GetUserErr := errors.New("Can't get user")
+
+	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+		})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	claims := parsedToken.Claims.(*tokenClaims)
+
+	if claims.UserId != 0 {
+		u, err := us.repo.GetUserByID(ctx, claims.UserId)
+		if err != nil {
+			log.Errorf("can't get user from db: %v", err)
+			return nil, nil, err
+		}
+		return u, nil, nil
+	}
+
+	if claims.VKUserId != 0 {
+		vku, err := us.repo.GetVKUserByID(ctx, claims.VKUserId)
+		if err != nil {
+			log.Errorf("can't get vkuser from db: %v", err)
+			return nil, nil, err
+		}
+		return nil, vku, nil
+	}
+
+	return nil, nil, GetUserErr
 }
 
 func (us *UserServiceImp) GetVKUserByID(ctx context.Context, vkid int) (*models.VKUser, error) {
@@ -81,8 +115,9 @@ func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, passw
 			IssuedAt:  time.Now().Unix(),
 		},
 		u.Id,
+		0,
 	})
-	return token.SignedString([]byte(signKey))
+	return token.SignedString([]byte(SignKey))
 }
 
 func (us *UserServiceImp) GenerateVKToken(ctx context.Context, vkid int) (string, error) {
@@ -91,10 +126,12 @@ func (us *UserServiceImp) GenerateVKToken(ctx context.Context, vkid int) (string
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
+			Issuer: "stonks",
 		},
+		0,
 		vkid,
 	})
-	return token.SignedString([]byte(signKey))
+	return token.SignedString([]byte(SignKey))
 }
 
 func (us *UserServiceImp) ParseToken(token string) (int, error) {

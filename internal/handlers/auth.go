@@ -11,6 +11,7 @@ import (
 	"github.com/veremchukvv/stonks-test/internal/repository/pg"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"net/http"
+	"time"
 )
 
 func (h *Handler) signup(c echo.Context) error {
@@ -175,5 +176,6 @@ func (h *Handler) callbackVK(c echo.Context) error {
 }
 
 func (h *Handler) signout(c echo.Context) error {
-	return c.String(http.StatusOK, "signout OK")
+	c.SetCookie(&http.Cookie{Name: "jwt", Value: "", HttpOnly: true, Path: "/", Expires: time.Now().Add(-time.Hour)})
+	return c.Redirect(http.StatusOK, "http://localhost:3000/")
 }

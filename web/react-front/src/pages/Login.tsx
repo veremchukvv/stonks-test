@@ -11,7 +11,7 @@ const vkLogin = () => {
     window.open("http://localhost:8000/users/oauth/vk", "_self");
 }
 
-const Login = () => {
+const Login = (props: {setName: (name: string) => void}) => {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -20,7 +20,7 @@ const Login = () => {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault()
 
-        await fetch('http://localhost:8000/users/signin', {
+        const response = await fetch('http://localhost:8000/users/signin', {
             method: 'POST',
             headers: {'Content-Type':'application/json'},
             credentials: 'include',
@@ -29,7 +29,11 @@ const Login = () => {
                 password
             })
         })
+
+        const content = await response.json()
         setRedirect(true)
+        props.setName(content.name)
+
     }
 
     if (redirect)

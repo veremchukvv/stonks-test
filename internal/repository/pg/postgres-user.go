@@ -56,7 +56,7 @@ func (ur *PostgresUserRepo) GetUserByID(ctx context.Context, id int) (*models.Us
 	const query string = `SELECT id, name, lastname, email, password_hash FROM users WHERE id=$1`
 	var u models.User
 	err := ur.db.QueryRow(ctx, query, id).Scan(&u.Id, &u.Name,
-		&u.Lastname, &u.Email)
+		&u.Lastname, &u.Email, &u.Password)
 	if err != nil {
 			log.Infof("Can't get user: %v", err)
 			return nil, err

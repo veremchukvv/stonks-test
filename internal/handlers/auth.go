@@ -77,10 +77,10 @@ func (h *Handler) user(c echo.Context) error {
 	u, vu, err  := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
 
 	if u != nil {
-		c.JSON(200, u.Name)
+		c.JSON(200, u)
 	}
 	if vu != nil {
-		c.JSON(200, vu.Name)
+		c.JSON(200, vu)
 	}
 	return nil
 }

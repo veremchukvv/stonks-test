@@ -12,7 +12,7 @@ const Home = () => {
                     })
                 const content = await response.json()
 
-                setName(content)
+                setName(content.name)
 
                 }
         )()
@@ -20,7 +20,7 @@ const Home = () => {
 
     return (
         <div>
-            Welcome {name} !
+            {name ? 'Welcome ' + name : 'Please sign in' }
         </div>
     );
 };

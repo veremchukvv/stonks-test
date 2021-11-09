@@ -1,16 +1,16 @@
 swagger: "2.0"
 info:
-  description: "This is a fun Stonks service. You can find out more about us at [https://github.com/veremchukvv/stonks-test](https://github.com/veremchukvv/stonks-test)."
+  description: "This is a Stonks service. You can find out more about us at [https://github.com/veremchukvv/stonks-test](https://github.com/veremchukvv/stonks-test)."
   version: "1.0.0"
   title: "Stonks"
   license:
     name: "MIT"
     url: "https://opensource.org/licenses/mit-license.php"
 schemes:
-  - "https"
+  - "http"
 basePath: "/"
 tags:
-  - name: "auth"
+  - name: "users"
     description: "Operations about authorization"
   - name: "profile"
     description: "Operations about user"
@@ -19,11 +19,38 @@ tags:
   - name: "market"
     description: "Operations about stocks"
 paths:
-  /login:
+  /signup:
     post:
       tags:
-        - "auth"
-      summary: "Log user into the system (only OAuth in MVP)"
+        - "users"
+      summary: "Create new user into the system"
+      description: ""
+      operationId: "CreateUser"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "body"
+          in: body
+          required: true
+          description: ""
+          schema:
+            $ref: "#/definitions/CreateUserRequest"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/CreateUserResponse"
+        "400":
+          description: ""
+        "401":
+          description: ""
+  /signin:
+    post:
+      tags:
+        - "users"
+      summary: "Log user into the system"
       description: ""
       operationId: "loginUser"
       consumes:
@@ -46,10 +73,10 @@ paths:
           description: "OAuth general error"
         "401":
           description: "Unauthorized"
-  /logout:
+  /signout:
     post:
       tags:
-        - "auth"
+        - "users"
       summary: "Log out current user"
       description: ""
       operationId: "logoutUser"
@@ -59,11 +86,11 @@ paths:
       responses:
         "200":
           description: "successful operation"
-  /profile:
+  /api/v1/profile:
     post:
       tags:
         - "profile"
-      summary: "Create new profile (only OAuth in MVP)"
+      summary: "Create new profile"
       description: ""
       operationId: "createProfile"
       consumes:
@@ -83,7 +110,7 @@ paths:
     put:
       tags:
         - "profile"
-      summary: "Update profile (only OAuth in MVP)"
+      summary: "Update profile"
       description: ""
       operationId: "updateProfile"
       consumes:
@@ -108,7 +135,7 @@ paths:
       responses:
         "200":
           description: "successful operation"
-  /portfolios:
+  /api/v1/portfolios:
     post:
       tags:
         - "portfolios"
@@ -160,7 +187,7 @@ paths:
           description: "Portfolio not found"
         "405":
           description: "Validation exception"
-  /portfolios/{portfolioId}:
+  /api/v1/portfolios/{portfolioId}:
     get:
       tags:
         - "portfolios"
@@ -205,7 +232,7 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Portfolio not found"
-  /market/stocks:
+  /api/v1/market/stocks:
     get:
       tags:
         - "market"
@@ -233,7 +260,7 @@ paths:
           description: "Invalid input"
         "404":
           description: "Stocks not found"
-  /market/deals:
+  /api/v1/market/deals:
     post:
       tags:
         - "market"

@@ -11,6 +11,7 @@ import (
 	"github.com/veremchukvv/stonks-test/internal/repository/pg"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"net/http"
+	"time"
 )
 
 func (h *Handler) signup(c echo.Context) error {
@@ -28,7 +29,7 @@ func (h *Handler) signup(c echo.Context) error {
 		c.Response().Write([]byte(`{"error": "Creating User error"}`))
 		return nil
 	}
-	log.Infof("Created user %d", createdUser.Id)
+	log.Infof("Created user with ID: %d", createdUser.Id)
 	return c.JSON(http.StatusCreated, createdUser)
 }
 
@@ -46,8 +47,43 @@ func (h *Handler) signin(c echo.Context) error {
 		c.Response().Write([]byte(`{"error": "Authentication failure"}`))
 		return nil
 	}
-	c.SetCookie(&http.Cookie{Name: "jwt", Value: token})
+	c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h *Handler) user(c echo.Context) error {
+	//log := logging.FromContext(h.ctx)
+	cookie, err := c.Request().Cookie("jwt")
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			c.Response().WriteHeader(http.StatusUnauthorized)
+			c.Response().Write([]byte(`{"error": "not logined"}`))
+			return nil
+		}
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
+		return nil
+	}
+	//if cookie == nil {
+	//	c.Response().WriteHeader(http.StatusUnauthorized)
+	//	c.Response().Write([]byte(`{"error": "not logined"}`))
+	//	return nil
+	//}
+	//log.Info(err)
+	//if err != nil {
+	//	c.Response().WriteHeader(http.StatusUnauthorized)
+	//	c.Response().Write([]byte(`{"error": "not logined"}`))
+	//	return nil
+	//}
+	u, vu, err  := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
+
+	if u != nil {
+		c.JSON(200, u)
+	}
+	if vu != nil {
+		c.JSON(200, vu)
+	}
+	return nil
 }
 
 func (h *Handler) oauthGoogle(c echo.Context) error {
@@ -132,7 +168,7 @@ func (h *Handler) callbackVK(c echo.Context) error {
 
 	token, err := h.services.UserService.GenerateVKToken(h.ctx, input.Response[0].Id)
 
-	c.SetCookie(&http.Cookie{Name: "jwt", Value: token})
+	c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
 
 	log.Infof("Successfull login for VK user: %d", input.Response[0].Id)
 
@@ -140,5 +176,6 @@ func (h *Handler) callbackVK(c echo.Context) error {
 }
 
 func (h *Handler) signout(c echo.Context) error {
-	return c.String(http.StatusOK, "signout OK")
+	c.SetCookie(&http.Cookie{Name: "jwt", Value: "", HttpOnly: true, Path: "/", Expires: time.Now().Add(-time.Hour)})
+	return c.Redirect(http.StatusOK, "http://localhost:3000/")
 }

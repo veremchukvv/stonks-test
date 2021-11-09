@@ -13,9 +13,6 @@ const Navigation = (props: {name: string, setName: (name: string) => void }) => 
 
     let menu
 
-    console.log(props.name)
-    console.log(props.setName)
-
     if (props.name === undefined){
         menu = (
             <ul className="navbar-nav me-auto mb-2 mb-md-0">

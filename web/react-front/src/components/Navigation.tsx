@@ -13,7 +13,7 @@ const Navigation = (props: {name: string, setName: (name: string) => void }) => 
 
     let menu
 
-    if (props.name === undefined){
+    if (props.name === undefined || '') {
         menu = (
             <ul className="navbar-nav me-auto mb-2 mb-md-0">
                 <li className="nav-item active">
@@ -27,6 +27,9 @@ const Navigation = (props: {name: string, setName: (name: string) => void }) => 
     } else {
         menu = (
         <ul className="navbar-nav me-auto mb-2 mb-md-0">
+            <li className="nav-item active">
+                <Link to="/profile" className="nav-link">{props.name}</Link>
+            </li>
             <li className="nav-item active">
                 <Link to="/" className="nav-link" onClick={logout}>Logout</Link>
             </li>

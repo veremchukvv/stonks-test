@@ -3,6 +3,7 @@ import './App.css';
 import Home from "./pages/Home"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
+import Profile from "./pages/Profile"
 import Navigation from "./components/Navigation"
 import {BrowserRouter, Route} from "react-router-dom";
 
@@ -19,7 +20,6 @@ function App() {
                 const content = await response.json()
 
                 setName(content.name)
-
             }
         )()
     })
@@ -32,6 +32,7 @@ function App() {
             <Route path="/" exact component={() => <Home name={name}/>}/>
             <Route path="/login" component={() => <Login setName={setName}/>}/>
             <Route path="/register" component={Register}/>
+            <Route path="/profile" component={Profile}/>
       </main>
         </BrowserRouter>
     </div>

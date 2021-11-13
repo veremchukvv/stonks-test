@@ -1,12 +1,15 @@
 import React from 'react';
 
 const Home = (props: {name: string}) => {
-
-    return (
-        <div>
-            {props.name ? 'Welcome ' + props.name : 'Please sign in' }
-        </div>
-    );
+  if (!props.name) {
+      return (
+          <>
+            Please sign in
+            </>)
+  } return (
+            <>
+            Welcome {props.name}
+            </>)
 };
 
 export default Home;

@@ -17,6 +17,8 @@ import (
 
 func main() {
 
+	//TODO display error on main page when backend is unavailable
+
 	log := logging.NewLogger(false, "console")
 	ctx := logging.WithLogger(context.Background(), log)
 

@@ -1,7 +1,10 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Link} from 'react-router-dom';
+import {AuthContext} from "../context/authContext";
 
 const Navigation = (props: {name: string, setName: (name: string) => void }) => {
+    const auth = useContext(AuthContext)
+
     const logout = async () => {
         await fetch('http://localhost:8000/users/signout', {
             method: 'POST',
@@ -13,7 +16,7 @@ const Navigation = (props: {name: string, setName: (name: string) => void }) => 
 
     let menu
 
-    if (props.name === undefined || '') {
+    if (!auth.isAuthenticated) {
         menu = (
             <ul className="navbar-nav me-auto mb-2 mb-md-0">
                 <li className="nav-item active">
@@ -28,7 +31,7 @@ const Navigation = (props: {name: string, setName: (name: string) => void }) => 
         menu = (
         <ul className="navbar-nav me-auto mb-2 mb-md-0">
             <li className="nav-item active">
-                <Link to="/profile" className="nav-link">{props.name}</Link>
+                <Link to="/profile" className="nav-link">{auth.userName}</Link>
             </li>
             <li className="nav-item active">
                 <Link to="/" className="nav-link" onClick={logout}>Logout</Link>

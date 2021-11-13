@@ -1,14 +1,16 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {AuthContext} from "../context/authContext";
 
-const Home = (props: {name: string}) => {
-  if (!props.name) {
+const Home = () => {
+    const auth = useContext(AuthContext)
+  if (!auth.isAuthenticated) {
       return (
           <>
             Please sign in
             </>)
   } return (
             <>
-            Welcome {props.name}
+            Welcome {auth.userName}
             </>)
 };
 

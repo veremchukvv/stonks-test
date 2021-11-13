@@ -6,9 +6,12 @@ import Register from "./pages/Register"
 import Profile from "./pages/Profile"
 import Navigation from "./components/Navigation"
 import {BrowserRouter, Route} from "react-router-dom";
+import {AuthContext} from "./context/authContext";
 
 function App() {
     const [name, setName] = useState('')
+    const isAuthenticated = !!name
+    const userName = name
 
     useEffect(() => {
         (
@@ -22,20 +25,23 @@ function App() {
                 setName(content.name)
             }
         )()
-    })
+    }, [name]
+        )
 
   return (
+      <AuthContext.Provider value={{userName, isAuthenticated}}>
     <div className="App">
         <BrowserRouter>
             <Navigation name={name} setName={setName} />
       <main className="form-signin">
-            <Route path="/" exact component={() => <Home name={name}/>}/>
+            <Route path="/" exact component={Home}/>
             <Route path="/login" component={() => <Login setName={setName}/>}/>
             <Route path="/register" component={Register}/>
             <Route path="/profile" component={Profile}/>
       </main>
         </BrowserRouter>
     </div>
+      </AuthContext.Provider>
   );
 }
 

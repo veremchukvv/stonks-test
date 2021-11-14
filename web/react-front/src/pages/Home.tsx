@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
 import {AuthContext} from "../context/authContext";
+import PortfolioList from "../components/PortfolioList";
 
 const Home = () => {
     const auth = useContext(AuthContext)
@@ -11,6 +12,7 @@ const Home = () => {
   } return (
             <>
             Welcome {auth.userName}
+                <PortfolioList/>
             </>)
 };
 

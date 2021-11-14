@@ -52,6 +52,7 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		portfolio := profile.Group("/portfolio")
 		{
 			portfolio.POST("/", h.createPortfolio)
+			portfolio.GET("/", h.getAllPortfolios)
 			portfolio.PUT("/:id", h.modifyPortfolio)
 			portfolio.GET("/:id", h.getPortfolio)
 			portfolio.DELETE("/:id", h.deletePortfolio)

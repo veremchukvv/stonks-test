@@ -31,7 +31,7 @@ var SignKey = os.Getenv("SIGN_KEY")
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int `json:"user_id"`
+	UserId   int `json:"user_id"`
 	VKUserId int `json:"vkuser_id"`
 }
 
@@ -54,7 +54,7 @@ func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.Us
 
 	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
 		return []byte(SignKey), nil
-		})
+	})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -126,7 +126,7 @@ func (us *UserServiceImp) GenerateVKToken(ctx context.Context, vkid int) (string
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
-			Issuer: "stonks",
+			Issuer:    "stonks",
 		},
 		0,
 		vkid,

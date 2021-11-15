@@ -33,4 +33,3 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, portfolio 
 func (pr *PostgresPortfolioRepo) DeletePortfolio(ctx context.Context, portfolio_id int) error {
 	return nil
 }
-

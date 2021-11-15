@@ -367,7 +367,7 @@ definitions:
         description: "info about the stock"
       type:
         type: "string"
-        enum: [bond, stock, fond]
+        enum: [bond, stock, fund]
       cost:
         type: "number"
         format: "float"

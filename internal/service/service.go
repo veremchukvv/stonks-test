@@ -25,7 +25,7 @@ type PortfolioService interface {
 }
 
 type Services struct {
-	UserService UserService
+	UserService      UserService
 	PortfolioService PortfolioService
 }
 

@@ -3,15 +3,15 @@ package handlers
 import (
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"github.com/veremchukvv/stonks-test/pkg/logging"
 )
 
 func (h *Handler) createPortfolio(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "not implemented yet")
+
 }
 
 func (h *Handler) getAllPortfolios(c echo.Context) error {
-	log := logging.FromContext(h.ctx)
+	//log := logging.FromContext(h.ctx)
 
 	return c.String(http.StatusNotImplemented, "not implemented yet")
 }

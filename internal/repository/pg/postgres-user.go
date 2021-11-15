@@ -24,7 +24,7 @@ func NewPostgresUserRepo(pgpool *pgxpool.Pool, ctx context.Context) *PostgresUse
 
 func (ur *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
 	log := logging.FromContext(ctx)
-	const query string = `SELECT id, name, lastname, email, password_hash FROM users WHERE email=$1`
+	const query string = `SELECT user_id, user_name, lastname, email, password_hash FROM users WHERE email=$1`
 	var u models.User
 	err := ur.db.QueryRow(ctx, query, email).Scan(&u.Id, &u.Name,
 		&u.Lastname, &u.Email, &u.Password)
@@ -37,7 +37,7 @@ func (ur *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*
 
 func (ur *PostgresUserRepo) GetVKUserByID(ctx context.Context, vkid int) (*models.VKUser, error) {
 	log := logging.FromContext(ctx)
-	const query string = `SELECT vkid, name, lastname, email FROM vkusers WHERE vkid=$1`
+	const query string = `SELECT vkuser_id, vkuser_name, lastname, email FROM vkusers WHERE vkuser_id=$1`
 	var vu models.VKUser
 	err := ur.db.QueryRow(ctx, query, vkid).Scan(&vu.VKId, &vu.Name,
 		&vu.Lastname, &vu.Email)
@@ -53,23 +53,23 @@ func (ur *PostgresUserRepo) GetVKUserByID(ctx context.Context, vkid int) (*model
 
 func (ur *PostgresUserRepo) GetUserByID(ctx context.Context, id int) (*models.User, error) {
 	log := logging.FromContext(ctx)
-	const query string = `SELECT id, name, lastname, email, password_hash FROM users WHERE id=$1`
+	const query string = `SELECT user_id, user_name, lastname, email, password_hash FROM users WHERE user_id=$1`
 	var u models.User
 	err := ur.db.QueryRow(ctx, query, id).Scan(&u.Id, &u.Name,
 		&u.Lastname, &u.Email, &u.Password)
 	if err != nil {
-			log.Infof("Can't get user: %v", err)
-			return nil, err
-		}
+		log.Infof("Can't get user: %v", err)
+		return nil, err
+	}
 	return &u, nil
 }
 
 func (ur *PostgresUserRepo) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	log := logging.FromContext(ctx)
 	const query string = `INSERT INTO users 
-		(name, lastname, email, password_hash) 
+		(user_name, lastname, email, password_hash) 
 		VALUES($1, $2, $3, $4)
-		returning id;`
+		returning user_id;`
 
 	var uid int
 	err := ur.db.QueryRow(ctx, query, user.Name, user.Lastname, user.Email, user.Password).Scan(&uid)
@@ -84,9 +84,9 @@ func (ur *PostgresUserRepo) CreateUser(ctx context.Context, user *models.User) (
 func (ur *PostgresUserRepo) CreateVKUser(ctx context.Context, vkuser *models.VKUser) (*models.VKUser, error) {
 	log := logging.FromContext(ctx)
 	const query string = `INSERT INTO vkusers 
-		(vkid, name, lastname, email) 
+		(vkuser_id, vkuser_name, lastname, email) 
 		VALUES($1, $2, $3, $4)
-		returning vkid;`
+		returning vkuser_id;`
 
 	var vkuid int
 	err := ur.db.QueryRow(ctx, query, vkuser.VKId, vkuser.Name, vkuser.Lastname, vkuser.Email).Scan(&vkuid)

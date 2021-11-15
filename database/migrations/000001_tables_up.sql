@@ -61,3 +61,12 @@ CREATE TABLE if not exists stocks
     cost          MONEY               NOT NULL,
     currency      INTEGER             REFERENCES currencies(currency_id)
 );
+CREATE TABLE if not exists stocks_items
+(
+    stocks_item_id SERIAL PRIMARY KEY,
+    portfolio INTEGER REFERENCES portfolios(portfolio_id),
+    stock_item INTEGER REFERENCES stocks(stock_id),
+    amount INTEGER
+);
+
+

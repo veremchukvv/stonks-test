@@ -41,11 +41,11 @@ Create one
       <tbody>
       { portfolios.map((portfolio, index) => {
         return (
-          <tr key={portfolio._id}>
+          <tr key={portfolio.id}>
             <td>{index + 1}</td>
             <td>{portfolio.name}</td>
             <td>
-              <Link to={`/portfolio/${portfolio._id}`}>Открыть</Link>
+              <Link to={`/portfolio/${portfolio.id}`}>Открыть</Link>
             </td>
           </tr>
         )

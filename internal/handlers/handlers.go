@@ -40,16 +40,16 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		auth.POST("/signout", h.signout)
 	}
 
-	api := e.Group("/api/v1")
-	{
-		profile := api.Group("/profile")
-		{
-			profile.POST("/", h.createProfile)
-			profile.PUT("/:id", h.modifyProfile)
-			profile.GET("/:id", h.getProfile)
-			profile.DELETE("/:id", h.deleteProfile)
-		}
-		portfolio := profile.Group("/portfolio")
+	//api := e.Group("/api/v1")
+	//{
+	//	profile := api.Group("/profile")
+	//	{
+	//		profile.POST("/", h.createProfile)
+	//		profile.PUT("/:id", h.modifyProfile)
+	//		profile.GET("/:id", h.getProfile)
+	//		profile.DELETE("/:id", h.deleteProfile)
+	//	}
+		portfolio := e.Group("/api/v1/portfolio")
 		{
 			portfolio.POST("/", h.createPortfolio)
 			portfolio.GET("/", h.getAllPortfolios)
@@ -63,7 +63,5 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		//	market.GET("/:id")
 		//	market.POST("/:id/deal")
 		//}
-	}
-
 	return e
-}
+	}

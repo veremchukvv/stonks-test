@@ -34,6 +34,9 @@ Create one
       <tr>
         <th>Id</th>
         <th>Name</th>
+        <th>Total RUB assets value</th>
+        <th>Total USD assets value</th>
+        <th>Total EUR assets value</th>
         <th>Open</th>
       </tr>
       </thead>
@@ -44,6 +47,9 @@ Create one
           <tr key={portfolio.id}>
             <td>{index + 1}</td>
             <td>{portfolio.name}</td>
+            <td>{portfolio.assets_rub}</td>
+            <td>{portfolio.assets_usd}</td>
+            <td>{portfolio.assets_eur}</td>
             <td>
               <Link to={`/portfolio/${portfolio.id}`}>Открыть</Link>
             </td>

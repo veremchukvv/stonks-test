@@ -48,9 +48,41 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 
 func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int, authType string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
 	log := logging.FromContext(ctx)
-	const query string = `INSERT INTO portfolios () VALUES (user_id=$1 and user_auth_type=$2)`
-	var portfolios []*models.Portfolio
-	return nil, nil
+
+	const queryNewPortfolio string = `INSERT INTO portfolios (user_id, user_auth_type, portfolio_name, description, is_public) VALUES ($1, $2, $3, $4, $5)`
+	var portfolio *models.Portfolio
+	var pid int
+	err := pr.db.QueryRow(ctx, queryNewPortfolio, userId, authType, newPortfolio.Name, newPortfolio.Description, newPortfolio.Public).Scan(&pid)
+	if err != nil {
+		log.Infof("Error on processing query to DB: %v", err)
+		return nil, err
+	}
+	var bid int
+	const queryNewBalances string = `INSERT INTO balances (portfolio_id, currency_id, money_value) VALUES ($1, $2, $3)`
+	err = pr.db.QueryRow(ctx, queryNewBalances, pid, 1, 0).Scan(&bid)
+	if err != nil {
+		log.Infof("Error on processing query to DB: %v", err)
+		return nil, err
+	}
+	err = pr.db.QueryRow(ctx, queryNewBalances, pid, 2, 0).Scan(&bid)
+	if err != nil {
+		log.Infof("Error on processing query to DB: %v", err)
+		return nil, err
+	}
+	err = pr.db.QueryRow(ctx, queryNewBalances, pid, 3, 0).Scan(&bid)
+	if err != nil {
+		log.Infof("Error on processing query to DB: %v", err)
+		return nil, err
+	}
+	var sid int
+	const queryNewStockItem string = `INSERT INTO stock_items (portfolio, stock_item, stock_cost, stock_currency, amount) VALUES ($1, $2, $3, $4, $5)`
+	err = pr.db.QueryRow(ctx, queryNewStockItem, pid, 7, 0, 1, 1).Scan(&sid)
+	if err != nil {
+		log.Infof("Error on processing query to DB: %v", err)
+		return nil, err
+	}
+	portfolio.Id = pid
+	return portfolio, nil
 }
 
 func (pr *PostgresPortfolioRepo) DeletePortfolio(ctx context.Context, portfolioId int) error {

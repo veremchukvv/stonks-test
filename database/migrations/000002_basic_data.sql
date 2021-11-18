@@ -16,6 +16,7 @@ insert into stocks(stock_id, stock_name, description, ticker, stock_type, cost, 
 insert into stocks(stock_id, stock_name, description, ticker, stock_type, cost, currency) values (4, 'Tesla', 'US automaker company', 'TSLA', 'stock', 1000, 2);
 insert into stocks(stock_id, stock_name, description, ticker, stock_type, cost, currency) values (5, 'Siemens', 'European Company', 'SIE', 'stock', 300, 3);
 insert into stocks(stock_id, stock_name, description, ticker, stock_type, cost, currency) values (6, 'Volkswagen', 'European automaker company', 'VOW', 'stock', 500, 3);
+insert into stocks(stock_id, stock_name, description, ticker, stock_type, cost, currency) values (7, 'NULL', 'NULL', 'NULL', 'stock', 0, 1);
 
 insert into stocks_items(stocks_item_id, portfolio, stock_item, stock_cost, stock_currency, amount) values (1, 1, 1, 100, 1, 10);
 insert into stocks_items(stocks_item_id, portfolio, stock_item, stock_cost, stock_currency, amount) values (2, 1, 2, 50, 1, 20);

@@ -40,14 +40,30 @@ func (ps *PortfolioServiceImp) GetAllPortfolios(ctx context.Context, token strin
 	return portfolios, nil
 }
 
-func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, portfolio_id int) (*models.Portfolio, error) {
+func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, portfolioId int) (*models.Portfolio, error) {
 	return nil, nil
 }
 
-func (ps *PortfolioServiceImp) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio) (*models.Portfolio, error) {
-	return nil, nil
+func (ps *PortfolioServiceImp) CreatePortfolio(ctx context.Context, token string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
+	log := logging.FromContext(ctx)
+
+	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	//TODO move parse of jwt to middleware or func
+	claims := parsedToken.Claims.(*tokenClaims)
+
+	createdPortfolio, err := ps.repo.CreatePortfolio(ctx, claims.UserId, claims.AuthType, newPortfolio)
+	if err != nil {
+		log.Infof("Error on creating portfolio in DB %v", err)
+		return nil, err
+	}
+	return createdPortfolio, nil
 }
 
-func (ps *PortfolioServiceImp) DeletePortfolio(ctx context.Context, portfolio_id int) error {
+func (ps *PortfolioServiceImp) DeletePortfolio(ctx context.Context, portfolioId int) error {
 	return nil
 }

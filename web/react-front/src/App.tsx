@@ -7,6 +7,7 @@ import Profile from "./pages/Profile"
 import Navigation from "./components/Navigation"
 import {BrowserRouter, Route} from "react-router-dom";
 import {AuthContext} from "./context/authContext";
+import CreatePortfolio from './pages/CreatePortfolio';
 
 function App() {
     const [name, setName] = useState('')
@@ -38,6 +39,7 @@ function App() {
             <Route path="/login" component={() => <Login setName={setName}/>}/>
             <Route path="/register" component={Register}/>
             <Route path="/profile" component={Profile}/>
+            <Route path="/newPortfolio" component={CreatePortfolio} />
       </main>
         </BrowserRouter>
     </div>

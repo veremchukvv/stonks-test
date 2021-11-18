@@ -76,7 +76,7 @@ func (h *Handler) user(c echo.Context) error {
 	//	return nil
 	//}
 	u, err := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
-log.Info(u)
+	log.Info(u)
 	if u != nil {
 		c.JSON(200, u)
 	}

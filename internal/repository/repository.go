@@ -16,6 +16,6 @@ type UserRepository interface {
 type PortfolioRepository interface {
 	GetAllPortfolios(ctx context.Context, userId int, authType string) ([]*models.Portfolio, error)
 	GetOnePortfolio(ctx context.Context, portfolio_id int) (*models.Portfolio, error)
-	CreatePortfolio(ctx context.Context, portfolio *models.Portfolio) (*models.Portfolio, error)
+	CreatePortfolio(ctx context.Context, userId int, authType string, portfolio *models.Portfolio) (*models.Portfolio, error)
 	DeletePortfolio(ctx context.Context, portfolio_id int) error
 }

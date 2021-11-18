@@ -46,7 +46,10 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	return nil, nil
 }
 
-func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, portfolio *models.Portfolio) (*models.Portfolio, error) {
+func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int, authType string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
+	log := logging.FromContext(ctx)
+	const query string = `INSERT INTO portfolios () VALUES (user_id=$1 and user_auth_type=$2)`
+	var portfolios []*models.Portfolio
 	return nil, nil
 }
 
@@ -67,4 +70,3 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 	}
 	return portfolios, nil
 }
-

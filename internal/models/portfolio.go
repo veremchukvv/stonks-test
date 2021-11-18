@@ -10,5 +10,4 @@ type Portfolio struct {
 	AssetsEUR   float32 `json:"assets_eur"`
 	//Stocks      map[Stock]int        `json:"stocks"`
 	//Cash        map[Currency]float32 `json:"cash"`
-
 }

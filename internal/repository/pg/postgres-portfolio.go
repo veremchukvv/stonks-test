@@ -52,6 +52,11 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 	const queryNewPortfolio string = `INSERT INTO portfolios (user_id, user_auth_type, portfolio_name, description, is_public) VALUES ($1, $2, $3, $4, $5)`
 	var portfolio *models.Portfolio
 	var pid int
+	log.Info(userId)
+	log.Info(authType)
+	log.Info(newPortfolio.Name)
+	log.Info(newPortfolio.Description)
+	log.Info(newPortfolio.Public)
 	err := pr.db.QueryRow(ctx, queryNewPortfolio, userId, authType, newPortfolio.Name, newPortfolio.Description, newPortfolio.Public).Scan(&pid)
 	if err != nil {
 		log.Infof("Error on processing query to DB: %v", err)

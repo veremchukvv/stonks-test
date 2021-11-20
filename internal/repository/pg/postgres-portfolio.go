@@ -115,8 +115,8 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 	}
 	var AssetsR Assets
 
-	for i, port := range portfolios {
-		for _, cur := range currencyList {
+	for _, port := range portfolios {
+		for j, cur := range currencyList {
 			log.Infof("portfolio ID: %d", port.Id)
 			log.Infof("currency ID: %d", cur.Id)
 			const query string = `SELECT SUM(stock_value) FROM stocks_items WHERE (portfolio=$1 and stock_currency=$2)`
@@ -127,23 +127,9 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 				return nil, err
 			}
 
-			////PortPtr := reflect.ValueOf(&port).Elem()
-			//log.Info(PortPtr)
-			//log.Info(PortPtr.Kind())
-			//println(PortPtr.String())
-			//println(PortPtr.Elem().String())
-			//log.Info(portPtr.FieldByName(assetsList[i]))
-			//log.Info(portPtr.FieldByName(assetsList[i]).Elem())
-			//indir := reflect.Indirect(PortPtr)
-			//log.Info(indir)
-			//log.Info(indir.Kind())
-			//reflect.Indirect(port).FieldByName(AssetsList[i]).SetFloat(AssetsR.Results)
-			reflect.ValueOf(port).Elem().FieldByName(AssetsList[i]).SetFloat(AssetsR.Results)
-		log.Info(AssetsR.Results)
-			//if err != nil {
-			//	log.Infof("Error on query rows: %v", err)
-			//	return nil, err
-			//}
+			reflect.ValueOf(port).Elem().FieldByName(AssetsList[j]).SetFloat(AssetsR.Results)
+			log.Info(AssetsR.Results)
+
 		}
 	}
 	return portfolios, nil

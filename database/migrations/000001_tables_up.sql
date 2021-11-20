@@ -35,9 +35,9 @@ CREATE TABLE if not exists portfolios
 );
 CREATE TABLE if not exists currencies
 (
-    currency_id   SERIAL              PRIMARY KEY,
-    currency_name VARCHAR(255)        NOT NULL UNIQUE,
-    ticker        VARCHAR(255)        NOT NULL UNIQUE
+    currency_id     SERIAL              PRIMARY KEY,
+    currency_name   VARCHAR(255)        NOT NULL UNIQUE,
+    currency_ticker VARCHAR(255)        NOT NULL UNIQUE
 );
 CREATE TABLE if not exists balances
 (

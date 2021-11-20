@@ -5,9 +5,9 @@ type Portfolio struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Public      bool    `json:"is_public"`
-	AssetsRUB   float32 `json:"assets_rub"`
-	AssetsUSD   float32 `json:"assets_usd"`
-	AssetsEUR   float32 `json:"assets_eur"`
+	AssetsRUB   float64 `json:"assets_rub" ticker:"RUB"`
+	AssetsUSD   float64 `json:"assets_usd" ticker:"USD"`
+	AssetsEUR   float64 `json:"assets_eur" ticker:"EUR"`
 	//Stocks      map[Stock]int        `json:"stocks"`
 	//Cash        map[Currency]float32 `json:"cash"`
 }

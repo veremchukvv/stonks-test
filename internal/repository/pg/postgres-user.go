@@ -113,7 +113,7 @@ func (ur *PostgresUserRepo) UpdateUser(ctx context.Context, user *models.User) (
 
 func (ur *PostgresUserRepo) DeleteUser(ctx context.Context, userId int, authType string) error {
 	log := logging.FromContext(ctx)
-	const query string = `DELETE FROM users WHERE user_id=$1 and user_auth_type=$2 `
+	const query string = `DELETE FROM users WHERE user_id=$1 and user_auth_type=$2 returning user_id`
 
 	var uid int
 	err := ur.db.QueryRow(ctx, query, userId, authType).Scan(&uid)

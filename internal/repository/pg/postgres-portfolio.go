@@ -42,7 +42,6 @@ func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userId in
 	if portfolios == nil {
 		return nil, nil
 	}
-	log.Info("here")
 	portfoliosWithAssets, err := pr.getPortfolioAssets(ctx, portfolios)
 	return portfoliosWithAssets, nil
 }

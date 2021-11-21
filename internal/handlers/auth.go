@@ -52,7 +52,7 @@ func (h *Handler) signin(c echo.Context) error {
 }
 
 func (h *Handler) user(c echo.Context) error {
-	//log := logging.FromContext(h.ctx)
+	log := logging.FromContext(h.ctx)
 	cookie, err := c.Request().Cookie("jwt")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
@@ -75,14 +75,12 @@ func (h *Handler) user(c echo.Context) error {
 	//	c.Response().Write([]byte(`{"error": "not logined"}`))
 	//	return nil
 	//}
-	u, vu, err  := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
-
+	u, err := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
+	log.Info(u)
 	if u != nil {
 		c.JSON(200, u)
 	}
-	if vu != nil {
-		c.JSON(200, vu)
-	}
+
 	return nil
 }
 
@@ -148,8 +146,8 @@ func (h *Handler) callbackVK(c echo.Context) error {
 			log.Info(err)
 			log.Info("trying to create new VK user")
 
-			newVKUser := &models.VKUser{
-				VKId:     input.Response[0].Id,
+			newVKUser := &models.User{
+				Id:       input.Response[0].Id,
 				Name:     input.Response[0].First_name,
 				Lastname: input.Response[0].Last_name,
 			}
@@ -159,7 +157,7 @@ func (h *Handler) callbackVK(c echo.Context) error {
 				log.Errorf("Can't create VK user: %v", err)
 				return err
 			}
-			log.Infof("Created VK user with id: %d", newVKUser.VKId)
+			log.Infof("Created VK user with id: %d", newVKUser.Id)
 		} else {
 			log.Errorf("Other VK error: %v", err)
 			return err

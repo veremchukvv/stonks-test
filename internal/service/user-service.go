@@ -31,8 +31,8 @@ var SignKey = os.Getenv("SIGN_KEY")
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId int `json:"user_id"`
-	VKUserId int `json:"vkuser_id"`
+	UserId   int    `json:"user_id"`
+	AuthType string `json:"auth_type"`
 }
 
 type UserServiceImp struct {
@@ -47,42 +47,42 @@ func NewUserServiceImp(repo repository.UserRepository, hasher *hash.BCHasher) *U
 	}
 }
 
-func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.User, *models.VKUser, error) {
+func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.User, error) {
 	log := logging.FromContext(ctx)
 
 	GetUserErr := errors.New("Can't get user")
 
 	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
 		return []byte(SignKey), nil
-		})
+	})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	claims := parsedToken.Claims.(*tokenClaims)
 
 	if claims.UserId != 0 {
-		u, err := us.repo.GetUserByID(ctx, claims.UserId)
+		u, err := us.repo.GetUserByID(ctx, claims.UserId, claims.AuthType)
 		if err != nil {
 			log.Errorf("can't get user from db: %v", err)
-			return nil, nil, err
+			return nil, err
 		}
-		return u, nil, nil
+		return u, nil
 	}
 
-	if claims.VKUserId != 0 {
-		vku, err := us.repo.GetVKUserByID(ctx, claims.VKUserId)
-		if err != nil {
-			log.Errorf("can't get vkuser from db: %v", err)
-			return nil, nil, err
-		}
-		return nil, vku, nil
-	}
+	//if claims.VKUserId != 0 {
+	//	vku, err := us.repo.GetVKUserByID(ctx, claims.VKUserId)
+	//	if err != nil {
+	//		log.Errorf("can't get vkuser from db: %v", err)
+	//		return nil, nil, err
+	//	}
+	//	return nil, vku, nil
+	//}
 
-	return nil, nil, GetUserErr
+	return nil, GetUserErr
 }
 
-func (us *UserServiceImp) GetVKUserByID(ctx context.Context, vkid int) (*models.VKUser, error) {
+func (us *UserServiceImp) GetVKUserByID(ctx context.Context, vkid int) (*models.User, error) {
 	return us.repo.GetVKUserByID(ctx, vkid)
 }
 
@@ -95,7 +95,7 @@ func (us *UserServiceImp) CreateUser(ctx context.Context, user *models.User) (*m
 	return us.repo.CreateUser(ctx, user)
 }
 
-func (us *UserServiceImp) CreateVKUser(ctx context.Context, vkuser *models.VKUser) (*models.VKUser, error) {
+func (us *UserServiceImp) CreateVKUser(ctx context.Context, vkuser *models.User) (*models.User, error) {
 	return us.repo.CreateVKUser(ctx, vkuser)
 }
 
@@ -115,7 +115,7 @@ func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, passw
 			IssuedAt:  time.Now().Unix(),
 		},
 		u.Id,
-		0,
+		"local",
 	})
 	return token.SignedString([]byte(SignKey))
 }
@@ -126,10 +126,10 @@ func (us *UserServiceImp) GenerateVKToken(ctx context.Context, vkid int) (string
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
-			Issuer: "stonks",
+			Issuer:    "stonks",
 		},
-		0,
 		vkid,
+		"vk",
 	})
 	return token.SignedString([]byte(SignKey))
 }

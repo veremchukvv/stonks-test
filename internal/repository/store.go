@@ -8,10 +8,12 @@ import (
 
 type Store struct {
 	UserRepository
+	PortfolioRepository
 }
 
 func NewStore(db *pgxpool.Pool, ctx context.Context) *Store {
 	return &Store{
 		pg.NewPostgresUserRepo(db, ctx),
+		pg.NewPostgresPortfolioRepo(db, ctx),
 	}
 }

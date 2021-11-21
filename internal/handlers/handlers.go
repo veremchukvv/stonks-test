@@ -24,7 +24,7 @@ func NewHandlers(ctx context.Context, services *service.Services) *Handler {
 func (h *Handler) InitRoutes() *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://127.0.0.1:3000", "http://localhost:3000"},
+		AllowOrigins:     []string{"http://127.0.0.1:3000", "http://localhost:3000"},
 		AllowCredentials: true,
 	}))
 
@@ -40,29 +40,28 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		auth.POST("/signout", h.signout)
 	}
 
-	api := e.Group("/api/v1")
+	//api := e.Group("/api/v1")
+	//{
+	//	profile := api.Group("/profile")
+	//	{
+	//		profile.POST("/", h.createProfile)
+	//		profile.PUT("/:id", h.modifyProfile)
+	//		profile.GET("/:id", h.getProfile)
+	//		profile.DELETE("/:id", h.deleteProfile)
+	//	}
+	portfolio := e.Group("/api/v1/portfolio")
 	{
-		profile := api.Group("/profile")
-		{
-			profile.POST("/", h.createProfile)
-			profile.PUT("/:id", h.modifyProfile)
-			profile.GET("/:id", h.getProfile)
-			profile.DELETE("/:id", h.deleteProfile)
-		}
-		portfolio := profile.Group("/portfolio")
-		{
-			portfolio.POST("/", h.createPortfolio)
-			portfolio.PUT("/:id", h.modifyPortfolio)
-			portfolio.GET("/:id", h.getPortfolio)
-			portfolio.DELETE("/:id", h.deletePortfolio)
-		}
-		//market := api.Group("/stocks")
-		//{
-		//	market.GET("/")
-		//	market.GET("/:id")
-		//	market.POST("/:id/deal")
-		//}
+		portfolio.POST("/", h.createPortfolio)
+		portfolio.GET("/", h.getAllPortfolios)
+		portfolio.PUT("/:id", h.modifyPortfolio)
+		portfolio.GET("/:id", h.getPortfolio)
+		portfolio.DELETE("/:id", h.deletePortfolio)
 	}
-
+	//market := api.Group("/stocks")
+	//{
+	//	market.GET("/")
+	//	market.GET("/:id")
+	//	market.POST("/:id/deal")
+	//}
 	return e
 }

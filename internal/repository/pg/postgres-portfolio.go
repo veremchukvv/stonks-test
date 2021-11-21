@@ -112,6 +112,8 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 	}
 	var AssetsR Assets
 
+	//TODO check if struct really needed here
+
 	for _, port := range portfolios {
 		for j, cur := range currencyList {
 			const query string = `SELECT SUM(stock_value) FROM stocks_items WHERE (portfolio=$1 and stock_currency=$2)`

@@ -90,6 +90,19 @@ func (us *UserServiceImp) UpdateUser(ctx context.Context, user *models.User, tok
 	return us.repo.UpdateUser(ctx, user)
 }
 
+func (us *UserServiceImp) DeleteUser(ctx context.Context, token string) error {
+	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		return err
+	}
+
+	claims := parsedToken.Claims.(*tokenClaims)
+
+	return us.repo.DeleteUser(ctx, claims.UserId, claims.AuthType)
+}
+
 func (us *UserServiceImp) CreateVKUser(ctx context.Context, vkuser *models.User) (*models.User, error) {
 	return us.repo.CreateVKUser(ctx, vkuser)
 }

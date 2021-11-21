@@ -134,13 +134,13 @@ func (h *Handler) deleteUser(c echo.Context) error {
 		return nil
 	}
 
-	u, err := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
+	u, err := h.services.UserService.DeleteUser(c.Request().Context(), cookie.Value)
 	log.Info(u)
 	if u != nil {
 		c.JSON(200, u)
 	}
-
-	return nil
+	c.SetCookie(&http.Cookie{Name: "jwt", Value: "", HttpOnly: true, Path: "/", Expires: time.Now().Add(-time.Hour)})
+	return c.Redirect(http.StatusOK, "http://localhost:3000/")
 }
 
 func (h *Handler) callbackGoogle(c echo.Context) error {

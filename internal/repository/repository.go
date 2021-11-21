@@ -7,6 +7,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *models.User) (*models.User, error)
+	UpdateUser(ctx context.Context, user *models.User) (*models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	CreateVKUser(ctx context.Context, user *models.User) (*models.User, error)
 	GetVKUserByID(ctx context.Context, vkid int) (*models.User, error)

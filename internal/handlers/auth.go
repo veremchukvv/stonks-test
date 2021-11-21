@@ -64,17 +64,7 @@ func (h *Handler) user(c echo.Context) error {
 		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
 		return nil
 	}
-	//if cookie == nil {
-	//	c.Response().WriteHeader(http.StatusUnauthorized)
-	//	c.Response().Write([]byte(`{"error": "not logined"}`))
-	//	return nil
-	//}
-	//log.Info(err)
-	//if err != nil {
-	//	c.Response().WriteHeader(http.StatusUnauthorized)
-	//	c.Response().Write([]byte(`{"error": "not logined"}`))
-	//	return nil
-	//}
+
 	u, err := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
 	log.Info(u)
 	if u != nil {
@@ -97,6 +87,29 @@ func (h *Handler) oauthVK(c echo.Context) error {
 	state := oauth.GetRandomState()
 	url := cfg.AuthCodeURL(state)
 	http.Redirect(c.Response(), c.Request(), url, http.StatusTemporaryRedirect)
+	return nil
+}
+
+func (h *Handler) updateUser(c echo.Context) error {
+	log := logging.FromContext(h.ctx)
+	cookie, err := c.Request().Cookie("jwt")
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			c.Response().WriteHeader(http.StatusUnauthorized)
+			c.Response().Write([]byte(`{"error": "not logined"}`))
+			return nil
+		}
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
+		return nil
+	}
+
+	u, err := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
+	log.Info(u)
+	if u != nil {
+		c.JSON(200, u)
+	}
+
 	return nil
 }
 

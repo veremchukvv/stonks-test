@@ -12,19 +12,9 @@ import (
 	"time"
 )
 
-//type UserSignupReq struct {
-//	Name     string
-//	Email    string
-//	Password string
-//}
-//
-//type UserSigninReq struct {
-//	Email    string
-//	Password string
-//}
-
 const (
 	tokenTTL = 12 * time.Hour
+	//TODO move to config
 )
 
 var SignKey = os.Getenv("SIGN_KEY")
@@ -69,16 +59,6 @@ func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.Us
 		}
 		return u, nil
 	}
-
-	//if claims.VKUserId != 0 {
-	//	vku, err := us.repo.GetVKUserByID(ctx, claims.VKUserId)
-	//	if err != nil {
-	//		log.Errorf("can't get vkuser from db: %v", err)
-	//		return nil, nil, err
-	//	}
-	//	return nil, vku, nil
-	//}
-
 	return nil, GetUserErr
 }
 
@@ -93,6 +73,10 @@ func (us *UserServiceImp) CreateUser(ctx context.Context, user *models.User) (*m
 		return nil, err
 	}
 	return us.repo.CreateUser(ctx, user)
+}
+
+func (us *UserServiceImp) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
+	return us.repo.UpdateUser(ctx, user)
 }
 
 func (us *UserServiceImp) CreateVKUser(ctx context.Context, vkuser *models.User) (*models.User, error) {

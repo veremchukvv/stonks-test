@@ -32,6 +32,7 @@ func (h *Handler) InitRoutes() *echo.Echo {
 	{
 		auth.POST("/signup", h.signup)
 		auth.GET("/user", h.user)
+		auth.PATCH("/user", h.updateUser)
 		auth.GET("/oauth/google", h.oauthGoogle)
 		auth.GET("/oauth/vk", h.oauthVK)
 		auth.GET("/callback/google", h.callbackGoogle)
@@ -53,7 +54,7 @@ func (h *Handler) InitRoutes() *echo.Echo {
 	{
 		portfolio.POST("/", h.createPortfolio)
 		portfolio.GET("/", h.getAllPortfolios)
-		portfolio.PUT("/:id", h.modifyPortfolio)
+		portfolio.PATCH("/:id", h.modifyPortfolio)
 		portfolio.GET("/:id", h.getPortfolio)
 		portfolio.DELETE("/:id", h.deletePortfolio)
 	}

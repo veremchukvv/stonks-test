@@ -54,6 +54,9 @@ func (h *Handler) getAllPortfolios(c echo.Context) error {
 		c.Response().WriteHeader(http.StatusInternalServerError)
 		c.Response().Write([]byte(`{"error": "can't get portfolios'"}`))
 	}
+	if p == nil {
+		return c.JSON(200, []string{})
+	}
 	return c.JSON(200, p)
 }
 

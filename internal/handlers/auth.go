@@ -91,6 +91,36 @@ func (h *Handler) oauthVK(c echo.Context) error {
 }
 
 func (h *Handler) updateUser(c echo.Context) error {
+	var u models.User
+
+	err := c.Bind(&u)
+	if err != nil {
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		c.Response().Write([]byte(`{"error": "Unmarshalling data error"}`))
+		return nil
+	}
+
+	cookie, err := c.Request().Cookie("jwt")
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			c.Response().WriteHeader(http.StatusUnauthorized)
+			c.Response().Write([]byte(`{"error": "not logined"}`))
+			return nil
+		}
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
+		return nil
+	}
+
+	uu, err := h.services.UserService.UpdateUser(c.Request().Context(), &u, cookie.Value)
+	if uu != nil {
+		c.JSON(200, uu)
+	}
+
+	return nil
+}
+
+func (h *Handler) deleteUser(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 	cookie, err := c.Request().Cookie("jwt")
 	if err != nil {

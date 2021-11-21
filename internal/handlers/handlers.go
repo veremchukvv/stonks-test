@@ -32,7 +32,8 @@ func (h *Handler) InitRoutes() *echo.Echo {
 	{
 		auth.POST("/signup", h.signup)
 		auth.GET("/user", h.user)
-		auth.PATCH("/user", h.updateUser)
+		auth.PATCH("/update", h.updateUser)
+		auth.DELETE("/delete", h.deleteUser)
 		auth.GET("/oauth/google", h.oauthGoogle)
 		auth.GET("/oauth/vk", h.oauthVK)
 		auth.GET("/callback/google", h.callbackGoogle)

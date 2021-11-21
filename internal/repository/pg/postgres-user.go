@@ -99,13 +99,10 @@ func (ur *PostgresUserRepo) CreateUser(ctx context.Context, user *models.User) (
 
 func (ur *PostgresUserRepo) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	log := logging.FromContext(ctx)
-	const query string = `INSERT INTO users 
-		(user_name, user_auth_type, lastname, email, password_hash) 
-		VALUES($1, $2, $3, $4, $5)
-		returning user_id;`
+	const query string = `UPDATE users SET (email, modified_at) = ($1, NOW()) WHERE user_id=$2 and user_auth_type=$3 returning user_id`
 
 	var uid int
-	err := ur.db.QueryRow(ctx, query, user.Name, "local", user.Lastname, user.Email, user.Password).Scan(&uid)
+	err := ur.db.QueryRow(ctx, query, user.Email, user.Id, user.AuthType).Scan(&uid)
 	if err != nil {
 		log.Errorf("Error on write user to database: %v", err)
 		return nil, err
@@ -113,7 +110,6 @@ func (ur *PostgresUserRepo) UpdateUser(ctx context.Context, user *models.User) (
 	user.Id = uid
 	return user, nil
 }
-
 
 func (ur *PostgresUserRepo) CreateVKUser(ctx context.Context, user *models.User) (*models.User, error) {
 	log := logging.FromContext(ctx)

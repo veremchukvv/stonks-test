@@ -75,7 +75,18 @@ func (us *UserServiceImp) CreateUser(ctx context.Context, user *models.User) (*m
 	return us.repo.CreateUser(ctx, user)
 }
 
-func (us *UserServiceImp) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
+func (us *UserServiceImp) UpdateUser(ctx context.Context, user *models.User, token string) (*models.User, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	claims := parsedToken.Claims.(*tokenClaims)
+	user.Id = claims.UserId
+	user.AuthType = claims.AuthType
+
 	return us.repo.UpdateUser(ctx, user)
 }
 

@@ -50,41 +50,38 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int, authType string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
 	log := logging.FromContext(ctx)
 
-	const queryNewPortfolio string = `INSERT INTO portfolios (user_id, user_auth_type, portfolio_name, description, is_public) VALUES ($1, $2, $3, $4, $5)`
-	var portfolio *models.Portfolio
-	var pid int
+	currenciesList, err := pr.getAllCurrencies(ctx)
+	if err != nil {
+		log.Infof("error on fetch currencies from DB %v", err)
+		return nil, err
+	}
 
-	err := pr.db.QueryRow(ctx, queryNewPortfolio, userId, authType, newPortfolio.Name, newPortfolio.Description, newPortfolio.Public).Scan(&pid)
+	const createNewPortfolio string = `INSERT INTO portfolios (user_id, user_auth_type, portfolio_name, description, is_public) VALUES ($1, $2, $3, $4, $5) returning portfolio_id`
+
+	var pid int
+	err = pr.db.QueryRow(ctx, createNewPortfolio, userId, authType, newPortfolio.Name, newPortfolio.Description, newPortfolio.Public).Scan(&pid)
 	if err != nil {
 		log.Infof("Error on processing query to DB: %v", err)
 		return nil, err
 	}
+
 	var bid int
-	const queryNewBalances string = `INSERT INTO balances (portfolio_id, currency_id, money_value) VALUES ($1, $2, $3)`
-	err = pr.db.QueryRow(ctx, queryNewBalances, pid, 1, 0).Scan(&bid)
-	if err != nil {
-		log.Infof("Error on processing query to DB: %v", err)
-		return nil, err
-	}
-	err = pr.db.QueryRow(ctx, queryNewBalances, pid, 2, 0).Scan(&bid)
-	if err != nil {
-		log.Infof("Error on processing query to DB: %v", err)
-		return nil, err
-	}
-	err = pr.db.QueryRow(ctx, queryNewBalances, pid, 3, 0).Scan(&bid)
-	if err != nil {
-		log.Infof("Error on processing query to DB: %v", err)
-		return nil, err
-	}
 	var sid int
-	const queryNewStockItem string = `INSERT INTO stock_items (portfolio, stock_item, stock_cost, stock_currency, amount) VALUES ($1, $2, $3, $4, $5)`
-	err = pr.db.QueryRow(ctx, queryNewStockItem, pid, 1, 0, 1, 1).Scan(&sid)
-	if err != nil {
-		log.Infof("Error on processing query to DB: %v", err)
-		return nil, err
+	const createNewBalances string = `INSERT INTO balances (portfolio_id, currency_id, money_value) VALUES ($1, $2, $3) returning balance_id`
+	const createNewStockItem string = `INSERT INTO stocks_items (portfolio, stock_item, stock_cost, stock_currency, amount) VALUES ($1, $2, $3, $4, $5) returning stocks_item_id`
+	for _, v := range currenciesList {
+		err = pr.db.QueryRow(ctx, createNewBalances, pid, v.Id, 0).Scan(&bid)
+		if err != nil {
+			log.Infof("Error on processing query to DB: %v", err)
+			return nil, err
+		}
+		err = pr.db.QueryRow(ctx, createNewStockItem, pid, 1, 0, v.Id, 1).Scan(&sid)
+		if err != nil {
+			log.Infof("Error on processing query to DB: %v", err)
+			return nil, err
+		}
 	}
-	portfolio.Id = pid
-	return portfolio, nil
+	return newPortfolio, nil
 }
 
 func (pr *PostgresPortfolioRepo) DeletePortfolio(ctx context.Context, portfolioId int) error {
@@ -100,7 +97,7 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 		return nil, err
 	}
 
-	AssetsList := make([]string, 0, 5)
+	AssetsList := make([]string, 0)
 	t := reflect.TypeOf(&models.Portfolio{}).Elem()
 	for x := 0; x < t.NumField(); x++ {
 		field := t.Field(x)
@@ -117,19 +114,13 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 
 	for _, port := range portfolios {
 		for j, cur := range currencyList {
-			log.Infof("portfolio ID: %d", port.Id)
-			log.Infof("currency ID: %d", cur.Id)
 			const query string = `SELECT SUM(stock_value) FROM stocks_items WHERE (portfolio=$1 and stock_currency=$2)`
-
 			err := pr.db.QueryRow(ctx, query, port.Id, cur.Id).Scan(&AssetsR.Results)
 			if err != nil {
 				log.Infof("Error on scan rows: %v", err)
 				return nil, err
 			}
-
 			reflect.ValueOf(port).Elem().FieldByName(AssetsList[j]).SetFloat(AssetsR.Results)
-			log.Info(AssetsR.Results)
-
 		}
 	}
 	return portfolios, nil
@@ -138,7 +129,7 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 func (pr *PostgresPortfolioRepo) getAllCurrencies(ctx context.Context) ([]*models.Currency, error) {
 	log := logging.FromContext(ctx)
 
-	const query string = `SELECT currency_id, ticker FROM currencies WHERE currency_id > 0`
+	const query string = `SELECT currency_id, currency_ticker FROM currencies WHERE currency_id > 0`
 	var currencies []*models.Currency
 	rows, err := pr.db.Query(ctx, query)
 	if err != nil {
@@ -155,6 +146,5 @@ func (pr *PostgresPortfolioRepo) getAllCurrencies(ctx context.Context) ([]*model
 		}
 		currencies = append(currencies, &currency)
 	}
-	log.Info(currencies)
 	return currencies, nil
 }

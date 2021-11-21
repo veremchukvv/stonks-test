@@ -121,7 +121,7 @@ func (h *Handler) updateUser(c echo.Context) error {
 }
 
 func (h *Handler) deleteUser(c echo.Context) error {
-	log := logging.FromContext(h.ctx)
+	//log := logging.FromContext(h.ctx)
 	cookie, err := c.Request().Cookie("jwt")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
@@ -134,10 +134,9 @@ func (h *Handler) deleteUser(c echo.Context) error {
 		return nil
 	}
 
-	u, err := h.services.UserService.DeleteUser(c.Request().Context(), cookie.Value)
-	log.Info(u)
-	if u != nil {
-		c.JSON(200, u)
+	err = h.services.UserService.DeleteUser(c.Request().Context(), cookie.Value)
+	if err != nil {
+		c.JSON(500, "error on delete user")
 	}
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: "", HttpOnly: true, Path: "/", Expires: time.Now().Add(-time.Hour)})
 	return c.Redirect(http.StatusOK, "http://localhost:3000/")

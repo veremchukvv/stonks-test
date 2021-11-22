@@ -40,8 +40,23 @@ func (ps *PortfolioServiceImp) GetAllPortfolios(ctx context.Context, token strin
 	return portfolios, nil
 }
 
-func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, portfolioId int) (*models.Portfolio, error) {
-	return nil, nil
+func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, token string, portfolioId int) (*models.Portfolio, []*models.Stock, error) {
+	log := logging.FromContext(ctx)
+
+	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		log.Info("error on authenticating user")
+		return nil, nil, err
+	}
+
+	portfolio, stocks, err := ps.repo.GetOnePortfolio(ctx, portfolioId)
+	if err != nil {
+		log.Infof("error on fetching portfolio data from DB: %v", err)
+		return nil, nil, err
+	}
+	return portfolio, stocks, nil
 }
 
 func (ps *PortfolioServiceImp) CreatePortfolio(ctx context.Context, token string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
@@ -51,6 +66,7 @@ func (ps *PortfolioServiceImp) CreatePortfolio(ctx context.Context, token string
 		return []byte(SignKey), nil
 	})
 	if err != nil {
+		log.Info("error on authenticating user")
 		return nil, err
 	}
 	//TODO move parse of jwt to middleware or func

@@ -4,6 +4,7 @@ import "encoding/json"
 
 type Stock struct {
 	Id          int     `json:"id"`
+	Ticker      string  `json:"ticker"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Type        string  `json:"type"`

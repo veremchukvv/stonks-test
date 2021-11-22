@@ -57,7 +57,6 @@ func (ps *PortfolioServiceImp) CreatePortfolio(ctx context.Context, token string
 	claims := parsedToken.Claims.(*tokenClaims)
 
 	createdPortfolio, err := ps.repo.CreatePortfolio(ctx, claims.UserId, claims.AuthType, newPortfolio)
-	log.Info("here")
 	if err != nil {
 		log.Infof("Error on creating portfolio in DB %v", err)
 		return nil, err

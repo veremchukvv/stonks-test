@@ -108,7 +108,12 @@ func (us *UserServiceImp) CreateVKUser(ctx context.Context, vkuser *models.User)
 }
 
 func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, password string) (string, error) {
+	log := logging.FromContext(ctx)
 	u, err := us.repo.GetUserByEmail(ctx, email)
+	if err != nil {
+		log.Info("Error on fetching user from DB")
+		return "", err
+	}
 	hashedPassword := u.Password
 	chk, err := us.hasher.CheckPWD(password, hashedPassword)
 	if err != nil {

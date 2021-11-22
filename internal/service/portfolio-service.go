@@ -50,7 +50,6 @@ func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, token string
 		log.Info("error on authenticating user")
 		return nil, nil, err
 	}
-
 	portfolio, stocks, err := ps.repo.GetOnePortfolio(ctx, portfolioId)
 	if err != nil {
 		log.Infof("error on fetching portfolio data from DB: %v", err)

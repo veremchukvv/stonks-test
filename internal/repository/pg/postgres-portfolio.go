@@ -50,14 +50,14 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	log := logging.FromContext(ctx)
 
 	const queryPortfolio string = `SELECT portfolio_name, description, is_public FROM portfolios WHERE portfolio_id=$1`
-	var portfolio *models.Portfolio
+	var portfolio models.Portfolio
+
 	err := pr.db.QueryRow(ctx, queryPortfolio, portfolioId).Scan(&portfolio.Name, &portfolio.Description, &portfolio.Public)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, nil, err
 	}
-
-	const queryStocks string = `SELECT stock_item, stock_cost, stock_currency, amount, stock_value FROM stock_items WHERE portfolio=$1`
+	const queryStocks string = `SELECT stock_item, stock_cost, stock_currency, amount, stock_value FROM stocks_items WHERE portfolio=$1`
 	var stocks []*models.Stock
 	rowsStocks, err := pr.db.Query(ctx, queryStocks, portfolioId)
 	if err != nil {
@@ -70,7 +70,8 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 		err = rowsStocks.Scan(&stock.Id, &stock.Cost, &stock.Currency)
 		stocks = append(stocks, &stock)
 	}
-	return portfolio, stocks, nil
+	log.Infof("stocks: %+v", stocks)
+	return &portfolio, stocks, nil
 }
 
 func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int, authType string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {

@@ -84,7 +84,6 @@ func (h *Handler) getPortfolio(c echo.Context) error {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
-	log.Infof("portId = %d", portId)
 	portfolio, stocks, err := h.services.PortfolioService.GetOnePortfolio(context.Background(), token.Value, portId)
 	if err != nil {
 		return c.JSON(500, "Can't get portfolio info")

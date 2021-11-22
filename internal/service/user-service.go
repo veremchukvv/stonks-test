@@ -12,19 +12,9 @@ import (
 	"time"
 )
 
-//type UserSignupReq struct {
-//	Name     string
-//	Email    string
-//	Password string
-//}
-//
-//type UserSigninReq struct {
-//	Email    string
-//	Password string
-//}
-
 const (
 	tokenTTL = 12 * time.Hour
+	//TODO move to config
 )
 
 var SignKey = os.Getenv("SIGN_KEY")
@@ -69,16 +59,6 @@ func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.Us
 		}
 		return u, nil
 	}
-
-	//if claims.VKUserId != 0 {
-	//	vku, err := us.repo.GetVKUserByID(ctx, claims.VKUserId)
-	//	if err != nil {
-	//		log.Errorf("can't get vkuser from db: %v", err)
-	//		return nil, nil, err
-	//	}
-	//	return nil, vku, nil
-	//}
-
 	return nil, GetUserErr
 }
 
@@ -95,12 +75,45 @@ func (us *UserServiceImp) CreateUser(ctx context.Context, user *models.User) (*m
 	return us.repo.CreateUser(ctx, user)
 }
 
+func (us *UserServiceImp) UpdateUser(ctx context.Context, user *models.User, token string) (*models.User, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	claims := parsedToken.Claims.(*tokenClaims)
+	user.Id = claims.UserId
+	user.AuthType = claims.AuthType
+
+	return us.repo.UpdateUser(ctx, user)
+}
+
+func (us *UserServiceImp) DeleteUser(ctx context.Context, token string) error {
+	parsedToken, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		return err
+	}
+
+	claims := parsedToken.Claims.(*tokenClaims)
+
+	return us.repo.DeleteUser(ctx, claims.UserId, claims.AuthType)
+}
+
 func (us *UserServiceImp) CreateVKUser(ctx context.Context, vkuser *models.User) (*models.User, error) {
 	return us.repo.CreateVKUser(ctx, vkuser)
 }
 
 func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, password string) (string, error) {
+	log := logging.FromContext(ctx)
 	u, err := us.repo.GetUserByEmail(ctx, email)
+	if err != nil {
+		log.Info("Error on fetching user from DB")
+		return "", err
+	}
 	hashedPassword := u.Password
 	chk, err := us.hasher.CheckPWD(password, hashedPassword)
 	if err != nil {

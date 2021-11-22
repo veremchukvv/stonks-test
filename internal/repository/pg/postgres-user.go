@@ -97,6 +97,33 @@ func (ur *PostgresUserRepo) CreateUser(ctx context.Context, user *models.User) (
 	return user, nil
 }
 
+func (ur *PostgresUserRepo) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
+	log := logging.FromContext(ctx)
+	const query string = `UPDATE users SET (email, modified_at) = ($1, NOW()) WHERE user_id=$2 and user_auth_type=$3 returning user_id`
+
+	var uid int
+	err := ur.db.QueryRow(ctx, query, user.Email, user.Id, user.AuthType).Scan(&uid)
+	if err != nil {
+		log.Errorf("Error on write user to database: %v", err)
+		return nil, err
+	}
+	user.Id = uid
+	return user, nil
+}
+
+func (ur *PostgresUserRepo) DeleteUser(ctx context.Context, userId int, authType string) error {
+	log := logging.FromContext(ctx)
+	const query string = `DELETE FROM users WHERE user_id=$1 and user_auth_type=$2 returning user_id`
+
+	var uid int
+	err := ur.db.QueryRow(ctx, query, userId, authType).Scan(&uid)
+	if err != nil {
+		log.Errorf("Error on delete user from database: %v", err)
+		return err
+	}
+	return nil
+}
+
 func (ur *PostgresUserRepo) CreateVKUser(ctx context.Context, user *models.User) (*models.User, error) {
 	log := logging.FromContext(ctx)
 	const query string = `INSERT INTO users 

@@ -46,19 +46,23 @@ func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userId in
 	return portfoliosWithAssets, nil
 }
 
-func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioId int) (*models.Portfolio, []*models.Stock, error) {
+func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioId int) (*models.OnePortfolioResp, []*models.StockResp, error) {
 	log := logging.FromContext(ctx)
 
 	const queryPortfolio string = `SELECT portfolio_name, description, is_public FROM portfolios WHERE portfolio_id=$1`
-	var portfolio models.Portfolio
+	var portfolio models.OnePortfolioResp
 
 	err := pr.db.QueryRow(ctx, queryPortfolio, portfolioId).Scan(&portfolio.Name, &portfolio.Description, &portfolio.Public)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, nil, err
 	}
-	const queryStocks string = `SELECT stock_item, stock_cost, stock_currency, amount, stock_value FROM stocks_items WHERE portfolio=$1`
-	var stocks []*models.Stock
+
+	const queryStocks string = `SELECT stocks_item_id, ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
+					currency_ticker FROM stocks_items INNER JOIN stocks ON stock_id = stock_item AND stock_currency = 
+					currency AND stock_cost = cost INNER JOIN currencies ON currency_id = stock_currency 
+					WHERE (portfolio=$1 and stock_cost>0)`
+	var stocks []*models.StockResp
 	rowsStocks, err := pr.db.Query(ctx, queryStocks, portfolioId)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
@@ -66,11 +70,10 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	}
 	defer rowsStocks.Close()
 	for rowsStocks.Next() {
-		var stock models.Stock
-		err = rowsStocks.Scan(&stock.Id, &stock.Cost, &stock.Currency)
+		var stock models.StockResp
+		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency)
 		stocks = append(stocks, &stock)
 	}
-	log.Infof("stocks: %+v", stocks)
 	return &portfolio, stocks, nil
 }
 

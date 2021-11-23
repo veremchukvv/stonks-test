@@ -67,6 +67,12 @@ func (h *Handler) modifyPortfolio(c echo.Context) error {
 }
 
 func (h *Handler) getPortfolio(c echo.Context) error {
+
+	type response struct {
+		PortfolioResp *models.OnePortfolioResp
+		StocksResp []*models.StockResp
+	}
+
 	log := logging.FromContext(h.ctx)
 	token, err := c.Request().Cookie("jwt")
 	if err != nil {
@@ -79,17 +85,22 @@ func (h *Handler) getPortfolio(c echo.Context) error {
 		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
 		return nil
 	}
-	portId, err := strconv.Atoi(c.Param("id"))
+	portfolioId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
-	portfolio, stocks, err := h.services.PortfolioService.GetOnePortfolio(context.Background(), token.Value, portId)
+	portfolio, stocks, err := h.services.PortfolioService.GetOnePortfolio(context.Background(), token.Value, portfolioId)
 	if err != nil {
 		return c.JSON(500, "Can't get portfolio info")
 	}
-	c.JSON(200, portfolio)
-	return c.JSON(200, stocks)
+
+	httpResponse := &response{
+		portfolio,
+		stocks,
+	}
+
+	return c.JSON(200, httpResponse)
 }
 
 func (h *Handler) deletePortfolio(c echo.Context) error {

@@ -40,7 +40,7 @@ func (ps *PortfolioServiceImp) GetAllPortfolios(ctx context.Context, token strin
 	return portfolios, nil
 }
 
-func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, token string, portfolioId int) (*models.Portfolio, []*models.Stock, error) {
+func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, token string, portfolioId int) (*models.OnePortfolioResp, []*models.StockResp, error) {
 	log := logging.FromContext(ctx)
 
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {

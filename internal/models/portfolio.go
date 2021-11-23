@@ -11,3 +11,9 @@ type Portfolio struct {
 	//Stocks      map[Stock]int        `json:"stocks"`
 	//Cash        map[Currency]float32 `json:"cash"`
 }
+
+type OnePortfolioResp struct {
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Public      bool    `json:"is_public"`
+}

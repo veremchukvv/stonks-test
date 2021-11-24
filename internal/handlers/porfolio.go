@@ -104,5 +104,29 @@ func (h *Handler) getPortfolio(c echo.Context) error {
 }
 
 func (h *Handler) deletePortfolio(c echo.Context) error {
-	return c.String(http.StatusNotImplemented, "not implemented yet")
+	log := logging.FromContext(h.ctx)
+	token, err := c.Request().Cookie("jwt")
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			c.Response().WriteHeader(http.StatusUnauthorized)
+			c.Response().Write([]byte(`{"error": "not logined"}`))
+			return nil
+		}
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
+		return nil
+	}
+	portfolioId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Info("can't parse URL params")
+		return c.JSON(500, "can't parse URL params")
+	}
+
+	err = h.services.PortfolioService.DeletePortfolio(context.Background(), token.Value, portfolioId)
+	if err != nil {
+		log.Infof("can't delete portfolio with ID %d", portfolioId)
+		return c.JSON(500, "can't delete portfolio")
+	}
+
+	return c.Redirect(http.StatusOK, "http://localhost:3000/")
 }

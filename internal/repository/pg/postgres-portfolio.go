@@ -115,6 +115,15 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 }
 
 func (pr *PostgresPortfolioRepo) DeletePortfolio(ctx context.Context, portfolioId int) error {
+	log := logging.FromContext(ctx)
+
+	const query string = `DELETE FROM portfolios WHERE portfolio_id =$1 returning portfolio_id`
+	var pid int
+	err := pr.db.QueryRow(ctx, query, portfolioId).Scan(&pid)
+	if err != nil {
+		log.Infof("error on deleting portfolio: %d from database %v", portfolioId, err)
+		return err
+	}
 	return nil
 }
 

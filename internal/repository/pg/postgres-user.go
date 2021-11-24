@@ -118,7 +118,7 @@ func (ur *PostgresUserRepo) DeleteUser(ctx context.Context, userId int, authType
 	var uid int
 	err := ur.db.QueryRow(ctx, query, userId, authType).Scan(&uid)
 	if err != nil {
-		log.Errorf("Error on delete user from database: %v", err)
+		log.Errorf("Error on delete user %d from database: %v", userId, err)
 		return err
 	}
 	return nil

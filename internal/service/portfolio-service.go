@@ -79,6 +79,22 @@ func (ps *PortfolioServiceImp) CreatePortfolio(ctx context.Context, token string
 	return createdPortfolio, nil
 }
 
-func (ps *PortfolioServiceImp) DeletePortfolio(ctx context.Context, portfolioId int) error {
+func (ps *PortfolioServiceImp) DeletePortfolio(ctx context.Context, token string, portfolioId int) error {
+	log := logging.FromContext(ctx)
+
+	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		log.Info("error on authenticating user")
+		return err
+	}
+
+	err = ps.repo.DeletePortfolio(ctx, portfolioId)
+	if err != nil {
+		log.Infof("error on deleting portfolio %d", portfolioId)
+		return err
+	}
+
 	return nil
 }

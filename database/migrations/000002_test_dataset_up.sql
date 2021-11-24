@@ -39,3 +39,11 @@ insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amou
 insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (2, 2, 50, 1, 3);
 insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (3, 1, 100, 1, 10);
 insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (3, 2, 50, 1, 20);
+
+
+insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (7, 1, 100, 1, 10);
+insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (7, 2, 50, 1, 20);
+insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (7, 3, 200, 2, 30);
+insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (7, 4, 1000, 2, 40);
+insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (7, 5, 300, 3, 50);
+insert into stocks_items(portfolio, stock_item, stock_cost, stock_currency, amount) values (7, 6, 500, 3, 60);

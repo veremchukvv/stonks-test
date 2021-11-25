@@ -46,8 +46,35 @@ func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userId in
 	return portfoliosWithAssets, nil
 }
 
-func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioId int) (*models.Portfolio, error) {
-	return nil, nil
+func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioId int) (*models.OnePortfolioResp, []*models.StockResp, error) {
+	log := logging.FromContext(ctx)
+
+	const queryPortfolio string = `SELECT portfolio_name, description, is_public FROM portfolios WHERE portfolio_id=$1`
+	var portfolio models.OnePortfolioResp
+
+	err := pr.db.QueryRow(ctx, queryPortfolio, portfolioId).Scan(&portfolio.Name, &portfolio.Description, &portfolio.Public)
+	if err != nil {
+		log.Infof("Error on query rows: %v", err)
+		return nil, nil, err
+	}
+
+	const queryStocks string = `SELECT stocks_item_id, ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
+					currency_ticker FROM stocks_items INNER JOIN stocks ON stock_id = stock_item AND stock_currency = 
+					currency AND stock_cost = cost INNER JOIN currencies ON currency_id = stock_currency 
+					WHERE (portfolio=$1 and stock_cost>0)`
+	var stocks []*models.StockResp
+	rowsStocks, err := pr.db.Query(ctx, queryStocks, portfolioId)
+	if err != nil {
+		log.Infof("Error on query rows: %v", err)
+		return nil, nil, err
+	}
+	defer rowsStocks.Close()
+	for rowsStocks.Next() {
+		var stock models.StockResp
+		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency)
+		stocks = append(stocks, &stock)
+	}
+	return &portfolio, stocks, nil
 }
 
 func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int, authType string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
@@ -88,6 +115,15 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 }
 
 func (pr *PostgresPortfolioRepo) DeletePortfolio(ctx context.Context, portfolioId int) error {
+	log := logging.FromContext(ctx)
+
+	const query string = `DELETE FROM portfolios WHERE portfolio_id =$1 returning portfolio_id`
+	var pid int
+	err := pr.db.QueryRow(ctx, query, portfolioId).Scan(&pid)
+	if err != nil {
+		log.Infof("error on deleting portfolio: %d from database %v", portfolioId, err)
+		return err
+	}
 	return nil
 }
 

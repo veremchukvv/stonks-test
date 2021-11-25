@@ -22,7 +22,8 @@ func NewPostgresPortfolioRepo(pgpool *pgxpool.Pool, ctx context.Context) *Postgr
 
 func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userId int, authType string) ([]*models.Portfolio, error) {
 	log := logging.FromContext(ctx)
-	const queryPortfolios string = `SELECT portfolio_id, portfolio_name, description, is_public FROM portfolios WHERE (user_id=$1 and user_auth_type=$2)`
+	const queryPortfolios string = `SELECT portfolio_id, portfolio_name, description, is_public FROM portfolios WHERE 
+									(user_id=$1 and user_auth_type=$2)`
 	var portfolios []*models.Portfolio
 	rowsPortfolios, err := pr.db.Query(ctx, queryPortfolios, userId, authType)
 	if err != nil {
@@ -86,7 +87,8 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 		return nil, err
 	}
 
-	const createNewPortfolio string = `INSERT INTO portfolios (user_id, user_auth_type, portfolio_name, description, is_public) VALUES ($1, $2, $3, $4, $5) returning portfolio_id`
+	const createNewPortfolio string = `INSERT INTO portfolios (user_id, user_auth_type, portfolio_name, description, 
+									is_public) VALUES ($1, $2, $3, $4, $5) returning portfolio_id`
 
 	var pid int
 	err = pr.db.QueryRow(ctx, createNewPortfolio, userId, authType, newPortfolio.Name, newPortfolio.Description, newPortfolio.Public).Scan(&pid)
@@ -97,8 +99,10 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 
 	var bid int
 	var sid int
-	const createNewBalances string = `INSERT INTO balances (portfolio_id, currency_id, money_value) VALUES ($1, $2, $3) returning balance_id`
-	const createNewStockItem string = `INSERT INTO stocks_items (portfolio, stock_item, stock_cost, stock_currency, amount) VALUES ($1, $2, $3, $4, $5) returning stocks_item_id`
+	const createNewBalances string = `INSERT INTO balances (portfolio_id, currency_id, money_value) VALUES ($1, $2, $3) 
+									returning balance_id`
+	const createNewStockItem string = `INSERT INTO stocks_items (portfolio, stock_item, stock_cost, stock_currency, 
+									amount) VALUES ($1, $2, $3, $4, $5) returning stocks_item_id`
 	for _, v := range currenciesList {
 		err = pr.db.QueryRow(ctx, createNewBalances, pid, v.Id, 0).Scan(&bid)
 		if err != nil {

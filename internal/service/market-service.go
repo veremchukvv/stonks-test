@@ -17,7 +17,7 @@ func NewMarketServiceImp(repo repository.MarketRepository) *MarketServiceImp {
 }
 
 func (msi *MarketServiceImp) GetAllStocks(ctx context.Context) ([]*models.Stock, error) {
-	return nil, nil
+	return msi.repo.GetAllStocks(ctx)
 }
 
 func (msi *MarketServiceImp) GetOneStock(ctx context.Context, stockId int) (*models.Stock, error) {
@@ -31,4 +31,3 @@ func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stock
 func (msi *MarketServiceImp) DeleteDeal(ctx context.Context, token string, dealId int) error {
 	return nil
 }
-

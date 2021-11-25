@@ -65,5 +65,12 @@ func (h *Handler) InitRoutes() *echo.Echo {
 	//	market.GET("/:id")
 	//	market.POST("/:id/deal")
 	//}
+	market := e.Group("/api/v1/stockmarket")
+	{
+		market.GET("/", h.getAllStocks)
+		market.GET("/:id", h.getOneStock)
+		market.POST("/:id/deal", h.makeDeal)
+		market.DELETE("/:id/deal", h.deleteDeal)
+	}
 	return e
 }

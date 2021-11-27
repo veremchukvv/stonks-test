@@ -7,11 +7,14 @@ import (
 )
 
 func (h *Handler) getAllStocks(c echo.Context) error {
+	//log := logging.FromContext(h.ctx)
+
 	s, err := h.services.MarketService.GetAllStocks(context.Background())
 
 	if err != nil {
 		return c.JSON(500, "can't get stocks")
 	}
+
 	return c.JSON(200, s)
 }
 
@@ -26,4 +29,3 @@ func (h *Handler) makeDeal(c echo.Context) error {
 func (h *Handler) deleteDeal(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "not implemented yet")
 }
-

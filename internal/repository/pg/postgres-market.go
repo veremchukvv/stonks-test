@@ -8,7 +8,7 @@ import (
 )
 
 type PostgresMarketRepo struct {
-	db *pgxpool.Pool
+	db  *pgxpool.Pool
 	ctx context.Context
 }
 
@@ -19,14 +19,12 @@ func NewPostgresMarketRepo(db *pgxpool.Pool, ctx context.Context) *PostgresMarke
 	}
 }
 
-func (pmr *PostgresMarketRepo) GetAllStocks(ctx context.Context) ([]*models.Stock, error) {
+func (pmr *PostgresMarketRepo) GetAllStocks(ctx context.Context) ([]*models.StockResp, error) {
 	log := logging.FromContext(ctx)
 
-	//const queryAllStocks string = `SELECT stock_id, stock_name, ticker, stock_type, cost, currency_ticker
-	//								FROM stocks INNER JOIN currencies ON currency_id = currency WHERE stock_id>1`
-	const queryAllStocks string = `SELECT stock_id, stock_name, ticker, stock_type, cost
-									FROM stocks WHERE cost>0`
-	var stocks []*models.Stock
+	const queryAllStocks string = `SELECT stock_id, stock_name, ticker, stock_type, cost, currency_ticker
+									FROM stocks INNER JOIN currencies ON currency_id = currency WHERE cost>0`
+	var stocks []*models.StockResp
 	rowsPortfolios, err := pmr.db.Query(ctx, queryAllStocks)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
@@ -34,9 +32,8 @@ func (pmr *PostgresMarketRepo) GetAllStocks(ctx context.Context) ([]*models.Stoc
 	}
 	defer rowsPortfolios.Close()
 	for rowsPortfolios.Next() {
-		var stock models.Stock
-		//err = rowsPortfolios.Scan(&stock.Id, &stock.Name, &stock.Ticker, &stock.Type, &stock.Cost, &stock.Currency)
-		err = rowsPortfolios.Scan(&stock.Id, &stock.Name, &stock.Ticker, &stock.Type, &stock.Cost)
+		var stock models.StockResp
+		err = rowsPortfolios.Scan(&stock.Id, &stock.Name, &stock.Ticker, &stock.Type, &stock.Cost, &stock.Currency)
 		if err != nil {
 			log.Infof("Error on scan rows: %v", err)
 			return nil, err

@@ -13,7 +13,7 @@ type Portfolio struct {
 }
 
 type OnePortfolioResp struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Public      bool    `json:"is_public"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Public      bool   `json:"is_public"`
 }

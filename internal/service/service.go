@@ -27,7 +27,7 @@ type PortfolioService interface {
 }
 
 type MarketService interface {
-	GetAllStocks(ctx context.Context) ([]*models.Stock, error)
+	GetAllStocks(ctx context.Context) ([]*models.StockResp, error)
 	GetOneStock(ctx context.Context, stockId int) (*models.Stock, error)
 	CreateDeal(ctx context.Context, token string, stockId int, stockAmount int) (int, error)
 	DeleteDeal(ctx context.Context, token string, dealId int) error

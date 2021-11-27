@@ -20,8 +20,8 @@ func (msi *MarketServiceImp) GetAllStocks(ctx context.Context) ([]*models.StockR
 	return msi.repo.GetAllStocks(ctx)
 }
 
-func (msi *MarketServiceImp) GetOneStock(ctx context.Context, stockId int) (*models.Stock, error) {
-	return nil, nil
+func (msi *MarketServiceImp) GetOneStock(ctx context.Context, stockId int) (*models.StockResp, error) {
+	return msi.repo.GetOneStock(ctx, stockId)
 }
 
 func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stockId int, stockAmount int) (int, error) {

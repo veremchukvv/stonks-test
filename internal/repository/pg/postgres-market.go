@@ -56,8 +56,18 @@ func (pmr *PostgresMarketRepo) GetOneStock(ctx context.Context, stockId int) (*m
 	}
 	return &stock, nil
 }
-func (pmr *PostgresMarketRepo) CreateDeal(ctx context.Context, stockId int, stockAmount int) (int, error) {
-	return 0, nil
+func (pmr *PostgresMarketRepo) CreateDeal(ctx context.Context, stockId int, stockAmount int, portfolioId int) (int, error) {
+	log := logging.FromContext(ctx)
+
+	const query string = `INSERT INTO stocks_items (portfolio, stock_item, amount) VALUES ($1, $2, $3) returning stocks_item_id`
+	var did int
+	err := pmr.db.QueryRow(ctx, query, portfolioId, stockId, stockAmount).Scan(&did)
+	if err != nil {
+		log.Infof("Error on query rows: %v", err)
+		return 0, err
+	}
+
+	return did, nil
 }
 func (pmr *PostgresMarketRepo) DeleteDeal(ctx context.Context, dealId int) error {
 	return nil

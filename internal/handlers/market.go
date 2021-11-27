@@ -3,6 +3,8 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
+	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"net/http"
 	"strconv"
@@ -39,7 +41,32 @@ func (h *Handler) getOneStock(c echo.Context) error {
 }
 
 func (h *Handler) makeDeal(c echo.Context) error {
-	return c.String(http.StatusNotImplemented, "not implemented yet")
+	log := logging.FromContext(h.ctx)
+
+	var req models.Deal
+
+	err := c.Bind(&req)
+	if err != nil {
+		log.Infof("error on get params from HTTP POST request %v", err)
+		return c.JSON(500, "error on get params from HTTP POST request")
+	}
+
+	cookie, err := c.Request().Cookie("jwt")
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			log.Infof("not logined %v", err)
+			return c.JSON(401, "not logined")
+		}
+		return c.JSON(500, "can't parse cookie")
+	}
+
+	d, err := h.services.MarketService.CreateDeal(context.Background(), cookie.Value, req.StockID, req.StockAmount, req.PortfolioID)
+	if err != nil {
+		log.Infof("error on creating deal %v", err)
+		return c.JSON(500, "error on creating deal")
+	}
+
+	return c.JSON(200, d)
 }
 
 func (h *Handler) deleteDeal(c echo.Context) error {

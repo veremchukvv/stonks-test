@@ -69,8 +69,8 @@ func (h *Handler) InitRoutes() *echo.Echo {
 	{
 		market.GET("/", h.getAllStocks)
 		market.GET("/:id", h.getOneStock)
-		market.POST("/:id/deal", h.makeDeal)
-		market.DELETE("/:id/deal", h.deleteDeal)
+		market.POST("/deal", h.makeDeal)
+		market.DELETE("/deal/:id", h.deleteDeal)
 	}
 	return e
 }

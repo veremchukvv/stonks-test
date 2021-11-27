@@ -25,6 +25,6 @@ type PortfolioRepository interface {
 type MarketRepository interface {
 	GetAllStocks(ctx context.Context) ([]*models.StockResp, error)
 	GetOneStock(ctx context.Context, stockId int) (*models.StockResp, error)
-	CreateDeal(ctx context.Context, stockId int, stockAmount int) (int, error)
+	CreateDeal(ctx context.Context, stockId int, stockAmount int, portfolioId int) (int, error)
 	DeleteDeal(ctx context.Context, dealId int) error
 }

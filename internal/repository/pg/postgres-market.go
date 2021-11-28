@@ -49,7 +49,8 @@ func (pmr *PostgresMarketRepo) GetOneStock(ctx context.Context, stockId int) (*m
 	const query string = `SELECT stock_name, ticker, stock_type, description, cost, currency_ticker
 									FROM stocks INNER JOIN currencies ON currency_id = currency WHERE stock_id=$1`
 	var stock models.StockResp
-	err := pmr.db.QueryRow(ctx, query, stockId).Scan(&stock.Name, &stock.Ticker, &stock.Type, &stock.Description, &stock.Cost, &stock.Currency)
+	err := pmr.db.QueryRow(ctx, query, stockId).Scan(&stock.Name, &stock.Ticker, &stock.Type, &stock.Description,
+		&stock.Cost, &stock.Currency)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, err
@@ -59,9 +60,11 @@ func (pmr *PostgresMarketRepo) GetOneStock(ctx context.Context, stockId int) (*m
 func (pmr *PostgresMarketRepo) CreateDeal(ctx context.Context, stockId int, stockAmount int, portfolioId int) (int, error) {
 	log := logging.FromContext(ctx)
 
-	const query string = `INSERT INTO stocks_items (portfolio, stock_item, amount) VALUES ($1, $2, $3) returning stocks_item_id`
+	const query string = `WITH rows AS (SELECT cost, currency FROM stocks WHERE stock_id = $1) INSERT INTO stocks_items 
+						(portfolio, stock_item, amount, stock_cost, stock_currency) SELECT $2, $3, $4, rows.cost, 
+						rows.currency FROM rows returning stocks_item_id;`
 	var did int
-	err := pmr.db.QueryRow(ctx, query, portfolioId, stockId, stockAmount).Scan(&did)
+	err := pmr.db.QueryRow(ctx, query, stockId, portfolioId, stockId, stockAmount).Scan(&did)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return 0, err

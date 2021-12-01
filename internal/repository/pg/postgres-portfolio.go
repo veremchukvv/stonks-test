@@ -60,7 +60,7 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	}
 
 	const queryStocks string = `SELECT stocks_item_id, ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
-					currency_ticker FROM stocks_items INNER JOIN stocks ON stock_id = stock_item AND stock_currency = 
+					currency_ticker, created_at FROM stocks_items INNER JOIN stocks ON stock_id = stock_item AND stock_currency = 
 					currency AND stock_cost = cost INNER JOIN currencies ON currency_id = stock_currency 
 					WHERE (portfolio=$1 and stock_cost>0)`
 	var stocks []*models.StockResp
@@ -72,7 +72,7 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	defer rowsStocks.Close()
 	for rowsStocks.Next() {
 		var stock models.StockResp
-		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency)
+		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency, &stock.CreatedAt)
 		stocks = append(stocks, &stock)
 	}
 	return &portfolio, stocks, nil

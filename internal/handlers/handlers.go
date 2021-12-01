@@ -59,7 +59,7 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		portfolio.GET("/:id", h.getPortfolio)
 		portfolio.DELETE("/:id", h.deletePortfolio)
 	}
-	deal := e.Group("/deal")
+	deal := e.Group("/api/v1/deals")
 	{
 		deal.GET("/:id", h.getOneDeal)
 		deal.POST("/:id", h.closeDeal)

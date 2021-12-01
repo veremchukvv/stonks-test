@@ -72,6 +72,3 @@ func (pmr *PostgresMarketRepo) CreateDeal(ctx context.Context, stockId int, stoc
 
 	return did, nil
 }
-func (pmr *PostgresMarketRepo) DeleteDeal(ctx context.Context, dealId int) error {
-	return nil
-}

@@ -26,14 +26,23 @@ type PortfolioService interface {
 	DeletePortfolio(ctx context.Context, token string, portfolioId int) error
 }
 
+type MarketService interface {
+	GetAllStocks(ctx context.Context) ([]*models.StockResp, error)
+	GetOneStock(ctx context.Context, stockId int) (*models.StockResp, error)
+	CreateDeal(ctx context.Context, token string, stockId int, stockAmount int, portfolioId int) (int, error)
+	DeleteDeal(ctx context.Context, token string, dealId int) error
+}
+
 type Services struct {
 	UserService      UserService
 	PortfolioService PortfolioService
+	MarketService    MarketService
 }
 
 func NewService(store *repository.Store, hasher *hash.BCHasher) *Services {
 	return &Services{
 		NewUserServiceImp(store, hasher),
 		NewPortfolioServiceImp(store),
+		NewMarketServiceImp(store),
 	}
 }

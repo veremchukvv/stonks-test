@@ -1,6 +1,9 @@
 package models
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Stock struct {
 	Id          int     `json:"id"`
@@ -13,14 +16,16 @@ type Stock struct {
 }
 
 type StockResp struct {
-	Id          int     `json:"id"`
-	Ticker      string  `json:"ticker"`
-	Name        string  `json:"name"`
-	Type		string  `json:"type"`
-	Amount		int		`json:"amount"`
-	Cost        float32 `json:"cost"`
-	Value       float32 `json:"value"`
-	Currency    string  `json:"currency"`
+	Id          int       `json:"id"`
+	Ticker      string    `json:"ticker"`
+	Name        string    `json:"name"`
+	Type        string    `json:"type"`
+	Description string    `json:"description"`
+	Amount      int       `json:"amount"`
+	Cost        float32   `json:"cost"`
+	Value       float32   `json:"value"`
+	Currency    string    `json:"currency"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 func (s Stock) MarshalText() (text []byte, err error) {

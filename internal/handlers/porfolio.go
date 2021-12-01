@@ -70,7 +70,7 @@ func (h *Handler) getPortfolio(c echo.Context) error {
 
 	type response struct {
 		PortfolioResp *models.OnePortfolioResp
-		StocksResp []*models.StockResp
+		StocksResp    []*models.StockResp
 	}
 
 	log := logging.FromContext(h.ctx)

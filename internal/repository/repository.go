@@ -21,3 +21,10 @@ type PortfolioRepository interface {
 	CreatePortfolio(ctx context.Context, userId int, authType string, portfolio *models.Portfolio) (*models.Portfolio, error)
 	DeletePortfolio(ctx context.Context, portfolioId int) error
 }
+
+type MarketRepository interface {
+	GetAllStocks(ctx context.Context) ([]*models.StockResp, error)
+	GetOneStock(ctx context.Context, stockId int) (*models.StockResp, error)
+	CreateDeal(ctx context.Context, stockId int, stockAmount int, portfolioId int) (int, error)
+	DeleteDeal(ctx context.Context, dealId int) error
+}

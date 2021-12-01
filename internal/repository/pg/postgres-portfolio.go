@@ -22,7 +22,8 @@ func NewPostgresPortfolioRepo(pgpool *pgxpool.Pool, ctx context.Context) *Postgr
 
 func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userId int, authType string) ([]*models.Portfolio, error) {
 	log := logging.FromContext(ctx)
-	const queryPortfolios string = `SELECT portfolio_id, portfolio_name, description, is_public FROM portfolios WHERE (user_id=$1 and user_auth_type=$2)`
+	const queryPortfolios string = `SELECT portfolio_id, portfolio_name, description, is_public FROM portfolios WHERE 
+									(user_id=$1 and user_auth_type=$2)`
 	var portfolios []*models.Portfolio
 	rowsPortfolios, err := pr.db.Query(ctx, queryPortfolios, userId, authType)
 	if err != nil {
@@ -59,7 +60,7 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	}
 
 	const queryStocks string = `SELECT stocks_item_id, ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
-					currency_ticker FROM stocks_items INNER JOIN stocks ON stock_id = stock_item AND stock_currency = 
+					currency_ticker, created_at FROM stocks_items INNER JOIN stocks ON stock_id = stock_item AND stock_currency = 
 					currency AND stock_cost = cost INNER JOIN currencies ON currency_id = stock_currency 
 					WHERE (portfolio=$1 and stock_cost>0)`
 	var stocks []*models.StockResp
@@ -71,7 +72,7 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	defer rowsStocks.Close()
 	for rowsStocks.Next() {
 		var stock models.StockResp
-		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency)
+		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency, &stock.CreatedAt)
 		stocks = append(stocks, &stock)
 	}
 	return &portfolio, stocks, nil
@@ -86,7 +87,8 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 		return nil, err
 	}
 
-	const createNewPortfolio string = `INSERT INTO portfolios (user_id, user_auth_type, portfolio_name, description, is_public) VALUES ($1, $2, $3, $4, $5) returning portfolio_id`
+	const createNewPortfolio string = `INSERT INTO portfolios (user_id, user_auth_type, portfolio_name, description, 
+									is_public) VALUES ($1, $2, $3, $4, $5) returning portfolio_id`
 
 	var pid int
 	err = pr.db.QueryRow(ctx, createNewPortfolio, userId, authType, newPortfolio.Name, newPortfolio.Description, newPortfolio.Public).Scan(&pid)
@@ -97,8 +99,10 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 
 	var bid int
 	var sid int
-	const createNewBalances string = `INSERT INTO balances (portfolio_id, currency_id, money_value) VALUES ($1, $2, $3) returning balance_id`
-	const createNewStockItem string = `INSERT INTO stocks_items (portfolio, stock_item, stock_cost, stock_currency, amount) VALUES ($1, $2, $3, $4, $5) returning stocks_item_id`
+	const createNewBalances string = `INSERT INTO balances (portfolio_id, currency_id, money_value) VALUES ($1, $2, $3) 
+									returning balance_id`
+	const createNewStockItem string = `INSERT INTO stocks_items (portfolio, stock_item, stock_cost, stock_currency, 
+									amount) VALUES ($1, $2, $3, $4, $5) returning stocks_item_id`
 	for _, v := range currenciesList {
 		err = pr.db.QueryRow(ctx, createNewBalances, pid, v.Id, 0).Scan(&bid)
 		if err != nil {

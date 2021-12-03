@@ -61,8 +61,8 @@ func (pmr *PostgresMarketRepo) CreateDeal(ctx context.Context, stockId int, stoc
 	log := logging.FromContext(ctx)
 
 	const query string = `WITH rows AS (SELECT cost, currency FROM stocks WHERE stock_id = $1) INSERT INTO stocks_items 
-						(portfolio, stock_item, amount, stock_cost, stock_currency) SELECT $2, $3, $4, rows.cost, 
-						rows.currency FROM rows returning stocks_item_id;`
+						(portfolio, stock_item, amount, stock_cost, stock_currency, buy_cost) SELECT $2, $3, $4, rows.cost, 
+						rows.currency, cost FROM rows returning stocks_item_id;`
 	var did int
 	err := pmr.db.QueryRow(ctx, query, stockId, portfolioId, stockId, stockAmount).Scan(&did)
 	if err != nil {

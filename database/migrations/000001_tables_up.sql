@@ -52,13 +52,21 @@ CREATE TABLE if not exists stocks
 );
 CREATE TABLE if not exists stocks_items
 (
-    stocks_item_id SERIAL,
-    portfolio      INTEGER            REFERENCES portfolios(portfolio_id) ON DELETE CASCADE,
-    stock_item     INTEGER,
-    stock_cost     FLOAT,
-    stock_currency INTEGER,
-    amount         INTEGER,
-    stock_value    FLOAT              GENERATED ALWAYS AS (amount * stock_cost) STORED,
-    created_at     TIMESTAMPTZ        NOT NULL DEFAULT current_timestamp,
-    FOREIGN KEY (stock_item, stock_cost, stock_currency) REFERENCES stocks (stock_id, cost, currency)
+    stocks_item_id       SERIAL,
+    portfolio            INTEGER            REFERENCES portfolios(portfolio_id) ON DELETE CASCADE,
+    stock_item           INTEGER,
+    stock_cost           FLOAT,
+    stock_currency       INTEGER,
+    amount               INTEGER,
+    stock_value          FLOAT              GENERATED ALWAYS AS (amount * stock_cost) STORED,
+    created_at           TIMESTAMPTZ        NOT NULL DEFAULT current_timestamp,
+    closed               BOOL               NOT NULL DEFAULT FALSE,
+    closed_at            TIMESTAMPTZ,
+    buy_cost             FLOAT,
+    sell_cost            FLOAT,
+    income_inter_money   FLOAT              GENERATED ALWAYS AS ((stock_cost - buy_cost) * amount) STORED,
+    income_inter_percent FLOAT              GENERATED ALWAYS AS ((((stock_cost - buy_cost) * amount)/(buy_cost*amount)) * 100) STORED,
+    income_final_money   FLOAT,
+    income_final_percent FLOAT,
+    FOREIGN KEY (stock_item, stock_cost, stock_currency) REFERENCES stocks (stock_id, cost, currency) ON UPDATE CASCADE
 );

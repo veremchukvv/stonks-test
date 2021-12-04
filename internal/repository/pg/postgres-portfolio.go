@@ -103,13 +103,13 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 									returning balance_id`
 	const createNewStockItem string = `INSERT INTO stocks_items (portfolio, stock_item, stock_cost, stock_currency, 
 									amount) VALUES ($1, $2, $3, $4, $5) returning stocks_item_id`
-	for _, v := range currenciesList {
+	for i, v := range currenciesList {
 		err = pr.db.QueryRow(ctx, createNewBalances, pid, v.Id, 0).Scan(&bid)
 		if err != nil {
 			log.Infof("Error on processing query to DB: %v", err)
 			return nil, err
 		}
-		err = pr.db.QueryRow(ctx, createNewStockItem, pid, 1, 0, v.Id, 1).Scan(&sid)
+		err = pr.db.QueryRow(ctx, createNewStockItem, pid, i+1, 0, v.Id, 1).Scan(&sid)
 		if err != nil {
 			log.Infof("Error on processing query to DB: %v", err)
 			return nil, err

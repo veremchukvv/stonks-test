@@ -66,7 +66,7 @@ CREATE TABLE if not exists stocks_items
     sell_cost            FLOAT,
     income_inter_money   FLOAT              GENERATED ALWAYS AS ((stock_cost - buy_cost) * amount) STORED,
     income_inter_percent FLOAT              GENERATED ALWAYS AS ((((stock_cost - buy_cost) * amount)/(buy_cost*amount)) * 100) STORED,
-    income_final_money   FLOAT,
-    income_final_percent FLOAT,
+    income_final_money   FLOAT              NOT NULL DEFAULT 0,
+    income_final_percent FLOAT              NOT NULL DEFAULT 0,
     FOREIGN KEY (stock_item, stock_cost, stock_currency) REFERENCES stocks (stock_id, cost, currency) ON UPDATE CASCADE
 );

@@ -7,8 +7,6 @@ import (
 	"github.com/veremchukvv/stonks-test/internal/service"
 )
 
-//const apiVersion = "v1"
-
 type Handler struct {
 	ctx      context.Context
 	services *service.Services
@@ -51,6 +49,7 @@ func (h *Handler) InitRoutes() *echo.Echo {
 	//		profile.GET("/:id", h.getProfile)
 	//		profile.DELETE("/:id", h.deleteProfile)
 	//	}
+
 	portfolio := e.Group("/api/v1/portfolio")
 	{
 		portfolio.POST("/", h.createPortfolio)
@@ -59,12 +58,14 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		portfolio.GET("/:id", h.getPortfolio)
 		portfolio.DELETE("/:id", h.deletePortfolio)
 	}
+
 	deal := e.Group("/api/v1/deals")
 	{
 		deal.GET("/:id", h.getOneDeal)
 		deal.POST("/:id", h.closeDeal)
 		deal.DELETE("/:id", h.deleteDeal)
 	}
+
 	market := e.Group("/api/v1/stockmarket")
 	{
 		market.GET("/", h.getAllStocks)
@@ -73,5 +74,6 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		market.DELETE("/deal/:id", h.deleteDeal)
 		
 	}
+
 	return e
 }

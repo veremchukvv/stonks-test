@@ -50,9 +50,9 @@ CREATE TABLE if not exists stocks
     currency      INTEGER             REFERENCES currencies(currency_id),
     PRIMARY KEY (stock_id, cost, currency)
 );
-CREATE TABLE if not exists stocks_items
+CREATE TABLE if not exists deals
 (
-    stocks_item_id       SERIAL,
+    deal_id              SERIAL,
     portfolio            INTEGER            REFERENCES portfolios(portfolio_id) ON DELETE CASCADE,
     stock_item           INTEGER,
     stock_cost           FLOAT,

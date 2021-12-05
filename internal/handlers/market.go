@@ -68,7 +68,3 @@ func (h *Handler) makeDeal(c echo.Context) error {
 
 	return c.JSON(200, d)
 }
-
-func (h *Handler) deleteDeal(c echo.Context) error {
-	return c.String(http.StatusNotImplemented, "not implemented yet")
-}

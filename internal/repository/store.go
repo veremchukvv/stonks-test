@@ -10,6 +10,7 @@ type Store struct {
 	UserRepository
 	PortfolioRepository
 	MarketRepository
+	DealRepository
 }
 
 func NewStore(db *pgxpool.Pool, ctx context.Context) *Store {
@@ -17,5 +18,6 @@ func NewStore(db *pgxpool.Pool, ctx context.Context) *Store {
 		pg.NewPostgresUserRepo(db, ctx),
 		pg.NewPostgresPortfolioRepo(db, ctx),
 		pg.NewPostgresMarketRepo(db, ctx),
+		pg.NewPostgresDealRepo(db, ctx),
 	}
 }

@@ -60,9 +60,9 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	}
 
 	const queryStocks string = `SELECT stocks_item_id, ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
-					currency_ticker, created_at FROM stocks_items INNER JOIN stocks ON stock_id = stock_item AND stock_currency = 
-					currency AND stock_cost = cost INNER JOIN currencies ON currency_id = stock_currency 
-					WHERE (portfolio=$1 and stock_cost>0)`
+					currency_ticker, created_at, closed, income_final_money, income_final_percent FROM stocks_items 
+                    INNER JOIN stocks ON stock_id = stock_item AND stock_currency = currency AND stock_cost = cost 
+                    INNER JOIN currencies ON currency_id = stock_currency WHERE (portfolio=$1 and stock_cost>0)`
 	var stocks []*models.StockResp
 	rowsStocks, err := pr.db.Query(ctx, queryStocks, portfolioId)
 	if err != nil {
@@ -72,7 +72,7 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 	defer rowsStocks.Close()
 	for rowsStocks.Next() {
 		var stock models.StockResp
-		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency, &stock.CreatedAt)
+		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency, &stock.CreatedAt, &stock.IsClosed, &stock.ProfitClosed, &stock.PercentClosed)
 		stocks = append(stocks, &stock)
 	}
 	return &portfolio, stocks, nil
@@ -103,13 +103,13 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 									returning balance_id`
 	const createNewStockItem string = `INSERT INTO stocks_items (portfolio, stock_item, stock_cost, stock_currency, 
 									amount) VALUES ($1, $2, $3, $4, $5) returning stocks_item_id`
-	for _, v := range currenciesList {
+	for i, v := range currenciesList {
 		err = pr.db.QueryRow(ctx, createNewBalances, pid, v.Id, 0).Scan(&bid)
 		if err != nil {
 			log.Infof("Error on processing query to DB: %v", err)
 			return nil, err
 		}
-		err = pr.db.QueryRow(ctx, createNewStockItem, pid, 1, 0, v.Id, 1).Scan(&sid)
+		err = pr.db.QueryRow(ctx, createNewStockItem, pid, i+1, 0, v.Id, 1).Scan(&sid)
 		if err != nil {
 			log.Infof("Error on processing query to DB: %v", err)
 			return nil, err

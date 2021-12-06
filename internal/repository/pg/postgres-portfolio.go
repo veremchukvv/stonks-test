@@ -83,11 +83,10 @@ func (pr *PostgresPortfolioRepo) GetPortfolioDeals(ctx context.Context, portfoli
 func (pr *PostgresPortfolioRepo) GetPortfolioClosedDeals(ctx context.Context, portfolioId int) ([]*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
-	const queryClosedDeals string = `SELECT closed_deal_id, ticker, stock_name, stock_type, amount, 
-					currency_ticker, closed_at, income_money, income_percent FROM closed_deals 
+	const queryClosedDeals string = `SELECT closed_deal_id, ticker, stock_name, stock_type, sell_cost, amount, 
+					currency_ticker, closed_at, stock_value, income_money, income_percent FROM closed_deals 
                     INNER JOIN stocks ON stock_id = stock_item AND stock_currency = currency 
-                    INNER JOIN currencies ON currency_id = stock_currency WHERE (portfolio=$1 and stock_cost >0
-)`
+                    INNER JOIN currencies ON currency_id = stock_currency WHERE (portfolio=$1 and stock_cost >0)`
 
 	var closedDeals []*models.DealResp
 	rowsClosedDeals, err := pr.db.Query(ctx, queryClosedDeals, portfolioId)
@@ -98,7 +97,7 @@ func (pr *PostgresPortfolioRepo) GetPortfolioClosedDeals(ctx context.Context, po
 	defer rowsClosedDeals.Close()
 	for rowsClosedDeals.Next() {
 		var closedDeal models.DealResp
-		err = rowsClosedDeals.Scan(&closedDeal.Id, &closedDeal.Ticker, &closedDeal.Name, &closedDeal.Type, &closedDeal.Amount, &closedDeal.Currency, &closedDeal.ClosedAt, &closedDeal.Profit, &closedDeal.Percent)
+		err = rowsClosedDeals.Scan(&closedDeal.Id, &closedDeal.Ticker, &closedDeal.Name, &closedDeal.Type, &closedDeal.SellCost, &closedDeal.Amount, &closedDeal.Currency, &closedDeal.ClosedAt, &closedDeal.Value, &closedDeal.Profit, &closedDeal.Percent)
 		closedDeals = append(closedDeals, &closedDeal)
 	}
 

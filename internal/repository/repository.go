@@ -33,4 +33,6 @@ type DealRepository interface {
 	GetOneDeal(ctx context.Context, dealId int) (*models.DealResp, error)
 	CloseDeal(ctx context.Context, dealId int) error
 	DeleteDeal(ctx context.Context, dealId int) error
+	GetOneClosedDeal(ctx context.Context, closedDealId int) (*models.DealResp, error)
+	DeleteClosedDeal(ctx context.Context, closedDealId int) error
 }

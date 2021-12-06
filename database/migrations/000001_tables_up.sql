@@ -78,7 +78,7 @@ CREATE TABLE if not exists closed_deals
     buy_cost       FLOAT,
     sell_cost      FLOAT              DEFAULT 0,
     stock_value    FLOAT              GENERATED ALWAYS AS (amount * sell_cost) STORED,
-    income_money   FLOAT,
-    income_percent FLOAT,
+    income_money   FLOAT              GENERATED ALWAYS AS ((sell_cost - buy_cost) * amount) STORED,
+    income_percent FLOAT              GENERATED ALWAYS AS ((((sell_cost - buy_cost) * amount)/(buy_cost*amount)) * 100) STORED,
     FOREIGN KEY (stock_item, stock_cost, stock_currency) REFERENCES stocks (stock_id, cost, currency) ON UPDATE CASCADE
 );

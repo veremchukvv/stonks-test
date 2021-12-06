@@ -67,6 +67,12 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		deal.DELETE("/:id", h.deleteDeal)
 	}
 
+	closedDeal := e.Group("/api/v1/closed")
+	{
+		closedDeal.GET("/:id", h.getOneClosedDeal)
+		closedDeal.DELETE("/:id", h.deleteClosedDeal)
+	}
+
 	market := e.Group("/api/v1/stockmarket")
 	{
 		market.GET("/", h.getAllStocks)

@@ -37,6 +37,8 @@ type DealService interface {
 	GetOneDeal(ctx context.Context, token string, dealId int) (*models.DealResp, error)
 	CloseDeal(ctx context.Context, token string, dealId int) error
 	DeleteDeal(ctx context.Context, token string, dealId int) error
+	GetOneClosedDeal(ctx context.Context, token string, closedDealId int) (*models.DealResp, error)
+	DeleteClosedDeal(ctx context.Context, token string, closedDealId int) error
 }
 
 type Services struct {

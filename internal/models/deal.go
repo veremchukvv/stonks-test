@@ -20,6 +20,8 @@ type DealResp struct {
 	Currency       string    `json:"currency"`
 	OpenedAt       time.Time `json:"opened_at"`
 	ClosedAt       time.Time `json:"closed_at"`
+	BuyCost        float32   `json:"buy_cost"`
+	SellCost	   float32   `json:"sell_cost"`
 	Profit         float32   `json:"profit"`
 	Percent        float32   `json:"percent"`
 

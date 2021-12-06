@@ -32,6 +32,20 @@ func (dsi *dealServiceImp) GetOneDeal(ctx context.Context, token string, dealId 
 	return dsi.repo.GetOneDeal(ctx, dealId)
 }
 
+func (dsi *dealServiceImp) GetOneClosedDeal(ctx context.Context, token string, closedDealId int) (*models.DealResp, error) {
+	log := logging.FromContext(ctx)
+
+	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		log.Info("error on authenticating user")
+		return nil, err
+	}
+
+	return dsi.repo.GetOneClosedDeal(ctx, closedDealId)
+}
+
 func (dsi *dealServiceImp) CloseDeal(ctx context.Context, token string, dealId int) error {
 	log := logging.FromContext(ctx)
 
@@ -45,6 +59,7 @@ func (dsi *dealServiceImp) CloseDeal(ctx context.Context, token string, dealId i
 
 	return dsi.repo.CloseDeal(ctx, dealId)
 }
+
 func (dsi *dealServiceImp) DeleteDeal(ctx context.Context, token string, dealId int) error {
 	log := logging.FromContext(ctx)
 
@@ -57,4 +72,18 @@ func (dsi *dealServiceImp) DeleteDeal(ctx context.Context, token string, dealId 
 	}
 
 	return dsi.repo.DeleteDeal(ctx, dealId)
+}
+
+func (dsi *dealServiceImp) DeleteClosedDeal(ctx context.Context, token string, closedDealId int) error {
+	log := logging.FromContext(ctx)
+
+	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		log.Info("error on authenticating user")
+		return err
+	}
+
+	return dsi.repo.DeleteClosedDeal(ctx, closedDealId)
 }

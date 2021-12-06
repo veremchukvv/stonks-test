@@ -19,17 +19,17 @@ func NewPostgresDealRepo(pgpool *pgxpool.Pool, ctx context.Context) *PostgresDea
 	}
 }
 
-func (npr *PostgresDealRepo) GetOneDeal(ctx context.Context, dealId int) (*models.StockResp, error) {
+func (npr *PostgresDealRepo) GetOneDeal(ctx context.Context, dealId int) (*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	const query string = `SELECT ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
-					currency_ticker, created_at FROM stocks_items INNER JOIN stocks ON stock_id = stock_item AND 
+					currency_ticker, created_at FROM deals INNER JOIN stocks ON stock_id = stock_item AND 
                     stock_currency = currency AND stock_cost = cost INNER JOIN currencies ON currency_id = 
-                    stock_currency WHERE stocks_item_id=$1`
+                    stock_currency WHERE deal_id=$1`
 
-	var deal models.StockResp
+	var deal models.DealResp
 
-	err := npr.db.QueryRow(ctx, query, dealId).Scan(&deal.Ticker, &deal.Name, &deal.Type, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.CreatedAt)
+	err := npr.db.QueryRow(ctx, query, dealId).Scan(&deal.Ticker, &deal.Name, &deal.Type, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.OpenedAt)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, err
@@ -43,10 +43,10 @@ func (npr *PostgresDealRepo) CloseDeal(ctx context.Context, dealId int) error {
 
 	const query string = `WITH aggregation_table AS (SELECT SUM((stock_cost - buy_cost) * amount) AS aggr_money, 
                           SUM((((stock_cost - buy_cost) * amount)/(buy_cost*amount)) * 100) AS aggr_percent FROM 
-                          stocks_items WHERE stocks_item_id = $1) UPDATE stocks_items SET (closed, sell_cost, closed_at, 
+                          deals WHERE deal_id = $1) UPDATE deals SET (closed, sell_cost, closed_at, 
                           income_final_money, income_final_percent) = (true, stock_cost, NOW(), 
                           aggregation_table.aggr_money, aggregation_table.aggr_percent) FROM aggregation_table WHERE 
-                          stocks_item_id = $1 returning stocks_item_id`
+                          deal_id = $1 returning deal_id`
 
 	var did int
 	err := npr.db.QueryRow(ctx, query, dealId).Scan(&did)
@@ -59,7 +59,7 @@ func (npr *PostgresDealRepo) CloseDeal(ctx context.Context, dealId int) error {
 func (npr *PostgresDealRepo) DeleteDeal(ctx context.Context, dealId int) error {
 	log := logging.FromContext(ctx)
 
-	const query string = `DELETE FROM stocks_items WHERE stocks_item_id =$1 returning stocks_item_id`
+	const query string = `DELETE FROM deals WHERE deal_id =$1 returning deal_id`
 	var did int
 	err := npr.db.QueryRow(ctx, query, dealId).Scan(&did)
 	if err != nil {

@@ -21,19 +21,20 @@ type UserService interface {
 
 type PortfolioService interface {
 	GetAllPortfolios(ctx context.Context, token string) ([]*models.Portfolio, error)
-	GetOnePortfolio(ctx context.Context, token string, portfolioId int) (*models.OnePortfolioResp, []*models.StockResp, error)
+	GetPortfolioDeals(ctx context.Context, token string, portfolioId int) (*models.OnePortfolioResp, []*models.DealResp, error)
+	GetPortfolioClosedDeals(ctx context.Context, token string, portfolioId int) ([]*models.DealResp, error)
 	CreatePortfolio(ctx context.Context, token string, portfolio *models.Portfolio) (*models.Portfolio, error)
 	DeletePortfolio(ctx context.Context, token string, portfolioId int) error
 }
 
 type MarketService interface {
-	GetAllStocks(ctx context.Context) ([]*models.StockResp, error)
-	GetOneStock(ctx context.Context, stockId int) (*models.StockResp, error)
+	GetAllStocks(ctx context.Context) ([]*models.DealResp, error)
+	GetOneStock(ctx context.Context, stockId int) (*models.DealResp, error)
 	CreateDeal(ctx context.Context, token string, stockId int, stockAmount int, portfolioId int) (int, error)
 }
 
 type DealService interface {
-	GetOneDeal(ctx context.Context, token string, dealId int) (*models.StockResp, error)
+	GetOneDeal(ctx context.Context, token string, dealId int) (*models.DealResp, error)
 	CloseDeal(ctx context.Context, token string, dealId int) error
 	DeleteDeal(ctx context.Context, token string, dealId int) error
 }

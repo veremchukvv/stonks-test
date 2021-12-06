@@ -55,7 +55,8 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		portfolio.POST("/", h.createPortfolio)
 		portfolio.GET("/", h.getAllPortfolios)
 		portfolio.PATCH("/:id", h.modifyPortfolio)
-		portfolio.GET("/:id", h.getPortfolio)
+		portfolio.GET("/:id", h.getPortfolioDeals)
+		portfolio.GET("/closed/:id", h.getPortfolioClosedDeals)
 		portfolio.DELETE("/:id", h.deletePortfolio)
 	}
 

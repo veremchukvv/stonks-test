@@ -17,11 +17,11 @@ func NewMarketServiceImp(repo repository.MarketRepository) *MarketServiceImp {
 	}
 }
 
-func (msi *MarketServiceImp) GetAllStocks(ctx context.Context) ([]*models.StockResp, error) {
+func (msi *MarketServiceImp) GetAllStocks(ctx context.Context) ([]*models.DealResp, error) {
 	return msi.repo.GetAllStocks(ctx)
 }
 
-func (msi *MarketServiceImp) GetOneStock(ctx context.Context, stockId int) (*models.StockResp, error) {
+func (msi *MarketServiceImp) GetOneStock(ctx context.Context, stockId int) (*models.DealResp, error) {
 	return msi.repo.GetOneStock(ctx, stockId)
 }
 

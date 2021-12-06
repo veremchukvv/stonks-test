@@ -18,7 +18,7 @@ func NewDealServiceImp(repo repository.DealRepository) *dealServiceImp {
 	}
 }
 
-func (dsi *dealServiceImp) GetOneDeal(ctx context.Context, token string, dealId int) (*models.StockResp, error) {
+func (dsi *dealServiceImp) GetOneDeal(ctx context.Context, token string, dealId int) (*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {

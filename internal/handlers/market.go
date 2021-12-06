@@ -43,7 +43,7 @@ func (h *Handler) getOneStock(c echo.Context) error {
 func (h *Handler) makeDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 
-	var req models.Deal
+	var req models.DealReq
 
 	err := c.Bind(&req)
 	if err != nil {

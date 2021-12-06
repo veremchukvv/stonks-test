@@ -66,11 +66,11 @@ func (h *Handler) modifyPortfolio(c echo.Context) error {
 	return c.String(http.StatusNotImplemented, "not implemented yet")
 }
 
-func (h *Handler) getPortfolio(c echo.Context) error {
+func (h *Handler) getPortfolioDeals(c echo.Context) error {
 
 	type response struct {
 		PortfolioResp *models.OnePortfolioResp
-		StocksResp    []*models.StockResp
+		DealResp    []*models.DealResp
 	}
 
 	log := logging.FromContext(h.ctx)
@@ -90,7 +90,7 @@ func (h *Handler) getPortfolio(c echo.Context) error {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
-	portfolio, stocks, err := h.services.PortfolioService.GetOnePortfolio(context.Background(), token.Value, portfolioId)
+	portfolio, stocks, err := h.services.PortfolioService.GetPortfolioDeals(context.Background(), token.Value, portfolioId)
 	if err != nil {
 		return c.JSON(500, "Can't get portfolio info")
 	}
@@ -101,6 +101,33 @@ func (h *Handler) getPortfolio(c echo.Context) error {
 	}
 
 	return c.JSON(200, httpResponse)
+}
+
+func (h *Handler) getPortfolioClosedDeals(c echo.Context) error {
+	log := logging.FromContext(h.ctx)
+
+	token, err := c.Request().Cookie("jwt")
+	if err != nil {
+		if errors.Is(err, http.ErrNoCookie) {
+			c.Response().WriteHeader(http.StatusUnauthorized)
+			c.Response().Write([]byte(`{"error": "not logined"}`))
+			return nil
+		}
+		c.Response().WriteHeader(http.StatusInternalServerError)
+		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
+		return nil
+	}
+	portfolioId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		log.Info("can't parse URL params")
+		return c.JSON(500, "can't parse URL params")
+	}
+	closedDeals, err := h.services.PortfolioService.GetPortfolioClosedDeals(context.Background(), token.Value, portfolioId)
+	if err != nil {
+		return c.JSON(500, "Can't get portfolio closed deals info")
+	}
+
+	return c.JSON(200, closedDeals)
 }
 
 func (h *Handler) deletePortfolio(c echo.Context) error {

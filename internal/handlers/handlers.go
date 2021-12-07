@@ -55,7 +55,8 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		portfolio.POST("/", h.createPortfolio)
 		portfolio.GET("/", h.getAllPortfolios)
 		portfolio.PATCH("/:id", h.modifyPortfolio)
-		portfolio.GET("/:id", h.getPortfolio)
+		portfolio.GET("/:id", h.getPortfolioDeals)
+		portfolio.GET("/closed/:id", h.getPortfolioClosedDeals)
 		portfolio.DELETE("/:id", h.deletePortfolio)
 	}
 
@@ -64,6 +65,12 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		deal.GET("/:id", h.getOneDeal)
 		deal.POST("/:id", h.closeDeal)
 		deal.DELETE("/:id", h.deleteDeal)
+	}
+
+	closedDeal := e.Group("/api/v1/closed")
+	{
+		closedDeal.GET("/:id", h.getOneClosedDeal)
+		closedDeal.DELETE("/:id", h.deleteClosedDeal)
 	}
 
 	market := e.Group("/api/v1/stockmarket")

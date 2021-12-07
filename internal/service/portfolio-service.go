@@ -40,7 +40,7 @@ func (ps *PortfolioServiceImp) GetAllPortfolios(ctx context.Context, token strin
 	return portfolios, nil
 }
 
-func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, token string, portfolioId int) (*models.OnePortfolioResp, []*models.StockResp, error) {
+func (ps *PortfolioServiceImp) GetPortfolioDeals(ctx context.Context, token string, portfolioId int) (*models.OnePortfolioResp, []*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
@@ -50,12 +50,30 @@ func (ps *PortfolioServiceImp) GetOnePortfolio(ctx context.Context, token string
 		log.Info("error on authenticating user")
 		return nil, nil, err
 	}
-	portfolio, stocks, err := ps.repo.GetOnePortfolio(ctx, portfolioId)
+	portfolio, deals, err := ps.repo.GetPortfolioDeals(ctx, portfolioId)
 	if err != nil {
 		log.Infof("error on fetching portfolio data from DB: %v", err)
 		return nil, nil, err
 	}
-	return portfolio, stocks, nil
+	return portfolio, deals, nil
+}
+
+func (ps *PortfolioServiceImp) GetPortfolioClosedDeals(ctx context.Context, token string, portfolioId int) ([]*models.DealResp, error) {
+	log := logging.FromContext(ctx)
+
+	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
+		return []byte(SignKey), nil
+	})
+	if err != nil {
+		log.Info("error on authenticating user")
+		return nil, err
+	}
+	closedDeals, err := ps.repo.GetPortfolioClosedDeals(ctx, portfolioId)
+	if err != nil {
+		log.Infof("error on fetching portfolio data from DB: %v", err)
+		return nil, err
+	}
+	return closedDeals, nil
 }
 
 func (ps *PortfolioServiceImp) CreatePortfolio(ctx context.Context, token string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {

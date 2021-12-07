@@ -17,19 +17,22 @@ type UserRepository interface {
 
 type PortfolioRepository interface {
 	GetAllPortfolios(ctx context.Context, userId int, authType string) ([]*models.Portfolio, error)
-	GetOnePortfolio(ctx context.Context, portfolioId int) (*models.OnePortfolioResp, []*models.StockResp, error)
+	GetPortfolioDeals(ctx context.Context, portfolioId int) (*models.OnePortfolioResp, []*models.DealResp, error)
+	GetPortfolioClosedDeals(ctx context.Context, portfolioId int) ([]*models.DealResp, error)
 	CreatePortfolio(ctx context.Context, userId int, authType string, portfolio *models.Portfolio) (*models.Portfolio, error)
 	DeletePortfolio(ctx context.Context, portfolioId int) error
 }
 
 type MarketRepository interface {
-	GetAllStocks(ctx context.Context) ([]*models.StockResp, error)
-	GetOneStock(ctx context.Context, stockId int) (*models.StockResp, error)
+	GetAllStocks(ctx context.Context) ([]*models.DealResp, error)
+	GetOneStock(ctx context.Context, stockId int) (*models.DealResp, error)
 	CreateDeal(ctx context.Context, stockId int, stockAmount int, portfolioId int) (int, error)
 }
 
 type DealRepository interface {
-	GetOneDeal(ctx context.Context, dealId int) (*models.StockResp, error)
+	GetOneDeal(ctx context.Context, dealId int) (*models.DealResp, error)
 	CloseDeal(ctx context.Context, dealId int) error
 	DeleteDeal(ctx context.Context, dealId int) error
+	GetOneClosedDeal(ctx context.Context, closedDealId int) (*models.DealResp, error)
+	DeleteClosedDeal(ctx context.Context, closedDealId int) error
 }

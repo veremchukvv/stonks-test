@@ -47,7 +47,7 @@ func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userId in
 	return portfoliosWithAssets, nil
 }
 
-func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioId int) (*models.OnePortfolioResp, []*models.StockResp, error) {
+func (pr *PostgresPortfolioRepo) GetPortfolioDeals(ctx context.Context, portfolioId int) (*models.OnePortfolioResp, []*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	const queryPortfolio string = `SELECT portfolio_name, description, is_public FROM portfolios WHERE portfolio_id=$1`
@@ -59,23 +59,49 @@ func (pr *PostgresPortfolioRepo) GetOnePortfolio(ctx context.Context, portfolioI
 		return nil, nil, err
 	}
 
-	const queryStocks string = `SELECT stocks_item_id, ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
-					currency_ticker, created_at, closed, income_final_money, income_final_percent FROM stocks_items 
+	const queryDeals string = `SELECT deal_id, ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
+					currency_ticker, opened_at, income_money, income_percent FROM deals 
                     INNER JOIN stocks ON stock_id = stock_item AND stock_currency = currency AND stock_cost = cost 
                     INNER JOIN currencies ON currency_id = stock_currency WHERE (portfolio=$1 and stock_cost>0)`
-	var stocks []*models.StockResp
-	rowsStocks, err := pr.db.Query(ctx, queryStocks, portfolioId)
+
+	var deals []*models.DealResp
+	rowsDeals, err := pr.db.Query(ctx, queryDeals, portfolioId)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, nil, err
 	}
-	defer rowsStocks.Close()
-	for rowsStocks.Next() {
-		var stock models.StockResp
-		err = rowsStocks.Scan(&stock.Id, &stock.Ticker, &stock.Name, &stock.Type, &stock.Amount, &stock.Cost, &stock.Value, &stock.Currency, &stock.CreatedAt, &stock.IsClosed, &stock.ProfitClosed, &stock.PercentClosed)
-		stocks = append(stocks, &stock)
+	defer rowsDeals.Close()
+	for rowsDeals.Next() {
+		var deal models.DealResp
+		err = rowsDeals.Scan(&deal.Id, &deal.Ticker, &deal.Name, &deal.Type, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.OpenedAt, &deal.Profit, &deal.Percent)
+		deals = append(deals, &deal)
 	}
-	return &portfolio, stocks, nil
+
+	return &portfolio, deals, nil
+}
+
+func (pr *PostgresPortfolioRepo) GetPortfolioClosedDeals(ctx context.Context, portfolioId int) ([]*models.DealResp, error) {
+	log := logging.FromContext(ctx)
+
+	const queryClosedDeals string = `SELECT closed_deal_id, ticker, stock_name, stock_type, sell_cost, amount, 
+					currency_ticker, closed_at, stock_value, income_money, income_percent FROM closed_deals 
+                    INNER JOIN stocks ON stock_id = stock_item AND stock_currency = currency 
+                    INNER JOIN currencies ON currency_id = stock_currency WHERE (portfolio=$1 and stock_cost >0)`
+
+	var closedDeals []*models.DealResp
+	rowsClosedDeals, err := pr.db.Query(ctx, queryClosedDeals, portfolioId)
+	if err != nil {
+		log.Infof("Error on query rows: %v", err)
+		return nil, err
+	}
+	defer rowsClosedDeals.Close()
+	for rowsClosedDeals.Next() {
+		var closedDeal models.DealResp
+		err = rowsClosedDeals.Scan(&closedDeal.Id, &closedDeal.Ticker, &closedDeal.Name, &closedDeal.Type, &closedDeal.SellCost, &closedDeal.Amount, &closedDeal.Currency, &closedDeal.ClosedAt, &closedDeal.Value, &closedDeal.Profit, &closedDeal.Percent)
+		closedDeals = append(closedDeals, &closedDeal)
+	}
+
+	return closedDeals, nil
 }
 
 func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int, authType string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
@@ -99,22 +125,31 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 
 	var bid int
 	var sid int
+	var csid int
 	const createNewBalances string = `INSERT INTO balances (portfolio_id, currency_id, money_value) VALUES ($1, $2, $3) 
 									returning balance_id`
-	const createNewStockItem string = `INSERT INTO stocks_items (portfolio, stock_item, stock_cost, stock_currency, 
-									amount) VALUES ($1, $2, $3, $4, $5) returning stocks_item_id`
+	const createNullStockItem string = `INSERT INTO deals (portfolio, stock_item, stock_cost, stock_currency, 
+									amount) VALUES ($1, $2, $3, $4, $5) returning deal_id`
+	const createNullClosedStockItem string = `INSERT INTO closed_deals (portfolio, stock_item, stock_cost, stock_currency, 
+									amount) VALUES ($1, $2, $3, $4, $5) returning closed_deal_id`
 	for i, v := range currenciesList {
 		err = pr.db.QueryRow(ctx, createNewBalances, pid, v.Id, 0).Scan(&bid)
 		if err != nil {
 			log.Infof("Error on processing query to DB: %v", err)
 			return nil, err
 		}
-		err = pr.db.QueryRow(ctx, createNewStockItem, pid, i+1, 0, v.Id, 1).Scan(&sid)
+		err = pr.db.QueryRow(ctx, createNullStockItem, pid, i+1, 0, v.Id, 1).Scan(&sid)
+		if err != nil {
+			log.Infof("Error on processing query to DB: %v", err)
+			return nil, err
+		}
+		err = pr.db.QueryRow(ctx, createNullClosedStockItem, pid, i+1, 0, v.Id, 1).Scan(&csid)
 		if err != nil {
 			log.Infof("Error on processing query to DB: %v", err)
 			return nil, err
 		}
 	}
+
 	return newPortfolio, nil
 }
 
@@ -141,12 +176,16 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 	}
 
 	AssetsList := make([]string, 0)
+	ProfitList := make([]string, 0)
+	PercentList := make([]string, 0)
 	t := reflect.TypeOf(&models.Portfolio{}).Elem()
 	for x := 0; x < t.NumField(); x++ {
 		field := t.Field(x)
 		fieldTag := field.Tag.Get("ticker")
 		if fieldTag != "" {
 			AssetsList = append(AssetsList, "Assets"+fieldTag)
+			ProfitList = append(ProfitList, "Profit"+fieldTag)
+			PercentList = append(PercentList, "Percent"+fieldTag)
 		}
 	}
 
@@ -159,13 +198,32 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 
 	for _, port := range portfolios {
 		for j, cur := range currencyList {
-			const query string = `SELECT SUM(stock_value) FROM stocks_items WHERE (portfolio=$1 and stock_currency=$2)`
-			err := pr.db.QueryRow(ctx, query, port.Id, cur.Id).Scan(&AssetsR.Results)
+			const queryAssets string = `WITH rows AS (SELECT (SELECT SUM(stock_value) FROM deals WHERE 
+                                 (portfolio=$1 and stock_currency=$2)) AS sum1, (SELECT SUM(stock_value) FROM closed_deals WHERE 
+                                 portfolio=$1 and stock_currency=$2) AS sum2) SELECT SUM(sum1+sum2) from rows`
+			err := pr.db.QueryRow(ctx, queryAssets, port.Id, cur.Id).Scan(&AssetsR.Results)
 			if err != nil {
 				log.Infof("Error on scan rows: %v", err)
 				return nil, err
 			}
 			reflect.ValueOf(port).Elem().FieldByName(AssetsList[j]).SetFloat(AssetsR.Results)
+
+			const queryProfit string = `select coalesce(sum(income_money), 0) FROM deals WHERE (portfolio=$1 and stock_currency=$2)`
+			err = pr.db.QueryRow(ctx, queryProfit, port.Id, cur.Id).Scan(&AssetsR.Results)
+			if err != nil {
+				log.Infof("Error on scan rows: %v", err)
+				return nil, err
+			}
+			reflect.ValueOf(port).Elem().FieldByName(ProfitList[j]).SetFloat(AssetsR.Results)
+
+			const queryPercent string = `select coalesce(avg(income_percent), 0) FROM deals WHERE (portfolio=$1 and stock_currency=$2)`
+			err = pr.db.QueryRow(ctx, queryPercent, port.Id, cur.Id).Scan(&AssetsR.Results)
+			if err != nil {
+				log.Infof("Error on scan rows: %v", err)
+				return nil, err
+			}
+			reflect.ValueOf(port).Elem().FieldByName(PercentList[j]).SetFloat(AssetsR.Results)
+
 		}
 	}
 	return portfolios, nil

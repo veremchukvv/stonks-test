@@ -176,12 +176,16 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 	}
 
 	AssetsList := make([]string, 0)
+	ProfitList := make([]string, 0)
+	PercentList := make([]string, 0)
 	t := reflect.TypeOf(&models.Portfolio{}).Elem()
 	for x := 0; x < t.NumField(); x++ {
 		field := t.Field(x)
 		fieldTag := field.Tag.Get("ticker")
 		if fieldTag != "" {
 			AssetsList = append(AssetsList, "Assets"+fieldTag)
+			ProfitList = append(ProfitList, "Profit"+fieldTag)
+			PercentList = append(PercentList, "Percent"+fieldTag)
 		}
 	}
 
@@ -194,15 +198,32 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 
 	for _, port := range portfolios {
 		for j, cur := range currencyList {
-			const query string = `WITH rows AS (SELECT (SELECT SUM(stock_value) FROM deals WHERE 
+			const queryAssets string = `WITH rows AS (SELECT (SELECT SUM(stock_value) FROM deals WHERE 
                                  (portfolio=$1 and stock_currency=$2)) AS sum1, (SELECT SUM(stock_value) FROM closed_deals WHERE 
-                                 portfolio=$1 and stock_currency=$2) AS sum2) SELECT SUM(sum1+sum2) from rows;`
-			err := pr.db.QueryRow(ctx, query, port.Id, cur.Id).Scan(&AssetsR.Results)
+                                 portfolio=$1 and stock_currency=$2) AS sum2) SELECT SUM(sum1+sum2) from rows`
+			err := pr.db.QueryRow(ctx, queryAssets, port.Id, cur.Id).Scan(&AssetsR.Results)
 			if err != nil {
 				log.Infof("Error on scan rows: %v", err)
 				return nil, err
 			}
 			reflect.ValueOf(port).Elem().FieldByName(AssetsList[j]).SetFloat(AssetsR.Results)
+
+			const queryProfit string = `select coalesce(sum(income_money), 0) FROM deals WHERE (portfolio=$1 and stock_currency=$2)`
+			err = pr.db.QueryRow(ctx, queryProfit, port.Id, cur.Id).Scan(&AssetsR.Results)
+			if err != nil {
+				log.Infof("Error on scan rows: %v", err)
+				return nil, err
+			}
+			reflect.ValueOf(port).Elem().FieldByName(ProfitList[j]).SetFloat(AssetsR.Results)
+
+			const queryPercent string = `select coalesce(avg(income_percent), 0) FROM deals WHERE (portfolio=$1 and stock_currency=$2)`
+			err = pr.db.QueryRow(ctx, queryPercent, port.Id, cur.Id).Scan(&AssetsR.Results)
+			if err != nil {
+				log.Infof("Error on scan rows: %v", err)
+				return nil, err
+			}
+			reflect.ValueOf(port).Elem().FieldByName(PercentList[j]).SetFloat(AssetsR.Results)
+
 		}
 	}
 	return portfolios, nil

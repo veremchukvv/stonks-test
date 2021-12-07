@@ -22,14 +22,14 @@ func NewPostgresDealRepo(pgpool *pgxpool.Pool, ctx context.Context) *PostgresDea
 func (npr *PostgresDealRepo) GetOneDeal(ctx context.Context, dealId int) (*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
-	const query string = `SELECT ticker, stock_name, stock_type, amount, stock_cost, stock_value, 
-					currency_ticker, created_at FROM deals INNER JOIN stocks ON stock_id = stock_item AND 
+	const query string = `SELECT ticker, stock_name, stock_type, description, buy_cost, income_money, income_percent, amount, stock_cost, stock_value, 
+					currency_ticker, opened_at FROM deals INNER JOIN stocks ON stock_id = stock_item AND 
                     stock_currency = currency AND stock_cost = cost INNER JOIN currencies ON currency_id = 
                     stock_currency WHERE deal_id=$1`
 
 	var deal models.DealResp
 
-	err := npr.db.QueryRow(ctx, query, dealId).Scan(&deal.Ticker, &deal.Name, &deal.Type, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.OpenedAt)
+	err := npr.db.QueryRow(ctx, query, dealId).Scan(&deal.Ticker, &deal.Name, &deal.Type, &deal.Description, &deal.BuyCost, &deal.Profit, &deal.Percent, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.OpenedAt)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, err

@@ -10,9 +10,12 @@ import (
 	"github.com/veremchukvv/stonks-test/internal/oauth"
 	"github.com/veremchukvv/stonks-test/internal/repository/pg"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
+	"golang.org/x/oauth2"
 	"net/http"
 	"time"
 )
+
+//type CustomId int
 
 func (h *Handler) signup(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
@@ -75,15 +78,19 @@ func (h *Handler) user(c echo.Context) error {
 }
 
 func (h *Handler) oauthGoogle(c echo.Context) error {
-	cfg := oauth.GetOauthConfig()
+	log := logging.FromContext(h.ctx)
+
+	cfg := oauth.GetOauthGoogleConfig()
 	state := oauth.GetRandomState()
-	url := cfg.AuthCodeURL(state)
+	//url := cfg.AuthCodeURL(state, oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	url := cfg.AuthCodeURL(state, oauth2.AccessTypeOffline)
+	log.Info(url)
 	http.Redirect(c.Response(), c.Request(), url, http.StatusTemporaryRedirect)
 	return nil
 }
 
 func (h *Handler) oauthVK(c echo.Context) error {
-	cfg := oauth.GetOauthConfig()
+	cfg := oauth.GetOauthVKConfig()
 	state := oauth.GetRandomState()
 	url := cfg.AuthCodeURL(state)
 	http.Redirect(c.Response(), c.Request(), url, http.StatusTemporaryRedirect)
@@ -143,22 +150,90 @@ func (h *Handler) deleteUser(c echo.Context) error {
 }
 
 func (h *Handler) callbackGoogle(c echo.Context) error {
-	content, err := oauth.GetUserInfo(context.Background(), oauth.GetRandomState(), c.Request().FormValue("state"),
-		c.Request().FormValue("code"), oauth.GetOauthConfig())
-	if err != nil {
-		fmt.Println(err.Error())
-		http.Redirect(c.Response(), c.Request(), "/", http.StatusTemporaryRedirect)
-		return nil
+	type GoogleContent struct {
+		Id         string   `json:"id"`
+		First_name string   `json:"given_name"`
+		Last_name  string   `json:"family_name"`
+		Email      string   `json:"email"`
 	}
-	fmt.Fprintf(c.Response(), "Content: %s\n", content)
-	return nil
+
+	//type GoogleResponse struct {
+	//	Response GoogleContent `json:"response"`
+	//}
+
+	log := logging.FromContext(h.ctx)
+
+	code := c.Request().FormValue("code")
+	log.Info(code)
+
+	content, err := oauth.GetUserGoogleInfo(context.Background(), oauth.GetRandomState(), c.Request().FormValue("state"),
+		c.Request().FormValue("code"), oauth.GetOauthGoogleConfig())
+	if err != nil {
+		log.Info(err)
+		//http.Redirect(c.Response(), c.Request(), "/", http.StatusTemporaryRedirect)
+		//return nil
+	}
+	log.Info(string(content))
+
+	var input GoogleContent
+	err = json.Unmarshal(content, &input)
+	if err != nil {
+		log.Info(err)
+	}
+
+	gu, err := h.services.UserService.GetGoogleUserByID(h.ctx, input.Id)
+	if err != nil {
+		if errors.Is(err, pg.ErrGoogleUserNotFound) {
+			log.Info(err)
+			log.Info("trying to create new Google user")
+
+			newGoogleUser := &models.User{
+				GoogleId: input.Id,
+				Name:     input.First_name,
+				Lastname: input.Last_name,
+				Email:    input.Email,
+			}
+
+			ngu, err := h.services.UserService.CreateGoogleUser(h.ctx, newGoogleUser)
+			if err != nil {
+				log.Errorf("Can't create Google user: %v", err)
+				return err
+			}
+			log.Infof("Created Google user with id: %d", ngu.Id)
+
+			token, err := h.services.UserService.GenerateGoogleToken(h.ctx, ngu.Id)
+			if err != nil {
+				log.Info("error on generating google token")
+			}
+
+			c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
+
+			log.Infof("Successfull login for Google user: %d", ngu.Id)
+
+		} else {
+			log.Errorf("Other Google error: %v", err)
+			return err
+		}
+
+	}
+
+	token, err := h.services.UserService.GenerateGoogleToken(h.ctx, gu.Id)
+	if err != nil {
+		log.Info("error on generating google token")
+	}
+
+	c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
+
+	log.Infof("Successfull login for Google user: %d", gu.Id)
+
+	return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/")
 }
 
 func (h *Handler) callbackVK(c echo.Context) error {
 
 	type VKContent struct {
-		First_name string `json:"first_name"`
 		Id         int    `json:"id"`
+		First_name string `json:"first_name"`
 		Last_name  string `json:"last_name"`
 	}
 
@@ -168,8 +243,8 @@ func (h *Handler) callbackVK(c echo.Context) error {
 
 	log := logging.FromContext(h.ctx)
 
-	content, err := oauth.GetUserInfo(h.ctx, oauth.GetRandomState(), c.Request().FormValue("state"),
-		c.Request().FormValue("code"), oauth.GetOauthConfig())
+	content, err := oauth.GetUserVKInfo(h.ctx, oauth.GetRandomState(), c.Request().FormValue("state"),
+		c.Request().FormValue("code"), oauth.GetOauthVKConfig())
 	if err != nil {
 		fmt.Println(err.Error())
 		http.Redirect(c.Response(), c.Request(), "/", http.StatusTemporaryRedirect)
@@ -219,3 +294,27 @@ func (h *Handler) signout(c echo.Context) error {
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: "", HttpOnly: true, Path: "/", Expires: time.Now().Add(-time.Hour)})
 	return c.Redirect(http.StatusOK, "http://localhost:3000/")
 }
+
+//func (ci *CustomId) UnmarshalJSON(data []byte) error {
+//	var raw interface{}
+//
+//	err := json.Unmarshal(data, &raw)
+//	if err != nil {
+//		return errors.New("CustomFloat64: UnmarshalJSON: " + err.Error())
+//	}
+//	switch v := raw.(type) {
+//	case int:
+//		*ci = CustomId(v)
+//		return nil
+//	case string:
+//		parsed, err := strconv.Atoi(v)
+//		if err != nil {
+//			return errors.New("CustomInt: parsing \"" + v + "\": not a int")
+//		}
+//		*ci = CustomId(parsed)
+//		return nil
+//	default:
+//		return errors.New("CustomInt: parsing \"" + string(data) + "\": unknown value")
+//	}
+//	return nil
+//}

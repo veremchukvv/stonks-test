@@ -10,6 +10,7 @@ import (
 )
 
 var ErrVkUserNotFound = errors.New("VK user not found")
+var ErrGoogleUserNotFound = errors.New("Google user not found")
 
 type PostgresUserRepo struct {
 	db  *pgxpool.Pool
@@ -35,11 +36,11 @@ func (ur *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*
 	return &u, nil
 }
 
-func (ur *PostgresUserRepo) GetVKUserByID(ctx context.Context, vkid int) (*models.User, error) {
+func (ur *PostgresUserRepo) GetVKUserByID(ctx context.Context, id int) (*models.User, error) {
 	log := logging.FromContext(ctx)
 	const query string = `SELECT user_id, user_auth_type, user_name, lastname, email FROM users WHERE (user_id=$1 and user_auth_type='vk')`
 	var vu models.User
-	err := ur.db.QueryRow(ctx, query, vkid).Scan(&vu.Id, &vu.AuthType, &vu.Name,
+	err := ur.db.QueryRow(ctx, query, id).Scan(&vu.Id, &vu.AuthType, &vu.Name,
 		&vu.Lastname, &vu.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -49,6 +50,22 @@ func (ur *PostgresUserRepo) GetVKUserByID(ctx context.Context, vkid int) (*model
 		return nil, err
 	}
 	return &vu, nil
+}
+
+func (ur *PostgresUserRepo) GetGoogleUserByID(ctx context.Context, gid string) (*models.User, error) {
+	log := logging.FromContext(ctx)
+	const query string = `SELECT user_id, user_auth_type, user_name, lastname, email FROM users WHERE (google_id=$1 and user_auth_type='google')`
+	var gu models.User
+	err := ur.db.QueryRow(ctx, query, gid).Scan(&gu.Id, &gu.AuthType, &gu.Name,
+		&gu.Lastname, &gu.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			log.Infof("Can't get Google User: %v", err)
+			return nil, ErrGoogleUserNotFound
+		}
+		return nil, err
+	}
+	return &gu, nil
 }
 
 func (ur *PostgresUserRepo) GetUserByID(ctx context.Context, id int, auth_type string) (*models.User, error) {
@@ -133,6 +150,23 @@ func (ur *PostgresUserRepo) CreateVKUser(ctx context.Context, user *models.User)
 
 	var uid int
 	err := ur.db.QueryRow(ctx, query, user.Id, "vk", user.Name, user.Lastname, user.Email).Scan(&uid)
+	if err != nil {
+		log.Errorf("Error on write user to database: %v", err)
+		return nil, err
+	}
+	user.Id = uid
+	return user, nil
+}
+
+func (ur *PostgresUserRepo) CreateGoogleUser(ctx context.Context, user *models.User) (*models.User, error) {
+	log := logging.FromContext(ctx)
+	const query string = `INSERT INTO users 
+		(google_id, user_auth_type, user_name, lastname, email) 
+		VALUES($1, $2, $3, $4, $5)
+		returning user_id;`
+
+	var uid int
+	err := ur.db.QueryRow(ctx, query, user.GoogleId, "google", user.Name, user.Lastname, user.Email).Scan(&uid)
 	if err != nil {
 		log.Errorf("Error on write user to database: %v", err)
 		return nil, err

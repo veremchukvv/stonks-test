@@ -16,9 +16,12 @@ type ClientServer struct {
 }
 
 type OAuth struct {
-	VkClientID     string `yaml:"vk_client_id" env:"VK_CLIENT_ID" env-required:"true"`
-	VkClientSecret string `yaml:"vk_client_secret" env:"VK_CLIENT_SECRET" env-required:"true"`
-	VkRedirectURL  string `yaml:"vk_redirect_url" env:"VK_REDIRECT_URL" env-required:"true"`
+	VkClientID         string `yaml:"vk_client_id" env:"VK_CLIENT_ID" env-required:"true"`
+	VkClientSecret     string `yaml:"vk_client_secret" env:"VK_CLIENT_SECRET" env-required:"true"`
+	VkRedirectURL      string `yaml:"vk_redirect_url" env:"VK_REDIRECT_URL" env-required:"true"`
+	GoogleClientID     string `yaml:"google_client_id" env:"GOOGLE_CLIENT_ID" env-required:"true"`
+	GoogleClientSecret string `yaml:"google_client_secret" env:"GOOGLE_CLIENT_SECRET" env-required:"true"`
+	GoogleRedirectURL  string `yaml:"google_redirect_url" env:"GOOGLE_REDIRECT_URL" env-required:"true"`
 }
 
 type DB struct {

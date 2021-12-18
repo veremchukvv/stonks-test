@@ -4,6 +4,7 @@ CREATE TYPE stock_type AS ENUM('stock', 'bond', 'fund');
 CREATE TABLE if not exists users
 (
     user_id        SERIAL              NOT NULL,
+    google_id      VARCHAR(255),
     user_auth_type user_auth_type      NOT NULL,
     user_name      VARCHAR(255)        NOT NULL,
     lastname       VARCHAR(255)        NOT NULL,

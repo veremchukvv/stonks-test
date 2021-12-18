@@ -62,8 +62,12 @@ func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.Us
 	return nil, GetUserErr
 }
 
-func (us *UserServiceImp) GetVKUserByID(ctx context.Context, vkid int) (*models.User, error) {
-	return us.repo.GetVKUserByID(ctx, vkid)
+func (us *UserServiceImp) GetVKUserByID(ctx context.Context, id int) (*models.User, error) {
+	return us.repo.GetVKUserByID(ctx, id)
+}
+
+func (us *UserServiceImp) GetGoogleUserByID(ctx context.Context, gid string) (*models.User, error) {
+	return us.repo.GetGoogleUserByID(ctx, gid)
 }
 
 func (us *UserServiceImp) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
@@ -103,8 +107,12 @@ func (us *UserServiceImp) DeleteUser(ctx context.Context, token string) error {
 	return us.repo.DeleteUser(ctx, claims.UserId, claims.AuthType)
 }
 
-func (us *UserServiceImp) CreateVKUser(ctx context.Context, vkuser *models.User) (*models.User, error) {
-	return us.repo.CreateVKUser(ctx, vkuser)
+func (us *UserServiceImp) CreateVKUser(ctx context.Context, user *models.User) (*models.User, error) {
+	return us.repo.CreateVKUser(ctx, user)
+}
+
+func (us *UserServiceImp) CreateGoogleUser(ctx context.Context, user *models.User) (*models.User, error) {
+	return us.repo.CreateGoogleUser(ctx, user)
 }
 
 func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, password string) (string, error) {
@@ -133,7 +141,7 @@ func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, passw
 	return token.SignedString([]byte(SignKey))
 }
 
-func (us *UserServiceImp) GenerateVKToken(ctx context.Context, vkid int) (string, error) {
+func (us *UserServiceImp) GenerateVKToken(ctx context.Context, id int) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
@@ -141,8 +149,22 @@ func (us *UserServiceImp) GenerateVKToken(ctx context.Context, vkid int) (string
 			IssuedAt:  time.Now().Unix(),
 			Issuer:    "stonks",
 		},
-		vkid,
+		id,
 		"vk",
+	})
+	return token.SignedString([]byte(SignKey))
+}
+
+func (us *UserServiceImp) GenerateGoogleToken(ctx context.Context, id int) (string, error) {
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    "stonks",
+		},
+		id,
+		"google",
 	})
 	return token.SignedString([]byte(SignKey))
 }

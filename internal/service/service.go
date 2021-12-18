@@ -13,9 +13,12 @@ type UserService interface {
 	UpdateUser(ctx context.Context, user *models.User, token string) (*models.User, error)
 	DeleteUser(ctx context.Context, token string) error
 	CreateVKUser(ctx context.Context, user *models.User) (*models.User, error)
-	GetVKUserByID(ctx context.Context, vkid int) (*models.User, error)
+	GetVKUserByID(ctx context.Context, id int) (*models.User, error)
+	CreateGoogleUser(ctx context.Context, user *models.User) (*models.User, error)
+	GetGoogleUserByID(ctx context.Context, gid string) (*models.User, error)
 	GenerateToken(ctx context.Context, email string, password string) (string, error)
-	GenerateVKToken(ctx context.Context, vkid int) (string, error)
+	GenerateVKToken(ctx context.Context, id int) (string, error)
+	GenerateGoogleToken(ctx context.Context, id int) (string, error)
 	ParseToken(token string) (int, error)
 }
 

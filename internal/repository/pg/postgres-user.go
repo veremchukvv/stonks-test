@@ -68,10 +68,10 @@ func (ur *PostgresUserRepo) GetGoogleUserByID(ctx context.Context, gid string) (
 	return &gu, nil
 }
 
-func (ur *PostgresUserRepo) GetUserByID(ctx context.Context, id int, auth_type string) (*models.User, error) {
+func (ur *PostgresUserRepo) GetUserByID(ctx context.Context, id int, authType string) (*models.User, error) {
 	log := logging.FromContext(ctx)
 
-	if auth_type == "local" {
+	if authType == "local" {
 		const query string = `SELECT user_id, user_auth_type, user_name, lastname, email, password_hash FROM users 
                               WHERE (user_id=$1 and user_auth_type='local')`
 		var u models.User

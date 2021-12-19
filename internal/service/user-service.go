@@ -141,7 +141,7 @@ func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, passw
 	return token.SignedString([]byte(SignKey))
 }
 
-func (us *UserServiceImp) GenerateVKToken(ctx context.Context, id int) (string, error) {
+func (us *UserServiceImp) GenerateVKToken(id int) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
@@ -155,7 +155,7 @@ func (us *UserServiceImp) GenerateVKToken(ctx context.Context, id int) (string, 
 	return token.SignedString([]byte(SignKey))
 }
 
-func (us *UserServiceImp) GenerateGoogleToken(ctx context.Context, id int) (string, error) {
+func (us *UserServiceImp) GenerateGoogleToken(id int) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
@@ -169,6 +169,6 @@ func (us *UserServiceImp) GenerateGoogleToken(ctx context.Context, id int) (stri
 	return token.SignedString([]byte(SignKey))
 }
 
-func (us *UserServiceImp) ParseToken(token string) (int, error) {
-	return 0, nil
-}
+//func (us *UserServiceImp) ParseToken(token string) (int, error) {
+//	return 0, nil
+//}

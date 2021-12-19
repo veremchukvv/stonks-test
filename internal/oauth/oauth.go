@@ -12,8 +12,6 @@ import (
 	"net/http"
 )
 
-//var VKconfig *oauth2.Config
-
 func GetOauthVKConfig() *oauth2.Config {
 	cfg, _ := config.GetConfig()
 	return &oauth2.Config{
@@ -59,7 +57,10 @@ func GetUserVKInfo(ctx context.Context, state string, oauthState string, code st
 	if err != nil {
 		return nil, fmt.Errorf("failed getting user info: %s", err.Error())
 	}
-	defer response.Body.Close()
+	defer func() {
+		_ = response.Body.Close()
+	}()
+
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed reading response body: %s", err.Error())
@@ -78,10 +79,10 @@ func GetUserGoogleInfo(ctx context.Context, state string, oauthState string, cod
 	token, err := conf.Exchange(ctx, code)
 	if err != nil {
 		log.Infof("code exchange failed: %s", err)
-		//return nil, fmt.Errorf("code exchange failed: %s", err.Error())
 	}
 
 	tokenSource := conf.TokenSource(ctx, token)
+
 	newToken, err := tokenSource.Token()
 	if err != nil {
 		log.Info(err)
@@ -92,26 +93,19 @@ func GetUserGoogleInfo(ctx context.Context, state string, oauthState string, cod
 		log.Info("Saved new token:", newToken.AccessToken)
 	}
 
-	//url := conf.AuthCodeURL(oauthState, oauth2.AccessTypeOffline, oauth2.ApprovalForce)
-
 	url := "https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken
 
-	log.Info(url)
-
-	//client := oauth2.NewClient(ctx, tokenSource)
-
-	//response, err := client.Get(url)
 	response, err := http.Get(url)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed getting user info: %s", err.Error())
 	}
-	defer response.Body.Close()
+	defer func() {
+		_ = response.Body.Close()
+	}()
 	contents, err := ioutil.ReadAll(response.Body)
-	log.Info(string(contents))
 	if err != nil {
 		return nil, fmt.Errorf("failed reading response body: %s", err.Error())
 	}
-
 	return contents, nil
 }

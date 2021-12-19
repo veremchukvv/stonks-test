@@ -61,7 +61,6 @@ func (h *Handler) getOneClosedDeal(c echo.Context) error {
 	return c.JSON(200, d)
 }
 
-
 func (h *Handler) closeDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 
@@ -139,6 +138,3 @@ func (h *Handler) deleteClosedDeal(c echo.Context) error {
 
 	return nil
 }
-
-
-

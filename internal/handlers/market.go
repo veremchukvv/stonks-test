@@ -11,14 +11,10 @@ import (
 )
 
 func (h *Handler) getAllStocks(c echo.Context) error {
-	//log := logging.FromContext(h.ctx)
-
 	s, err := h.services.MarketService.GetAllStocks(context.Background())
-
 	if err != nil {
 		return c.JSON(500, "can't get stocks")
 	}
-
 	return c.JSON(200, s)
 }
 
@@ -30,19 +26,15 @@ func (h *Handler) getOneStock(c echo.Context) error {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
-
 	s, err := h.services.MarketService.GetOneStock(context.Background(), stockId)
-
 	if err != nil {
 		return c.JSON(500, "can't get stock")
 	}
-
 	return c.JSON(200, s)
 }
 
 func (h *Handler) makeDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
-
 	var req models.DealReq
 
 	err := c.Bind(&req)
@@ -65,6 +57,5 @@ func (h *Handler) makeDeal(c echo.Context) error {
 		log.Infof("error on creating deal %v", err)
 		return c.JSON(500, "error on creating deal")
 	}
-
 	return c.JSON(200, d)
 }

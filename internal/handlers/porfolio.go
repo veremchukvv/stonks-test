@@ -11,30 +11,24 @@ import (
 )
 
 func (h *Handler) createPortfolio(c echo.Context) error {
-	//log := logging.FromContext(h.ctx)
 	token, err := c.Request().Cookie("jwt")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			c.Response().WriteHeader(http.StatusUnauthorized)
-			c.Response().Write([]byte(`{"error": "not logined"}`))
-			return nil
+			return c.JSON(401, "not logined")
 		}
-		c.Response().WriteHeader(http.StatusInternalServerError)
-		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
-		return nil
+		return c.JSON(500, "can't parse cookie")
 	}
+
 	var newPortfolio models.Portfolio
-	c.Bind(&newPortfolio)
+
+	err = c.Bind(&newPortfolio)
 	if err != nil {
-		c.Response().WriteHeader(http.StatusInternalServerError)
-		c.Response().Write([]byte(`{"error": "Unmarshalling data error"}`))
-		return nil
+		return c.JSON(500, "Unmarshalling data error")
 	}
 	createdPortfolio, err := h.services.PortfolioService.CreatePortfolio(context.Background(), token.Value, &newPortfolio)
 	if err != nil {
 		return c.JSON(500, "Error on create portfolio")
 	}
-
 	return c.JSON(200, createdPortfolio)
 }
 
@@ -43,18 +37,13 @@ func (h *Handler) getAllPortfolios(c echo.Context) error {
 
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			c.Response().WriteHeader(http.StatusUnauthorized)
-			c.Response().Write([]byte(`{"error": "not logined"}`))
-			return nil
+			return c.JSON(401, "not logined")
 		}
-		c.Response().WriteHeader(http.StatusInternalServerError)
-		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
-		return nil
+		return c.JSON(500, "can't parse cookie")
 	}
 	p, err := h.services.PortfolioService.GetAllPortfolios(context.Background(), token.Value)
 	if err != nil {
-		c.Response().WriteHeader(http.StatusInternalServerError)
-		c.Response().Write([]byte(`{"error": "can't get portfolios'"}`))
+		return c.JSON(500, "can't get portfolios")
 	}
 	if p == nil {
 		return c.JSON(200, []string{})
@@ -70,20 +59,16 @@ func (h *Handler) getPortfolioDeals(c echo.Context) error {
 
 	type response struct {
 		PortfolioResp *models.OnePortfolioResp
-		DealResp    []*models.DealResp
+		DealResp      []*models.DealResp
 	}
 
 	log := logging.FromContext(h.ctx)
 	token, err := c.Request().Cookie("jwt")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			c.Response().WriteHeader(http.StatusUnauthorized)
-			c.Response().Write([]byte(`{"error": "not logined"}`))
-			return nil
+			return c.JSON(401, "not logined")
 		}
-		c.Response().WriteHeader(http.StatusInternalServerError)
-		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
-		return nil
+		return c.JSON(500, "can't parse cookie")
 	}
 	portfolioId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -109,13 +94,9 @@ func (h *Handler) getPortfolioClosedDeals(c echo.Context) error {
 	token, err := c.Request().Cookie("jwt")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			c.Response().WriteHeader(http.StatusUnauthorized)
-			c.Response().Write([]byte(`{"error": "not logined"}`))
-			return nil
+			return c.JSON(401, "not logined")
 		}
-		c.Response().WriteHeader(http.StatusInternalServerError)
-		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
-		return nil
+		return c.JSON(500, "can't parse cookie")
 	}
 	portfolioId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -135,13 +116,9 @@ func (h *Handler) deletePortfolio(c echo.Context) error {
 	token, err := c.Request().Cookie("jwt")
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
-			c.Response().WriteHeader(http.StatusUnauthorized)
-			c.Response().Write([]byte(`{"error": "not logined"}`))
-			return nil
+			return c.JSON(401, "not logined")
 		}
-		c.Response().WriteHeader(http.StatusInternalServerError)
-		c.Response().Write([]byte(`{"error": "can't parse cookie'"}`))
-		return nil
+		return c.JSON(500, "can't parse cookie")
 	}
 	portfolioId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

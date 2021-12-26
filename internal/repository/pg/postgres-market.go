@@ -46,10 +46,10 @@ func (pmr *PostgresMarketRepo) GetAllStocks(ctx context.Context) ([]*models.Deal
 func (pmr *PostgresMarketRepo) GetOneStock(ctx context.Context, stockId int) (*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
-	const query string = `SELECT stock_name, ticker, stock_type, description, cost, currency_ticker
+	const query string = `SELECT stock_id, stock_name, ticker, stock_type, description, cost, currency_ticker
 									FROM stocks INNER JOIN currencies ON currency_id = currency WHERE stock_id=$1`
 	var stock models.DealResp
-	err := pmr.db.QueryRow(ctx, query, stockId).Scan(&stock.Name, &stock.Ticker, &stock.Type, &stock.Description,
+	err := pmr.db.QueryRow(ctx, query, stockId).Scan(&stock.Id, &stock.Name, &stock.Ticker, &stock.Type, &stock.Description,
 		&stock.Cost, &stock.Currency)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)

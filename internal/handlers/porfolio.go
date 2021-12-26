@@ -131,6 +131,6 @@ func (h *Handler) deletePortfolio(c echo.Context) error {
 		log.Infof("can't delete portfolio with ID %d", portfolioId)
 		return c.JSON(500, "can't delete portfolio")
 	}
-
-	return c.Redirect(http.StatusOK, "http://localhost:3000/")
+	//return c.Redirect(http.StatusOK, "http://localhost:3000/")
+	return c.JSON(200, "portfolio deleted")
 }

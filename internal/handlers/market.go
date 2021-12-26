@@ -52,10 +52,10 @@ func (h *Handler) makeDeal(c echo.Context) error {
 		return c.JSON(500, "can't parse cookie")
 	}
 
-	d, err := h.services.MarketService.CreateDeal(context.Background(), cookie.Value, req.StockID, req.StockAmount, req.PortfolioID)
+	_, err = h.services.MarketService.CreateDeal(context.Background(), cookie.Value, req.StockID, req.StockAmount, req.PortfolioID)
 	if err != nil {
 		log.Infof("error on creating deal %v", err)
 		return c.JSON(500, "error on creating deal")
 	}
-	return c.JSON(200, d)
+	return c.JSON(200, "Successful deal!")
 }

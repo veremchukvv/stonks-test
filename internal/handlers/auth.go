@@ -33,14 +33,14 @@ func (h *Handler) signin(c echo.Context) error {
 	var user models.User
 	err := c.Bind(&user)
 	if err != nil {
-		return c.JSON(500, "Unmarshalling data error")
+		return c.JSON(500, "Error on parsing request")
 	}
 	token, err := h.services.UserService.GenerateToken(h.ctx, user.Email, user.Password)
 	if err != nil {
-		return c.JSON(500, "Authentication failure")
+		return c.JSON(401, "Authentication failure")
 	}
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
-	return c.JSON(http.StatusOK, user)
+	return c.JSON(http.StatusOK, "Login successful")
 }
 
 func (h *Handler) user(c echo.Context) error {
@@ -56,7 +56,7 @@ func (h *Handler) user(c echo.Context) error {
 	u, err := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
 	log.Info(u)
 	if u != nil {
-		return c.JSON(200, "Successfull login")
+		return c.JSON(200, u)
 	}
 	return nil
 }
@@ -114,7 +114,8 @@ func (h *Handler) deleteUser(c echo.Context) error {
 		return c.JSON(500, "error on delete user")
 	}
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: "", HttpOnly: true, Path: "/", Expires: time.Now().Add(-time.Hour)})
-	return c.Redirect(http.StatusOK, "http://localhost:3000/")
+	//return c.Redirect(http.StatusOK, "http://localhost:3000/")
+	return c.JSON(200, "User deleted")
 }
 
 func (h *Handler) callbackGoogle(c echo.Context) error {
@@ -244,5 +245,6 @@ func (h *Handler) callbackVK(c echo.Context) error {
 
 func (h *Handler) signout(c echo.Context) error {
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: "", HttpOnly: true, Path: "/", Expires: time.Now().Add(-time.Hour)})
-	return c.Redirect(http.StatusOK, "http://localhost:3000/")
+	return c.JSON(200, "See you next time!")
+	//return c.Redirect(http.StatusOK, "http://localhost:3000/")
 }

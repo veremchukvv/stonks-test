@@ -89,7 +89,7 @@ paths:
         "401":
           description: "not logined"
       security:
-        - petstore_auth:
+        - stonks_auth: []
   /signout:
     post:
       tags:
@@ -119,7 +119,7 @@ paths:
         "401":
           description: "not logined"
       security:
-        - petstore_auth:
+        - stonks_auth: []
   /api/v1/portfolios:
     get:
       tags:
@@ -141,7 +141,7 @@ paths:
         "500":
           description: "Error on get deals"
       security:
-        - petstore_auth:
+        - stonks_auth: []
     post:
       tags:
         - "portfolios"
@@ -168,7 +168,7 @@ paths:
         "401":
           description: "Not logined"
       security:
-        - petstore_auth:
+        - stonks_auth: []
     put:
       tags:
         - "portfolios"
@@ -195,7 +195,7 @@ paths:
         "401":
           description: "Not logined"
       security:
-        - petstore_auth:
+        - stonks_auth: []
   /api/v1/portfolios/{portfolioId}:
     get:
       tags:
@@ -220,7 +220,7 @@ paths:
         "500":
           description: "Error on get deals"
       security:
-        - petstore_auth:
+        - stonks_auth: []
     delete:
       tags:
         - "portfolios"
@@ -243,7 +243,7 @@ paths:
         "500":
           description: "Error on deleting portfolio"
       security:
-        - petstore_auth:
+        - stonks_auth: []
   /api/v1/portfolios/closed/{portfolioId}:
     get:
       tags:
@@ -268,7 +268,7 @@ paths:
         "500":
           description: "Error on get closed deals"
       security:
-        - petstore_auth:
+        - stonks_auth: []
   /api/v1/stockmarket/:
     get:
       tags:
@@ -308,7 +308,7 @@ paths:
         "500":
           description: "Error on creating new deal"
       security:
-        - petstore_auth:
+        - stonks_auth: []
   /api/v1/stockmarket/{stockId}:
     get:
       tags:
@@ -358,7 +358,7 @@ paths:
         "500":
           description: "Not logined"
       security:
-        - petstore_auth:
+        - stonks_auth: []
     post:
       tags:
         - "deals"
@@ -380,7 +380,7 @@ paths:
         "500":
           description: "Error on closing deal"
       security:
-        - petstore_auth:
+        - stonks_auth: []
     delete:
       tags:
         - "deals"
@@ -403,7 +403,7 @@ paths:
         "500":
           description: "Error on deleting deal"
       security:
-        - petstore_auth:
+        - stonks_auth: []
   /api/v1/closed/{closedDealId}:
     get:
       tags:
@@ -430,7 +430,7 @@ paths:
         "500":
           description: "Error on getting closed deal"
       security:
-        - petstore_auth:
+        - stonks_auth: []
     delete:
       tags:
         - "deals"
@@ -453,7 +453,7 @@ paths:
         "500":
           description: "Error on deleting closed deal"
       security:
-        - petstore_auth:
+        - stonks_auth: []
 definitions:
   CreateUserRequest:
     type: "object"

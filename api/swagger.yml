@@ -8,6 +8,9 @@ info:
     url: "https://opensource.org/licenses/mit-license.php"
 schemes:
   - "http"
+securityDefinitions:
+  stonks_auth:
+    type: "basic"
 basePath: "/"
 tags:
   - name: "users"
@@ -85,6 +88,8 @@ paths:
           description: "can't parse cookie"
         "401":
           description: "not logined"
+      security:
+        - petstore_auth:
   /signout:
     post:
       tags:
@@ -112,7 +117,9 @@ paths:
         "500":
           description: "Error deleting user"
         "401":
-          description: "Authentication failure"
+          description: "not logined"
+      security:
+        - petstore_auth:
   /api/v1/portfolios:
     get:
       tags:
@@ -133,6 +140,8 @@ paths:
           description: "Not logined"
         "500":
           description: "Error on get deals"
+      security:
+        - petstore_auth:
     post:
       tags:
         - "portfolios"
@@ -158,6 +167,8 @@ paths:
           description: "Error on creating portfolio"
         "401":
           description: "Not logined"
+      security:
+        - petstore_auth:
     put:
       tags:
         - "portfolios"
@@ -183,6 +194,8 @@ paths:
           description: "Error on updating portfolio"
         "401":
           description: "Not logined"
+      security:
+        - petstore_auth:
   /api/v1/portfolios/{portfolioId}:
     get:
       tags:
@@ -206,6 +219,8 @@ paths:
           description: "Not logined"
         "500":
           description: "Error on get deals"
+      security:
+        - petstore_auth:
     delete:
       tags:
         - "portfolios"
@@ -227,6 +242,8 @@ paths:
           description: "Not logined"
         "500":
           description: "Error on deleting portfolio"
+      security:
+        - petstore_auth:
   /api/v1/portfolios/closed/{portfolioId}:
     get:
       tags:
@@ -250,6 +267,8 @@ paths:
           description: "Not logined"
         "500":
           description: "Error on get closed deals"
+      security:
+        - petstore_auth:
   /api/v1/stockmarket/:
     get:
       tags:
@@ -288,6 +307,8 @@ paths:
           description: "Not logined"
         "500":
           description: "Error on creating new deal"
+      security:
+        - petstore_auth:
   /api/v1/stockmarket/{stockId}:
     get:
       tags:
@@ -332,8 +353,12 @@ paths:
           description: "OK"
           schema:
             $ref: "#/definitions/Deals"
-        "500":
+        "401":
           description: "Error on getting deal"
+        "500":
+          description: "Not logined"
+      security:
+        - petstore_auth:
     post:
       tags:
         - "deals"
@@ -354,6 +379,8 @@ paths:
           description: "Not logined"
         "500":
           description: "Error on closing deal"
+      security:
+        - petstore_auth:
     delete:
       tags:
         - "deals"
@@ -375,11 +402,13 @@ paths:
           description: "Not logined"
         "500":
           description: "Error on deleting deal"
+      security:
+        - petstore_auth:
   /api/v1/closed/{closedDealId}:
     get:
       tags:
         - "deals"
-      summary: "Get information about one closes deal"
+      summary: "Get information about one closed deal"
       operationId: "getClosedDeal"
       consumes:
         - "application/json"
@@ -396,8 +425,12 @@ paths:
           description: "OK"
           schema:
             $ref: "#/definitions/Deals"
+        "401":
+          description: "Not logined"
         "500":
           description: "Error on getting closed deal"
+      security:
+        - petstore_auth:
     delete:
       tags:
         - "deals"
@@ -419,6 +452,8 @@ paths:
           description: "Not logined"
         "500":
           description: "Error on deleting closed deal"
+      security:
+        - petstore_auth:
 definitions:
   CreateUserRequest:
     type: "object"

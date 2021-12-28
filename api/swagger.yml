@@ -162,7 +162,7 @@ paths:
         "200":
           description: "OK"
           schema:
-            $ref: "#/definitions/PortfolioAssets"
+            $ref: "#/definitions/Portfolio"
         "500":
           description: "Error on creating portfolio"
         "401":
@@ -484,6 +484,15 @@ definitions:
       password:
         type: "string"
         description: "password hash"
+  CreateDeal:
+    type: "object"
+    properties:
+      stock_id:
+        type: "integer"
+      stock_amount:
+        type: "integer"
+      portfolio_id:
+        type: "integer"
   LoginRequest:
     type: "object"
     properties:
@@ -491,26 +500,6 @@ definitions:
         type: "string"
       password:
         type: "string"
-  CreateProfile:
-    type: "object"
-    properties:
-      JWT:
-        type: "string"
-  UpdateProfile:
-    type: "object"
-    properties:
-      username:
-        type: "string"
-  User:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-      username:
-        type: "string"
-      userStatus:
-        type: "integer"
-        description: "User Status"
   CreatePortfolioReq:
     type: "object"
     properties:
@@ -580,8 +569,9 @@ definitions:
       PortfolioResp:
         $ref: "#/definitions/OnePortfolio"
       DealResp:
-        type: array
-        $ref: "#/definitions/Deals"
+        type: "array"
+        items:
+          $ref: "#/definitions/Deals"
   Deals:
     type: "object"
     properties:
@@ -645,17 +635,3 @@ definitions:
       currency:
         type: "string"
         enum: [usd, eur, rub]
-  Search:
-    type: "string"
-    description: "search string"
-  CreateDeal:
-    type: "object"
-    properties:
-      stock_id:
-        type: "number"
-        description: "id of stock"
-      amount:
-        type: "integer"
-        description: "amount of stocks"
-      portfolio_id:
-        type: "integer"

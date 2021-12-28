@@ -4,10 +4,7 @@ import (
 	"context"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	//v3 "github.com/swaggest/swgui/v3"
 	"github.com/veremchukvv/stonks-test/internal/service"
-	//"net/http"
-	//"github.com/swaggest/swgui/v3emb"
 )
 
 type Handler struct {
@@ -85,15 +82,7 @@ func (h *Handler) InitRoutes() *echo.Echo {
 
 	}
 
-	//fs := http.FileServer(http.Dir("dist"))
-
-
-	//swagger := e.Group("docs")
-	//{
-	//	//swagger.GET("/", v3.NewHandler("/", "", "") )
-	//	swagger.GET("/", v3.NewHandler)
-	//}
-	////swaggerUrl := echoSwagger.URL("http://localhost:1323/swagger/doc.json")
+	e.Static("/api/", "../../api")
 
 	return e
 }

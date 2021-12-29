@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/veremchukvv/stonks-test/internal/api-server"
+	"github.com/veremchukvv/stonks-test/internal/apiserver"
 	"github.com/veremchukvv/stonks-test/internal/config"
 	"github.com/veremchukvv/stonks-test/internal/handlers"
 	"github.com/veremchukvv/stonks-test/internal/repository"
@@ -47,7 +47,7 @@ func main() {
 	hasher := hash.NewBCPasswordHasher(ctx)
 	services := service.NewService(repo, hasher)
 	handler := handlers.NewHandlers(ctx, services)
-	srv := api_server.NewServer(cfg.Server.Port, handler.InitRoutes())
+	srv := apiserver.NewServer(cfg.Server.Port, handler.InitRoutes())
 
 	go srv.Run(ctx)
 

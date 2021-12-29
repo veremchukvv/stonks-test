@@ -16,14 +16,14 @@ var (
 )
 
 type PostgresUserRepo struct {
-	db  *pgxpool.Pool
 	ctx context.Context
+	db  *pgxpool.Pool
 }
 
-func NewPostgresUserRepo(pgpool *pgxpool.Pool, ctx context.Context) *PostgresUserRepo {
+func NewPostgresUserRepo(ctx context.Context, pgpool *pgxpool.Pool) *PostgresUserRepo {
 	return &PostgresUserRepo{
-		pgpool,
 		ctx,
+		pgpool,
 	}
 }
 
@@ -130,14 +130,14 @@ func (ur *PostgresUserRepo) UpdateUser(ctx context.Context, user *models.User) (
 	return user, nil
 }
 
-func (ur *PostgresUserRepo) DeleteUser(ctx context.Context, userId int, authType string) error {
+func (ur *PostgresUserRepo) DeleteUser(ctx context.Context, userID int, authType string) error {
 	log := logging.FromContext(ctx)
 	const query string = `DELETE FROM users WHERE user_id=$1 and user_auth_type=$2 returning user_id`
 
 	var uid int
-	err := ur.db.QueryRow(ctx, query, userId, authType).Scan(&uid)
+	err := ur.db.QueryRow(ctx, query, userID, authType).Scan(&uid)
 	if err != nil {
-		log.Errorf("Error on delete user %d from database: %v", userId, err)
+		log.Errorf("Error on delete user %d from database: %v", userID, err)
 		return err
 	}
 	return nil

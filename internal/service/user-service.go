@@ -15,7 +15,7 @@ import (
 
 const (
 	tokenTTL = 12 * time.Hour
-	// TODO move to config
+	// TODO move to config.
 )
 
 var SignKey = os.Getenv("SIGN_KEY")

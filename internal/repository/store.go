@@ -16,9 +16,9 @@ type Store struct {
 
 func NewStore(db *pgxpool.Pool, ctx context.Context) *Store {
 	return &Store{
-		pg.NewPostgresUserRepo(db, ctx),
-		pg.NewPostgresPortfolioRepo(db, ctx),
-		pg.NewPostgresMarketRepo(db, ctx),
-		pg.NewPostgresDealRepo(db, ctx),
+		pg.NewPostgresUserRepo(ctx, db),
+		pg.NewPostgresPortfolioRepo(ctx, db),
+		pg.NewPostgresMarketRepo(ctx, db),
+		pg.NewPostgresDealRepo(ctx, db),
 	}
 }

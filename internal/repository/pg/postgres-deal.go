@@ -13,14 +13,14 @@ type PostgresDealRepo struct {
 	ctx context.Context
 }
 
-func NewPostgresDealRepo(pgpool *pgxpool.Pool, ctx context.Context) *PostgresDealRepo {
+func NewPostgresDealRepo(ctx context.Context, pgpool *pgxpool.Pool) *PostgresDealRepo {
 	return &PostgresDealRepo{
 		pgpool,
 		ctx,
 	}
 }
 
-func (npr *PostgresDealRepo) GetOneDeal(ctx context.Context, dealId int) (*models.DealResp, error) {
+func (npr *PostgresDealRepo) GetOneDeal(ctx context.Context, dealID int) (*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	const query string = `SELECT deal_id, ticker, stock_name, stock_type, description, buy_cost, income_money, income_percent, amount, stock_cost, stock_value, 
@@ -30,7 +30,7 @@ func (npr *PostgresDealRepo) GetOneDeal(ctx context.Context, dealId int) (*model
 
 	var deal models.DealResp
 
-	err := npr.db.QueryRow(ctx, query, dealId).Scan(&deal.Id, &deal.Ticker, &deal.Name, &deal.Type, &deal.Description, &deal.BuyCost, &deal.Profit, &deal.Percent, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.OpenedAt)
+	err := npr.db.QueryRow(ctx, query, dealID).Scan(&deal.Id, &deal.Ticker, &deal.Name, &deal.Type, &deal.Description, &deal.BuyCost, &deal.Profit, &deal.Percent, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.OpenedAt)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, err
@@ -39,7 +39,7 @@ func (npr *PostgresDealRepo) GetOneDeal(ctx context.Context, dealId int) (*model
 	return &deal, nil
 }
 
-func (npr *PostgresDealRepo) GetOneClosedDeal(ctx context.Context, closedDealId int) (*models.DealResp, error) {
+func (npr *PostgresDealRepo) GetOneClosedDeal(ctx context.Context, closedDealID int) (*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	const query string = `SELECT closed_deal_id, stock_name, ticker, stock_type, description, amount, buy_cost, sell_cost, stock_value, 
@@ -49,7 +49,7 @@ func (npr *PostgresDealRepo) GetOneClosedDeal(ctx context.Context, closedDealId 
 
 	var deal models.DealResp
 
-	err := npr.db.QueryRow(ctx, query, closedDealId).Scan(&deal.Id, &deal.Name, &deal.Ticker, &deal.Type, &deal.Description, &deal.Amount, &deal.BuyCost, &deal.SellCost, &deal.Value, &deal.Currency, &deal.OpenedAt, &deal.ClosedAt, &deal.Profit, &deal.Percent)
+	err := npr.db.QueryRow(ctx, query, closedDealID).Scan(&deal.Id, &deal.Name, &deal.Ticker, &deal.Type, &deal.Description, &deal.Amount, &deal.BuyCost, &deal.SellCost, &deal.Value, &deal.Currency, &deal.OpenedAt, &deal.ClosedAt, &deal.Profit, &deal.Percent)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, err
@@ -58,7 +58,7 @@ func (npr *PostgresDealRepo) GetOneClosedDeal(ctx context.Context, closedDealId 
 	return &deal, nil
 }
 
-func (npr *PostgresDealRepo) CloseDeal(ctx context.Context, dealId int) error {
+func (npr *PostgresDealRepo) CloseDeal(ctx context.Context, dealID int) error {
 	log := logging.FromContext(ctx)
 
 	const query string = `WITH preparation_table AS (SELECT deal_id, portfolio, stock_item, stock_cost, stock_currency, 
@@ -69,42 +69,42 @@ func (npr *PostgresDealRepo) CloseDeal(ctx context.Context, dealId int) error {
                           returning closed_deal_id`
 
 	var cdid int
-	err := npr.db.QueryRow(ctx, query, dealId).Scan(&cdid)
+	err := npr.db.QueryRow(ctx, query, dealID).Scan(&cdid)
 	if err != nil {
-		log.Infof("error on closing deal: %d in database %v", dealId, err)
+		log.Infof("error on closing deal: %d in database %v", dealID, err)
 		return err
 	}
 
-	err = npr.DeleteDeal(ctx, dealId)
+	err = npr.DeleteDeal(ctx, dealID)
 	if err != nil {
-		log.Infof("error on closing deal (deleting opened deal): %d in database %v", dealId, err)
+		log.Infof("error on closing deal (deleting opened deal): %d in database %v", dealID, err)
 		return err
 	}
 
 	return nil
 }
 
-func (npr *PostgresDealRepo) DeleteDeal(ctx context.Context, dealId int) error {
+func (npr *PostgresDealRepo) DeleteDeal(ctx context.Context, dealID int) error {
 	log := logging.FromContext(ctx)
 
 	const query string = `DELETE FROM deals WHERE deal_id =$1 returning deal_id`
 	var did int
-	err := npr.db.QueryRow(ctx, query, dealId).Scan(&did)
+	err := npr.db.QueryRow(ctx, query, dealID).Scan(&did)
 	if err != nil {
-		log.Infof("error on deleting stock item: %d from database %v", dealId, err)
+		log.Infof("error on deleting stock item: %d from database %v", dealID, err)
 		return err
 	}
 	return nil
 }
 
-func (npr *PostgresDealRepo) DeleteClosedDeal(ctx context.Context, closedDealId int) error {
+func (npr *PostgresDealRepo) DeleteClosedDeal(ctx context.Context, closedDealID int) error {
 	log := logging.FromContext(ctx)
 
 	const query string = `DELETE FROM closed_deals WHERE closed_deal_id =$1 returning closed_deal_id`
 	var did int
-	err := npr.db.QueryRow(ctx, query, closedDealId).Scan(&did)
+	err := npr.db.QueryRow(ctx, query, closedDealID).Scan(&did)
 	if err != nil {
-		log.Infof("error on deleting stock item: %d from database %v", closedDealId, err)
+		log.Infof("error on deleting stock item: %d from database %v", closedDealID, err)
 		return err
 	}
 	return nil

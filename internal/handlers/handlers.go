@@ -41,8 +41,8 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		auth.POST("/signout", h.signout)
 	}
 
-	//api := e.Group("/api/v1")
-	//{
+	// api := e.Group("/api/v1")
+	// {
 	//	profile := api.Group("/profile")
 	//	{
 	//		profile.POST("/", h.createProfile)

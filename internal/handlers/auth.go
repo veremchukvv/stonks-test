@@ -165,7 +165,7 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 				log.Info("error on generating google token")
 			}
 			c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
-			log.Infof("Successfull login for Google user: %d", ngu.Id)
+			log.Infof("Successful login for Google user: %d", ngu.Id)
 		} else {
 			log.Errorf("Other Google error: %v", err)
 			return err
@@ -179,7 +179,7 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
 
-	log.Infof("Successfull login for Google user: %d", gu.Id)
+	log.Infof("Successful login for Google user: %d", gu.Id)
 
 	return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/")
 }
@@ -238,7 +238,7 @@ func (h *Handler) callbackVK(c echo.Context) error {
 
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
 
-	log.Infof("Successfull login for VK user: %d", input.Response[0].Id)
+	log.Infof("Successful login for VK user: %d", input.Response[0].Id)
 
 	return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/")
 }

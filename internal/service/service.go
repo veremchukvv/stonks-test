@@ -17,9 +17,9 @@ type UserService interface {
 	CreateGoogleUser(ctx context.Context, user *models.User) (*models.User, error)
 	GetGoogleUserByID(ctx context.Context, gid string) (*models.User, error)
 	GenerateToken(ctx context.Context, email string, password string) (string, error)
-	GenerateVKToken(ctx context.Context, id int) (string, error)
-	GenerateGoogleToken(ctx context.Context, id int) (string, error)
-	ParseToken(token string) (int, error)
+	GenerateVKToken(id int) (string, error)
+	GenerateGoogleToken(id int) (string, error)
+	//ParseToken(token string) (int, error)
 }
 
 type PortfolioService interface {

@@ -37,6 +37,6 @@ func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stock
 	return msi.repo.CreateDeal(ctx, stockId, stockAmount, portfolioId)
 }
 
-func (msi *MarketServiceImp) DeleteDeal(ctx context.Context, token string, dealId int) error {
-	return nil
-}
+//func (msi *MarketServiceImp) DeleteDeal(ctx context.Context, token string, dealId int) error {
+//	return nil
+//}

@@ -8,22 +8,25 @@ info:
     url: "https://opensource.org/licenses/mit-license.php"
 schemes:
   - "http"
+securityDefinitions:
+  stonks_auth:
+    type: "basic"
 basePath: "/"
 tags:
   - name: "users"
     description: "Operations about authorization"
-  - name: "profile"
-    description: "Operations about user"
   - name: "portfolios"
     description: "Operations about portfolio"
-  - name: "market"
+  - name: "stockmarket"
     description: "Operations about stocks"
+  - name: "deals"
+    description: "Operations about deals"
 paths:
   /signup:
     post:
       tags:
         - "users"
-      summary: "Create new user into the system"
+      summary: "Create new local user into the system"
       description: ""
       operationId: "CreateUser"
       consumes:
@@ -38,20 +41,17 @@ paths:
           schema:
             $ref: "#/definitions/CreateUserRequest"
       responses:
-        "200":
-          description: "successful operation"
+        "201":
+          description: "User created"
           schema:
             $ref: "#/definitions/CreateUserResponse"
-        "400":
-          description: ""
-        "401":
-          description: ""
+        "500":
+          description: "Creating user error"
   /signin:
     post:
       tags:
         - "users"
-      summary: "Log user into the system"
-      description: ""
+      summary: "Login local user into the system"
       operationId: "loginUser"
       consumes:
         - "application/json"
@@ -61,24 +61,40 @@ paths:
         - name: "body"
           in: body
           required: true
-          description: ""
           schema:
             $ref: "#/definitions/LoginRequest"
       responses:
         "200":
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/LoginResponse"
-        "400":
-          description: "OAuth general error"
+          description: "Login successful"
+        "500":
+          description: "Error on parsing request"
         "401":
-          description: "Unauthorized"
+          description: "Authentication failure"
+  /user:
+    get:
+      tags:
+        - "users"
+      summary: "Get current user info"
+      operationId: "GetUser"
+      produces:
+        - "application/json"
+      parameters: [ ]
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/CreateUserResponse"
+        "500":
+          description: "can't parse cookie"
+        "401":
+          description: "not logined"
+      security:
+        - stonks_auth: []
   /signout:
     post:
       tags:
         - "users"
       summary: "Log out current user"
-      description: ""
       operationId: "logoutUser"
       produces:
         - "application/json"
@@ -86,56 +102,46 @@ paths:
       responses:
         "200":
           description: "successful operation"
-  /api/v1/profile:
-    post:
+  /delete:
+    delete:
       tags:
-        - "profile"
-      summary: "Create new profile"
-      description: ""
-      operationId: "createProfile"
-      consumes:
-        - "application/json"
+        - "users"
+      summary: "delete current user"
+      operationId: "deleteUser"
       produces:
         - "application/json"
-      parameters:
-        - name: "body"
-          in: body
-          required: true
-          description: ""
-          schema:
-            $ref: "#/definitions/CreateProfile"
+      parameters: []
       responses:
         "200":
-          description: "successful operation"
-    put:
-      tags:
-        - "profile"
-      summary: "Update profile"
-      description: ""
-      operationId: "updateProfile"
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      parameters:
-        - name: "body"
-          in: body
-          required: true
-          description: ""
-          schema:
-            $ref: "#/definitions/UpdateProfile"
-      responses:
-        "200":
-          description: "successful operation"
-        "400":
-          description: "Profile update general error"
+          description: "OK"
+        "500":
+          description: "Error deleting user"
+        "401":
+          description: "not logined"
+      security:
+        - stonks_auth: []
+  /api/v1/portfolios:
     get:
       tags:
-        - "profile"
+        - "portfolios"
+      summary: "Get all portfolios of user"
+      operationId: "getAllPortfolio"
+      produces:
+        - "application/json"
+      parameters: []
       responses:
         "200":
-          description: "successful operation"
-  /api/v1/portfolios:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Portfolio"
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on get deals"
+      security:
+        - stonks_auth: []
     post:
       tags:
         - "portfolios"
@@ -148,7 +154,7 @@ paths:
       parameters:
         - in: "body"
           name: "body"
-          description: "New portfolio object that needs to be added to profile"
+          description: "New portfolio in profile"
           required: true
           schema:
             $ref: "#/definitions/CreatePortfolioReq"
@@ -157,13 +163,16 @@ paths:
           description: "OK"
           schema:
             $ref: "#/definitions/Portfolio"
-        "405":
-          description: "Invalid input"
+        "500":
+          description: "Error on creating portfolio"
+        "401":
+          description: "Not logined"
+      security:
+        - stonks_auth: []
     put:
       tags:
         - "portfolios"
       summary: "Update an existing portfolio"
-      description: ""
       operationId: "updatePortfolio"
       consumes:
         - "application/json"
@@ -181,19 +190,18 @@ paths:
           description: "OK"
           schema:
             $ref: "#/definitions/Portfolio"
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Portfolio not found"
-        "405":
-          description: "Validation exception"
+        "500":
+          description: "Error on updating portfolio"
+        "401":
+          description: "Not logined"
+      security:
+        - stonks_auth: []
   /api/v1/portfolios/{portfolioId}:
     get:
       tags:
         - "portfolios"
-      summary: "Find portfolio by ID"
-      description: "Returns a single portfolio"
-      operationId: "getPortfolioById"
+      summary: "Get portfolio deals"
+      operationId: "getPortfolioDealsById"
       produces:
         - "application/json"
       parameters:
@@ -202,16 +210,17 @@ paths:
           description: "ID of portfolio to return"
           required: true
           type: "integer"
-          format: "int64"
       responses:
         "200":
-          description: "successful operation"
+          description: "OK"
           schema:
-            $ref: "#/definitions/Portfolio"
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Portfolio not found"
+            $ref: "#/definitions/PortfolioDeals"
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on get deals"
+      security:
+        - stonks_auth: []
     delete:
       tags:
         - "portfolios"
@@ -226,29 +235,49 @@ paths:
           description: "Portfolio id to delete"
           required: true
           type: "integer"
-          format: "int64"
       responses:
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Portfolio not found"
-  /api/v1/market/stocks:
+        "200":
+          description: "OK"
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on deleting portfolio"
+      security:
+        - stonks_auth: []
+  /api/v1/portfolios/closed/{portfolioId}:
     get:
       tags:
-        - "market"
-      summary: "Get information about stocks"
-      description: ""
-      operationId: "getStocks"
-      consumes:
-        - "application/json"
+        - "portfolios"
+      summary: "Get portfolio closed deals"
+      operationId: "getPortfolioClosedDealsById"
       produces:
         - "application/json"
       parameters:
-        - in: "body"
-          name: "body"
-          description: "Stocks to search"
+        - name: "portfolioId"
+          in: "path"
+          description: "ID of portfolio to return"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
           schema:
-            $ref: "#/definitions/Search"
+            $ref: "#/definitions/PortfolioDeals"
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on get closed deals"
+      security:
+        - stonks_auth: []
+  /api/v1/stockmarket/:
+    get:
+      tags:
+        - "stockmarket"
+      summary: "Get information about all stocks"
+      operationId: "getStocks"
+      produces:
+        - "application/json"
+      parameters: [ ]
       responses:
         "200":
           description: "OK"
@@ -256,16 +285,13 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Stock"
-        "405":
-          description: "Invalid input"
-        "404":
-          description: "Stocks not found"
-  /api/v1/market/deals:
+        "500":
+          description: "Error on get stocks"
+  /api/v1/stockmarket/deal:
     post:
       tags:
-        - "market"
-      summary: "Add deal"
-      description: ""
+        - "stockmarket"
+      summary: "Add new deal to portfolio"
       operationId: "addDeal"
       consumes:
         - "application/json"
@@ -274,63 +300,220 @@ paths:
       parameters:
         - in: "body"
           name: "body"
-          description: "Deal to add"
           schema:
-            $ref: "#/definitions/Deal"
+            $ref: "#/definitions/CreateDeal"
       responses:
-        "400":
-          description: "General error"
-        "405":
-          description: "Invalid input"
-        "404":
-          description: ""
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on creating new deal"
+      security:
+        - stonks_auth: []
+  /api/v1/stockmarket/{stockId}:
+    get:
+      tags:
+        - "stockmarket"
+      summary: "Get information about one stock"
+      operationId: "getStock"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "stockId"
+          in: "path"
+          description: "ID of stock"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Deals"
+        "500":
+          description: "Error on getting stock"
+  /api/v1/deals/{dealId}:
+    get:
+      tags:
+        - "deals"
+      summary: "Get information about one deal"
+      operationId: "getDeal"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "dealId"
+          in: "path"
+          description: "ID of deal"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Deals"
+        "401":
+          description: "Error on getting deal"
+        "500":
+          description: "Not logined"
+      security:
+        - stonks_auth: []
+    post:
+      tags:
+        - "deals"
+      summary: "Close deal"
+      operationId: "closeDeal"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "dealId"
+          in: "path"
+          description: "ID of closing deal"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on closing deal"
+      security:
+        - stonks_auth: []
+    delete:
+      tags:
+        - "deals"
+      summary: "Delete a deal"
+      description: ""
+      operationId: "deleteDeal"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "dealId"
+          in: "path"
+          description: "Deal id to delete"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on deleting deal"
+      security:
+        - stonks_auth: []
+  /api/v1/closed/{closedDealId}:
+    get:
+      tags:
+        - "deals"
+      summary: "Get information about one closed deal"
+      operationId: "getClosedDeal"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "closedDealId"
+          in: "path"
+          description: "ID of closed deal"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Deals"
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on getting closed deal"
+      security:
+        - stonks_auth: []
+    delete:
+      tags:
+        - "deals"
+      summary: "Delete a closed deal"
+      description: ""
+      operationId: "deleteClosedDeal"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "closedDealId"
+          in: "path"
+          description: "Closed deal id to delete"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Not logined"
+        "500":
+          description: "Error on deleting closed deal"
+      security:
+        - stonks_auth: []
 definitions:
-  LoginRequest:
+  CreateUserRequest:
     type: "object"
     properties:
-      JWT:
+      name:
         type: "string"
-  LoginResponse:
-    type: "object"
-    properties:
-      JWT:
+      lastname:
         type: "string"
-  CreateProfile:
-    type: "object"
-    properties:
-      JWT:
-        type: "string"
-  UpdateProfile:
-    type: "object"
-    properties:
       username:
         type: "string"
-  User:
+      email:
+        type: "string"
+      password:
+        type: "string"
+  CreateUserResponse:
     type: "object"
     properties:
       id:
         type: "integer"
-        format: "int64"
+      name:
+        type: "string"
+      lastname:
+        type: "string"
       username:
         type: "string"
-      userStatus:
+      email:
+        type: "string"
+      password:
+        type: "string"
+        description: "password hash"
+  CreateDeal:
+    type: "object"
+    properties:
+      stock_id:
         type: "integer"
-        format: "int32"
-        description: "User Status"
+      stock_amount:
+        type: "integer"
+      portfolio_id:
+        type: "integer"
+  LoginRequest:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
   CreatePortfolioReq:
     type: "object"
     properties:
       name:
         type: "string"
+      description:
+        type: "string"
       public:
         type: "boolean"
-        default: false
   UpdatePortfolioReq:
     type: "object"
     properties:
       id:
         type: "integer"
-        format: "int64"
       name:
         type: "string"
       public:
@@ -340,57 +523,115 @@ definitions:
     properties:
       id:
         type: "integer"
-        format: "int64"
       name:
         type: "string"
       public:
         type: "boolean"
-        default: false
-      stocks:
+      assets_rub:
+        type: "number"
+        format: "float"
+      assets_usd:
+        type: "number"
+        format: "float"
+      assets_eur:
+        type: "number"
+        format: "float"
+      profit_rub:
+        type: "number"
+        format: "float"
+      profit_usd:
+        type: "number"
+        format: "float"
+      profit_eur:
+        type: "number"
+        format: "float"
+      percent_rub:
+        type: "number"
+        format: "float"
+      percent_usd:
+        type: "number"
+        format: "float"
+      percent_eur:
+        type: "number"
+        format: "float"
+  OnePortfolio:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      description:
+        type: "string"
+      is_public:
+        type: "boolean"
+  PortfolioDeals:
+    type: "object"
+    properties:
+      PortfolioResp:
+        $ref: "#/definitions/OnePortfolio"
+      DealResp:
         type: "array"
         items:
-          $ref: "#/definitions/Stock"
-      cash:
+          $ref: "#/definitions/Deals"
+  Deals:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      ticker:
+        type: "string"
+      name:
+        type: "string"
+      type:
+        type: "string"
+        enum: [bond, stock, fund]
+      description:
+        type: "string"
+      amount:
+        type: "integer"
+      cost:
+        type: "number"
+        format: "float"
+      value:
+        type: "number"
+        format: "float"
+      currency:
+        type: "string"
+        enum: [usd, eur, rub]
+      opened_at:
+        type: "string"
+        format: "date-time"
+      closed_at:
+        type: "string"
+        format: "date-time"
+      buy_cost:
+        type: "number"
+        format: "float"
+      sell_cost:
+        type: "number"
+        format: "float"
+      profit:
+        type: "number"
+        format: "float"
+      percent:
         type: "number"
         format: "float"
   Stock:
     type: "object"
     properties:
       id:
+        type: "integer"
+      ticker:
         type: "string"
-        description: "ticker"
       name:
         type: "string"
-        description: "name of stock"
-      summary:
-        type: "string"
-        description: "info about the stock"
       type:
         type: "string"
-        enum: [bond, stock, fund]
+        enum: [ bond, stock, fund ]
+      description:
+        type: "string"
       cost:
         type: "number"
         format: "float"
       currency:
         type: "string"
         enum: [usd, eur, rub]
-  Search:
-    type: "string"
-    description: "search string"
-  Deal:
-    type: "object"
-    properties:
-      id:
-        type: "number"
-        format: "int64"
-        description: "id of deal"
-      type:
-        type: "string"
-        enum: [buy, sell]
-        description: "type of deal"
-      lot:
-        type: "string"
-        description: "ticker"
-      quantity:
-        type: "number"
-        format: "int64"

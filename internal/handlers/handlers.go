@@ -50,7 +50,7 @@ func (h *Handler) InitRoutes() *echo.Echo {
 	//		profile.DELETE("/:id", h.deleteProfile)
 	//	}
 
-	portfolio := e.Group("/api/v1/portfolio")
+	portfolio := e.Group("/api/v1/portfolios")
 	{
 		portfolio.POST("/", h.createPortfolio)
 		portfolio.GET("/", h.getAllPortfolios)
@@ -79,8 +79,10 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		market.GET("/:id", h.getOneStock)
 		market.POST("/deal", h.makeDeal)
 		market.DELETE("/deal/:id", h.deleteDeal)
-		
+
 	}
+
+	e.Static("/api/", "../../api")
 
 	return e
 }

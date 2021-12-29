@@ -55,12 +55,11 @@ func (h *Handler) getOneClosedDeal(c echo.Context) error {
 
 	d, err := h.services.DealService.GetOneClosedDeal(context.Background(), cookie.Value, dealId)
 	if err != nil {
-		return c.JSON(500, "can't get deal info")
+		return c.JSON(500, "can't get closed deal info")
 	}
 
 	return c.JSON(200, d)
 }
-
 
 func (h *Handler) closeDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
@@ -85,7 +84,7 @@ func (h *Handler) closeDeal(c echo.Context) error {
 		return c.JSON(500, "can't close deal")
 	}
 
-	return nil
+	return c.JSON(200, "Deal closed!")
 }
 
 func (h *Handler) deleteDeal(c echo.Context) error {
@@ -111,7 +110,7 @@ func (h *Handler) deleteDeal(c echo.Context) error {
 		return c.JSON(500, "can't delete deal")
 	}
 
-	return nil
+	return c.JSON(200, "Deal deleted")
 }
 
 func (h *Handler) deleteClosedDeal(c echo.Context) error {
@@ -137,8 +136,5 @@ func (h *Handler) deleteClosedDeal(c echo.Context) error {
 		return c.JSON(500, "can't delete closed deal")
 	}
 
-	return nil
+	return c.JSON(500, "closed deal deleted")
 }
-
-
-

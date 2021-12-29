@@ -1,0 +1,1005 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a Stonks service. You can find out more about us at [https://github.com/veremchukvv/stonks-test](https://github.com/veremchukvv/stonks-test).",
+    "version": "1.0.0",
+    "title": "Stonks",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/mit-license.php"
+    }
+  },
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "stonks_auth": {
+      "type": "basic"
+    }
+  },
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "users",
+      "description": "Operations about authorization"
+    },
+    {
+      "name": "portfolios",
+      "description": "Operations about portfolio"
+    },
+    {
+      "name": "stockmarket",
+      "description": "Operations about stocks"
+    },
+    {
+      "name": "deals",
+      "description": "Operations about deals"
+    }
+  ],
+  "paths": {
+    "/signup": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Create new local user into the system",
+        "description": "",
+        "operationId": "CreateUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/CreateUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created",
+            "schema": {
+              "$ref": "#/definitions/CreateUserResponse"
+            }
+          },
+          "500": {
+            "description": "Creating user error"
+          }
+        }
+      }
+    },
+    "/signin": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Login local user into the system",
+        "operationId": "loginUser",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          },
+          "401": {
+            "description": "Authentication failure"
+          },
+          "500": {
+            "description": "Error on parsing request"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Get current user info",
+        "operationId": "GetUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CreateUserResponse"
+            }
+          },
+          "401": {
+            "description": "not logined"
+          },
+          "500": {
+            "description": "can't parse cookie"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      }
+    },
+    "/signout": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Log out current user",
+        "operationId": "logoutUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/delete": {
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "delete current user",
+        "operationId": "deleteUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "not logined"
+          },
+          "500": {
+            "description": "Error deleting user"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/portfolios": {
+      "get": {
+        "tags": [
+          "portfolios"
+        ],
+        "summary": "Get all portfolios of user",
+        "operationId": "getAllPortfolio",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Portfolio"
+              }
+            }
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on get deals"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "portfolios"
+        ],
+        "summary": "Create new portfolio",
+        "operationId": "addNewPortfolio",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "New portfolio in profile",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreatePortfolioReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Portfolio"
+            }
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on creating portfolio"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "portfolios"
+        ],
+        "summary": "Update an existing portfolio",
+        "operationId": "updatePortfolio",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Update portfolio object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdatePortfolioReq"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Portfolio"
+            }
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on updating portfolio"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/portfolios/{portfolioId}": {
+      "get": {
+        "tags": [
+          "portfolios"
+        ],
+        "summary": "Get portfolio deals",
+        "operationId": "getPortfolioDealsById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portfolioId",
+            "in": "path",
+            "description": "ID of portfolio to return",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PortfolioDeals"
+            }
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on get deals"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "portfolios"
+        ],
+        "summary": "Delete a portfolio",
+        "description": "",
+        "operationId": "deletePortfolio",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portfolioId",
+            "in": "path",
+            "description": "Portfolio id to delete",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on deleting portfolio"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/portfolios/closed/{portfolioId}": {
+      "get": {
+        "tags": [
+          "portfolios"
+        ],
+        "summary": "Get portfolio closed deals",
+        "operationId": "getPortfolioClosedDealsById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "portfolioId",
+            "in": "path",
+            "description": "ID of portfolio to return",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PortfolioDeals"
+            }
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on get closed deals"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/stockmarket/": {
+      "get": {
+        "tags": [
+          "stockmarket"
+        ],
+        "summary": "Get information about all stocks",
+        "operationId": "getStocks",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Stock"
+              }
+            }
+          },
+          "500": {
+            "description": "Error on get stocks"
+          }
+        }
+      }
+    },
+    "/api/v1/stockmarket/deal": {
+      "post": {
+        "tags": [
+          "stockmarket"
+        ],
+        "summary": "Add new deal to portfolio",
+        "operationId": "addDeal",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateDeal"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on creating new deal"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/stockmarket/{stockId}": {
+      "get": {
+        "tags": [
+          "stockmarket"
+        ],
+        "summary": "Get information about one stock",
+        "operationId": "getStock",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "stockId",
+            "in": "path",
+            "description": "ID of stock",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Deals"
+            }
+          },
+          "500": {
+            "description": "Error on getting stock"
+          }
+        }
+      }
+    },
+    "/api/v1/deals/{dealId}": {
+      "get": {
+        "tags": [
+          "deals"
+        ],
+        "summary": "Get information about one deal",
+        "operationId": "getDeal",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "dealId",
+            "in": "path",
+            "description": "ID of deal",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Deals"
+            }
+          },
+          "401": {
+            "description": "Error on getting deal"
+          },
+          "500": {
+            "description": "Not logined"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "deals"
+        ],
+        "summary": "Close deal",
+        "operationId": "closeDeal",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "dealId",
+            "in": "path",
+            "description": "ID of closing deal",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on closing deal"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "deals"
+        ],
+        "summary": "Delete a deal",
+        "description": "",
+        "operationId": "deleteDeal",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "dealId",
+            "in": "path",
+            "description": "Deal id to delete",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on deleting deal"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/closed/{closedDealId}": {
+      "get": {
+        "tags": [
+          "deals"
+        ],
+        "summary": "Get information about one closed deal",
+        "operationId": "getClosedDeal",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "closedDealId",
+            "in": "path",
+            "description": "ID of closed deal",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Deals"
+            }
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on getting closed deal"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "deals"
+        ],
+        "summary": "Delete a closed deal",
+        "description": "",
+        "operationId": "deleteClosedDeal",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "closedDealId",
+            "in": "path",
+            "description": "Closed deal id to delete",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Not logined"
+          },
+          "500": {
+            "description": "Error on deleting closed deal"
+          }
+        },
+        "security": [
+          {
+            "stonks_auth": []
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lastname": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateUserResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "lastname": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string",
+          "description": "password hash"
+        }
+      }
+    },
+    "CreateDeal": {
+      "type": "object",
+      "properties": {
+        "stock_id": {
+          "type": "integer"
+        },
+        "stock_amount": {
+          "type": "integer"
+        },
+        "portfolio_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "LoginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "CreatePortfolioReq": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UpdatePortfolioReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Portfolio": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "public": {
+          "type": "boolean"
+        },
+        "assets_rub": {
+          "type": "number",
+          "format": "float"
+        },
+        "assets_usd": {
+          "type": "number",
+          "format": "float"
+        },
+        "assets_eur": {
+          "type": "number",
+          "format": "float"
+        },
+        "profit_rub": {
+          "type": "number",
+          "format": "float"
+        },
+        "profit_usd": {
+          "type": "number",
+          "format": "float"
+        },
+        "profit_eur": {
+          "type": "number",
+          "format": "float"
+        },
+        "percent_rub": {
+          "type": "number",
+          "format": "float"
+        },
+        "percent_usd": {
+          "type": "number",
+          "format": "float"
+        },
+        "percent_eur": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "OnePortfolio": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "is_public": {
+          "type": "boolean"
+        }
+      }
+    },
+    "PortfolioDeals": {
+      "type": "object",
+      "properties": {
+        "PortfolioResp": {
+          "$ref": "#/definitions/OnePortfolio"
+        },
+        "DealResp": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Deals"
+          }
+        }
+      }
+    },
+    "Deals": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "ticker": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "bond",
+            "stock",
+            "fund"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "cost": {
+          "type": "number",
+          "format": "float"
+        },
+        "value": {
+          "type": "number",
+          "format": "float"
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "usd",
+            "eur",
+            "rub"
+          ]
+        },
+        "opened_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "closed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "buy_cost": {
+          "type": "number",
+          "format": "float"
+        },
+        "sell_cost": {
+          "type": "number",
+          "format": "float"
+        },
+        "profit": {
+          "type": "number",
+          "format": "float"
+        },
+        "percent": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "Stock": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "ticker": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "bond",
+            "stock",
+            "fund"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "cost": {
+          "type": "number",
+          "format": "float"
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "usd",
+            "eur",
+            "rub"
+          ]
+        }
+      }
+    }
+  }
+}

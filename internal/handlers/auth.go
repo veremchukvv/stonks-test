@@ -121,7 +121,7 @@ func (h *Handler) deleteUser(c echo.Context) error {
 
 func (h *Handler) callbackGoogle(c echo.Context) error {
 	type GoogleContent struct {
-		Id        string `json:"id"`
+		ID        string `json:"id"`
 		FirstName string `json:"given_name"`
 		LastName  string `json:"family_name"`
 		Email     string `json:"email"`
@@ -141,13 +141,13 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 		log.Info(err)
 	}
 
-	gu, err := h.services.UserService.GetGoogleUserByID(h.ctx, input.Id)
+	gu, err := h.services.UserService.GetGoogleUserByID(h.ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, pg.ErrGoogleUserNotFound) {
 			log.Info("trying to create new Google user")
 
 			newGoogleUser := &models.User{
-				GoogleId: input.Id,
+				GoogleId: input.ID,
 				Name:     input.FirstName,
 				Lastname: input.LastName,
 				Email:    input.Email,
@@ -186,7 +186,7 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 
 func (h *Handler) callbackVK(c echo.Context) error {
 	type VKContent struct {
-		Id        int    `json:"id"`
+		ID        int    `json:"id"`
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`
 	}
@@ -210,14 +210,14 @@ func (h *Handler) callbackVK(c echo.Context) error {
 		log.Info(err)
 	}
 
-	_, err = h.services.UserService.GetVKUserByID(h.ctx, input.Response[0].Id)
+	_, err = h.services.UserService.GetVKUserByID(h.ctx, input.Response[0].ID)
 	if err != nil {
 		if errors.Is(err, pg.ErrVkUserNotFound) {
 			log.Info(err)
 			log.Info("trying to create new VK user")
 
 			newVKUser := &models.User{
-				Id:       input.Response[0].Id,
+				Id:       input.Response[0].ID,
 				Name:     input.Response[0].FirstName,
 				Lastname: input.Response[0].LastName,
 			}
@@ -234,11 +234,11 @@ func (h *Handler) callbackVK(c echo.Context) error {
 		}
 	}
 
-	token, err := h.services.UserService.GenerateVKToken(input.Response[0].Id)
+	token, err := h.services.UserService.GenerateVKToken(input.Response[0].ID)
 
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
 
-	log.Infof("Successful login for VK user: %d", input.Response[0].Id)
+	log.Infof("Successful login for VK user: %d", input.Response[0].ID)
 
 	return c.Redirect(http.StatusMovedPermanently, "http://localhost:3000/")
 }

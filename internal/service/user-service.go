@@ -22,7 +22,7 @@ var SignKey = os.Getenv("SIGN_KEY")
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId   int    `json:"user_id"`
+	UserID   int    `json:"user_id"`
 	AuthType string `json:"auth_type"`
 }
 
@@ -52,8 +52,8 @@ func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.Us
 
 	claims := parsedToken.Claims.(*tokenClaims)
 
-	if claims.UserId != 0 {
-		u, err := us.repo.GetUserByID(ctx, claims.UserId, claims.AuthType)
+	if claims.UserID != 0 {
+		u, err := us.repo.GetUserByID(ctx, claims.UserID, claims.AuthType)
 		if err != nil {
 			log.Errorf("can't get user from db: %v", err)
 			return nil, err
@@ -89,7 +89,7 @@ func (us *UserServiceImp) UpdateUser(ctx context.Context, user *models.User, tok
 	}
 
 	claims := parsedToken.Claims.(*tokenClaims)
-	user.Id = claims.UserId
+	user.Id = claims.UserID
 	user.AuthType = claims.AuthType
 
 	return us.repo.UpdateUser(ctx, user)
@@ -105,7 +105,7 @@ func (us *UserServiceImp) DeleteUser(ctx context.Context, token string) error {
 
 	claims := parsedToken.Claims.(*tokenClaims)
 
-	return us.repo.DeleteUser(ctx, claims.UserId, claims.AuthType)
+	return us.repo.DeleteUser(ctx, claims.UserID, claims.AuthType)
 }
 
 func (us *UserServiceImp) CreateVKUser(ctx context.Context, user *models.User) (*models.User, error) {

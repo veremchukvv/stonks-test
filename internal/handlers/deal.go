@@ -13,7 +13,7 @@ import (
 func (h *Handler) getOneDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 
-	dealId, err := strconv.Atoi(c.Param("id"))
+	dealID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
@@ -28,7 +28,7 @@ func (h *Handler) getOneDeal(c echo.Context) error {
 		return c.JSON(500, "can't parse cookie")
 	}
 
-	d, err := h.services.DealService.GetOneDeal(context.Background(), cookie.Value, dealId)
+	d, err := h.services.DealService.GetOneDeal(context.Background(), cookie.Value, dealID)
 	if err != nil {
 		return c.JSON(500, "can't get deal info")
 	}
@@ -39,7 +39,7 @@ func (h *Handler) getOneDeal(c echo.Context) error {
 func (h *Handler) getOneClosedDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 
-	dealId, err := strconv.Atoi(c.Param("id"))
+	dealID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
@@ -54,7 +54,7 @@ func (h *Handler) getOneClosedDeal(c echo.Context) error {
 		return c.JSON(500, "can't parse cookie")
 	}
 
-	d, err := h.services.DealService.GetOneClosedDeal(context.Background(), cookie.Value, dealId)
+	d, err := h.services.DealService.GetOneClosedDeal(context.Background(), cookie.Value, dealID)
 	if err != nil {
 		return c.JSON(500, "can't get closed deal info")
 	}
@@ -65,7 +65,7 @@ func (h *Handler) getOneClosedDeal(c echo.Context) error {
 func (h *Handler) closeDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 
-	dealId, err := strconv.Atoi(c.Param("id"))
+	dealID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
@@ -80,7 +80,7 @@ func (h *Handler) closeDeal(c echo.Context) error {
 		return c.JSON(500, "can't parse cookie")
 	}
 
-	err = h.services.DealService.CloseDeal(context.Background(), cookie.Value, dealId)
+	err = h.services.DealService.CloseDeal(context.Background(), cookie.Value, dealID)
 	if err != nil {
 		return c.JSON(500, "can't close deal")
 	}
@@ -91,7 +91,7 @@ func (h *Handler) closeDeal(c echo.Context) error {
 func (h *Handler) deleteDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 
-	dealId, err := strconv.Atoi(c.Param("id"))
+	dealID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
@@ -106,7 +106,7 @@ func (h *Handler) deleteDeal(c echo.Context) error {
 		return c.JSON(500, "can't parse cookie")
 	}
 
-	err = h.services.DealService.DeleteDeal(context.Background(), cookie.Value, dealId)
+	err = h.services.DealService.DeleteDeal(context.Background(), cookie.Value, dealID)
 	if err != nil {
 		return c.JSON(500, "can't delete deal")
 	}
@@ -117,7 +117,7 @@ func (h *Handler) deleteDeal(c echo.Context) error {
 func (h *Handler) deleteClosedDeal(c echo.Context) error {
 	log := logging.FromContext(h.ctx)
 
-	closedDealId, err := strconv.Atoi(c.Param("id"))
+	closedDealID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
@@ -132,7 +132,7 @@ func (h *Handler) deleteClosedDeal(c echo.Context) error {
 		return c.JSON(500, "can't parse cookie")
 	}
 
-	err = h.services.DealService.DeleteClosedDeal(context.Background(), cookie.Value, closedDealId)
+	err = h.services.DealService.DeleteClosedDeal(context.Background(), cookie.Value, closedDealID)
 	if err != nil {
 		return c.JSON(500, "can't delete closed deal")
 	}

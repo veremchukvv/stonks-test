@@ -14,7 +14,7 @@ type Store struct {
 	DealRepository
 }
 
-func NewStore(db *pgxpool.Pool, ctx context.Context) *Store {
+func NewStore(ctx context.Context, db *pgxpool.Pool) *Store {
 	return &Store{
 		pg.NewPostgresUserRepo(ctx, db),
 		pg.NewPostgresPortfolioRepo(ctx, db),

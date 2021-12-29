@@ -19,7 +19,7 @@ type UserRepository interface {
 }
 
 type PortfolioRepository interface {
-	GetAllPortfolios(ctx context.Context, userId int, authType string) ([]*models.Portfolio, error)
+	GetAllPortfolios(ctx context.Context, userID int, authType string) ([]*models.Portfolio, error)
 	GetPortfolioDeals(ctx context.Context, portfolioID int) (*models.OnePortfolioResp, []*models.DealResp, error)
 	GetPortfolioClosedDeals(ctx context.Context, portfolioID int) ([]*models.DealResp, error)
 	CreatePortfolio(ctx context.Context, userID int, authType string, portfolio *models.Portfolio) (*models.Portfolio, error)

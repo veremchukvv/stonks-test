@@ -69,12 +69,12 @@ func (h *Handler) getPortfolioDeals(c echo.Context) error {
 		}
 		return c.JSON(500, "can't parse cookie")
 	}
-	portfolioId, err := strconv.Atoi(c.Param("id"))
+	portfolioID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
-	portfolio, stocks, err := h.services.PortfolioService.GetPortfolioDeals(context.Background(), token.Value, portfolioId)
+	portfolio, stocks, err := h.services.PortfolioService.GetPortfolioDeals(context.Background(), token.Value, portfolioID)
 	if err != nil {
 		return c.JSON(500, "Can't get portfolio info")
 	}
@@ -97,12 +97,12 @@ func (h *Handler) getPortfolioClosedDeals(c echo.Context) error {
 		}
 		return c.JSON(500, "can't parse cookie")
 	}
-	portfolioId, err := strconv.Atoi(c.Param("id"))
+	portfolioID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
-	closedDeals, err := h.services.PortfolioService.GetPortfolioClosedDeals(context.Background(), token.Value, portfolioId)
+	closedDeals, err := h.services.PortfolioService.GetPortfolioClosedDeals(context.Background(), token.Value, portfolioID)
 	if err != nil {
 		return c.JSON(500, "Can't get portfolio closed deals info")
 	}
@@ -119,15 +119,15 @@ func (h *Handler) deletePortfolio(c echo.Context) error {
 		}
 		return c.JSON(500, "can't parse cookie")
 	}
-	portfolioId, err := strconv.Atoi(c.Param("id"))
+	portfolioID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
 
-	err = h.services.PortfolioService.DeletePortfolio(context.Background(), token.Value, portfolioId)
+	err = h.services.PortfolioService.DeletePortfolio(context.Background(), token.Value, portfolioID)
 	if err != nil {
-		log.Infof("can't delete portfolio with ID %d", portfolioId)
+		log.Infof("can't delete portfolio with ID %d", portfolioID)
 		return c.JSON(500, "can't delete portfolio")
 	}
 	// return c.Redirect(http.StatusOK, "http://localhost:3000/")

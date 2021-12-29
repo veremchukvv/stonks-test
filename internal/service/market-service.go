@@ -22,11 +22,11 @@ func (msi *MarketServiceImp) GetAllStocks(ctx context.Context) ([]*models.DealRe
 	return msi.repo.GetAllStocks(ctx)
 }
 
-func (msi *MarketServiceImp) GetOneStock(ctx context.Context, stockId int) (*models.DealResp, error) {
-	return msi.repo.GetOneStock(ctx, stockId)
+func (msi *MarketServiceImp) GetOneStock(ctx context.Context, stockID int) (*models.DealResp, error) {
+	return msi.repo.GetOneStock(ctx, stockID)
 }
 
-func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stockId int, stockAmount int, portfolioId int) (int, error) {
+func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stockID int, stockAmount int, portfolioID int) (int, error) {
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
 		return []byte(SignKey), nil
 	})
@@ -34,9 +34,9 @@ func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stock
 		return 0, err
 	}
 
-	return msi.repo.CreateDeal(ctx, stockId, stockAmount, portfolioId)
+	return msi.repo.CreateDeal(ctx, stockID, stockAmount, portfolioID)
 }
 
-// func (msi *MarketServiceImp) DeleteDeal(ctx context.Context, token string, dealId int) error {
+// func (msi *MarketServiceImp) DeleteDeal(ctx context.Context, token string, dealID int) error {
 //	return nil
 // }

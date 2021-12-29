@@ -43,7 +43,7 @@ func main() {
 
 	log.Info("Database connection OK ... (3/4)")
 
-	repo := repository.NewStore(db, ctx)
+	repo := repository.NewStore(ctx, db)
 	hasher := hash.NewBCPasswordHasher(ctx)
 	services := service.NewService(repo, hasher)
 	handler := handlers.NewHandlers(ctx, services)

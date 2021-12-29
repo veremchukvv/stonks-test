@@ -227,7 +227,6 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 				return nil, err
 			}
 			reflect.ValueOf(port).Elem().FieldByName(PercentList[j]).SetFloat(AssetsR.Results)
-
 		}
 	}
 	return portfolios, nil

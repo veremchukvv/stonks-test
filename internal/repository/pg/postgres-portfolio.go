@@ -2,10 +2,11 @@ package pg
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
-	"reflect"
 )
 
 type PostgresPortfolioRepo struct {
@@ -197,7 +198,7 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 	}
 	var AssetsR Assets
 
-	//TODO check if struct really needed here
+	// TODO check if struct really needed here
 
 	for _, port := range portfolios {
 		for j, cur := range currencyList {

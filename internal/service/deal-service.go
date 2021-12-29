@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/repository"

@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"context"
+	"net/http"
+	"strconv"
+
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
-	"net/http"
-	"strconv"
 )
 
 func (h *Handler) getAllStocks(c echo.Context) error {

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/repository"
@@ -86,7 +87,7 @@ func (ps *PortfolioServiceImp) CreatePortfolio(ctx context.Context, token string
 		log.Info("error on authenticating user")
 		return nil, err
 	}
-	//TODO move parse of jwt to middleware or func
+	// TODO move parse of jwt to middleware or func
 	claims := parsedToken.Claims.(*tokenClaims)
 
 	createdPortfolio, err := ps.repo.CreatePortfolio(ctx, claims.UserId, claims.AuthType, newPortfolio)

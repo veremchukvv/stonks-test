@@ -2,6 +2,7 @@ package hash
 
 import (
 	"context"
+
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"golang.org/x/crypto/bcrypt"
 )

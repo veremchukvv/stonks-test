@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
@@ -9,8 +10,10 @@ import (
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 )
 
-var ErrVkUserNotFound = errors.New("VK user not found")
-var ErrGoogleUserNotFound = errors.New("Google user not found")
+var (
+	ErrVkUserNotFound     = errors.New("VK user not found")
+	ErrGoogleUserNotFound = errors.New("Google user not found")
+)
 
 type PostgresUserRepo struct {
 	db  *pgxpool.Pool
@@ -20,7 +23,8 @@ type PostgresUserRepo struct {
 func NewPostgresUserRepo(pgpool *pgxpool.Pool, ctx context.Context) *PostgresUserRepo {
 	return &PostgresUserRepo{
 		pgpool,
-		ctx}
+		ctx,
+	}
 }
 
 func (ur *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
@@ -77,7 +81,6 @@ func (ur *PostgresUserRepo) GetUserByID(ctx context.Context, id int, authType st
 		var u models.User
 		err := ur.db.QueryRow(ctx, query, id).Scan(&u.Id, &u.AuthType, &u.Name,
 			&u.Lastname, &u.Email, &u.Password)
-
 		if err != nil {
 			log.Infof("Can't get user: %v", err)
 			return nil, err
@@ -89,7 +92,6 @@ func (ur *PostgresUserRepo) GetUserByID(ctx context.Context, id int, authType st
 	var u models.User
 	err := ur.db.QueryRow(ctx, query, id).Scan(&u.Id, &u.AuthType, &u.Name,
 		&u.Lastname)
-
 	if err != nil {
 		log.Infof("Can't get user: %v", err)
 		return nil, err

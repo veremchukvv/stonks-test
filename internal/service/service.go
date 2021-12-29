@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/repository"
 	"github.com/veremchukvv/stonks-test/pkg/hash"
@@ -19,7 +20,7 @@ type UserService interface {
 	GenerateToken(ctx context.Context, email string, password string) (string, error)
 	GenerateVKToken(id int) (string, error)
 	GenerateGoogleToken(id int) (string, error)
-	//ParseToken(token string) (int, error)
+	// ParseToken(token string) (int, error)
 }
 
 type PortfolioService interface {

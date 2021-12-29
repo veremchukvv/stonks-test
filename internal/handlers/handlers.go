@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/veremchukvv/stonks-test/internal/service"

@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"

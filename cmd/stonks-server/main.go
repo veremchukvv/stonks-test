@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/veremchukvv/stonks-test/internal/api-server"
 	"github.com/veremchukvv/stonks-test/internal/config"
 	"github.com/veremchukvv/stonks-test/internal/handlers"
@@ -10,14 +14,10 @@ import (
 	"github.com/veremchukvv/stonks-test/internal/service"
 	"github.com/veremchukvv/stonks-test/pkg/hash"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 func main() {
-
-	//TODO display error on main page when backend is unavailable
+	// TODO display error on main page when backend is unavailable
 
 	log := logging.NewLogger(false, "console")
 	ctx := logging.WithLogger(context.Background(), log)
@@ -55,12 +55,12 @@ func main() {
 
 	log.Info("App started!")
 
-	//fs := http.FileServer(http.Dir("../../api"))
-	//http.Handle("/api/", http.StripPrefix("/api", fs))
+	// fs := http.FileServer(http.Dir("../../api"))
+	// http.Handle("/api/", http.StripPrefix("/api", fs))
 	//
-	//go http.ListenAndServe(":8001", nil)
+	// go http.ListenAndServe(":8001", nil)
 	//
-	//log.Info("swaggerUI started!")
+	// log.Info("swaggerUI started!")
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)

@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
@@ -57,6 +58,7 @@ func (pmr *PostgresMarketRepo) GetOneStock(ctx context.Context, stockId int) (*m
 	}
 	return &stock, nil
 }
+
 func (pmr *PostgresMarketRepo) CreateDeal(ctx context.Context, stockId int, stockAmount int, portfolioId int) (int, error) {
 	log := logging.FromContext(ctx)
 

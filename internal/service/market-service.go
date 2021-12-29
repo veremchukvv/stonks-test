@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/repository"
@@ -26,7 +27,6 @@ func (msi *MarketServiceImp) GetOneStock(ctx context.Context, stockId int) (*mod
 }
 
 func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stockId int, stockAmount int, portfolioId int) (int, error) {
-
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
 		return []byte(SignKey), nil
 	})
@@ -37,6 +37,6 @@ func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stock
 	return msi.repo.CreateDeal(ctx, stockId, stockAmount, portfolioId)
 }
 
-//func (msi *MarketServiceImp) DeleteDeal(ctx context.Context, token string, dealId int) error {
+// func (msi *MarketServiceImp) DeleteDeal(ctx context.Context, token string, dealId int) error {
 //	return nil
-//}
+// }

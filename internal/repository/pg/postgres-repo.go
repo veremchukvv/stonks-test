@@ -2,11 +2,11 @@ package pg
 
 import (
 	"context"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type PG struct {
-}
+type PG struct{}
 
 func NewPG(ctx context.Context, url string) (*pgxpool.Pool, error) {
 	cfg, err := pgxpool.ParseConfig(url)

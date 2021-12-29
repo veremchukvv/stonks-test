@@ -3,17 +3,24 @@ package oauth
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/veremchukvv/stonks-test/internal/config"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/vk"
-	"io/ioutil"
-	"net/http"
 )
 
 func GetOauthVKConfig() *oauth2.Config {
-	cfg, _ := config.GetConfig()
+	log := logging.NewLogger(false, "console")
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Error("Can't read config")
+	}
+
 	return &oauth2.Config{
 		ClientID:     cfg.OAuth.VkClientID,
 		ClientSecret: cfg.OAuth.VkClientSecret,
@@ -24,7 +31,13 @@ func GetOauthVKConfig() *oauth2.Config {
 }
 
 func GetOauthGoogleConfig() *oauth2.Config {
-	cfg, _ := config.GetConfig()
+	log := logging.NewLogger(false, "console")
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Error("Can't read config")
+	}
+
 	return &oauth2.Config{
 		ClientID:     cfg.OAuth.GoogleClientID,
 		ClientSecret: cfg.OAuth.GoogleClientSecret,
@@ -35,7 +48,7 @@ func GetOauthGoogleConfig() *oauth2.Config {
 }
 
 func GetRandomState() string {
-	//TODO randomize state
+	// TODO randomize state
 	return "blabla1"
 }
 
@@ -96,7 +109,6 @@ func GetUserGoogleInfo(ctx context.Context, state string, oauthState string, cod
 	url := "https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken
 
 	response, err := http.Get(url)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed getting user info: %s", err.Error())
 	}

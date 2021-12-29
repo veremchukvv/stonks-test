@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"context"
+	"net/http"
+	"strconv"
+
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
-	"net/http"
-	"strconv"
 )
 
 func (h *Handler) createPortfolio(c echo.Context) error {
@@ -34,7 +35,6 @@ func (h *Handler) createPortfolio(c echo.Context) error {
 
 func (h *Handler) getAllPortfolios(c echo.Context) error {
 	token, err := c.Request().Cookie("jwt")
-
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
 			return c.JSON(401, "not logined")
@@ -56,7 +56,6 @@ func (h *Handler) modifyPortfolio(c echo.Context) error {
 }
 
 func (h *Handler) getPortfolioDeals(c echo.Context) error {
-
 	type response struct {
 		PortfolioResp *models.OnePortfolioResp
 		DealResp      []*models.DealResp
@@ -131,6 +130,6 @@ func (h *Handler) deletePortfolio(c echo.Context) error {
 		log.Infof("can't delete portfolio with ID %d", portfolioId)
 		return c.JSON(500, "can't delete portfolio")
 	}
-	//return c.Redirect(http.StatusOK, "http://localhost:3000/")
+	// return c.Redirect(http.StatusOK, "http://localhost:3000/")
 	return c.JSON(200, "portfolio deleted")
 }

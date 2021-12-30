@@ -139,6 +139,7 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 
 	log := logging.FromContext(h.ctx)
 
+	var err error
 	content, err := oauth.GetUserGoogleInfo(context.Background(), oauth.GetRandomState(), c.Request().FormValue("state"),
 		c.Request().FormValue("code"), oauth.GetOauthGoogleConfig())
 	if err != nil {

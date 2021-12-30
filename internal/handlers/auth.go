@@ -152,7 +152,8 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 		log.Info(err)
 	}
 
-	gu, err := h.services.UserService.GetGoogleUserByID(h.ctx, input.ID)
+	var gu *models.User
+	gu, err = h.services.UserService.GetGoogleUserByID(h.ctx, input.ID)
 	if err != nil {
 		if errors.Is(err, pg.ErrGoogleUserNotFound) {
 			log.Info("trying to create new Google user")
@@ -164,15 +165,16 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 				Email:    input.Email,
 			}
 
-			var err error
-			ngu, err := h.services.UserService.CreateGoogleUser(h.ctx, newGoogleUser)
+			var ngu *models.User
+			ngu, err = h.services.UserService.CreateGoogleUser(h.ctx, newGoogleUser)
 			if err != nil {
 				log.Errorf("Can't create Google user: %v", err)
 				return err
 			}
 			log.Infof("Created Google user with id: %d", ngu.Id)
 
-			token, err := h.services.UserService.GenerateGoogleToken(ngu.Id)
+			var token string
+			token, err = h.services.UserService.GenerateGoogleToken(ngu.Id)
 			if err != nil {
 				log.Info("error on generating google token")
 			}
@@ -209,6 +211,7 @@ func (h *Handler) callbackVK(c echo.Context) error {
 
 	log := logging.FromContext(h.ctx)
 
+	var err error
 	content, err := oauth.GetUserVKInfo(h.ctx, oauth.GetRandomState(), c.Request().FormValue("state"),
 		c.Request().FormValue("code"), oauth.GetOauthVKConfig())
 	if err != nil {
@@ -234,7 +237,7 @@ func (h *Handler) callbackVK(c echo.Context) error {
 				Lastname: input.Response[0].LastName,
 			}
 
-			_, err := h.services.UserService.CreateVKUser(h.ctx, newVKUser)
+			_, err = h.services.UserService.CreateVKUser(h.ctx, newVKUser)
 			if err != nil {
 				log.Errorf("Can't create VK user: %v", err)
 				return err

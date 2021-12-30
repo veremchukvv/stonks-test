@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/repository"
 	"github.com/veremchukvv/stonks-test/pkg/hash"
@@ -19,29 +20,29 @@ type UserService interface {
 	GenerateToken(ctx context.Context, email string, password string) (string, error)
 	GenerateVKToken(id int) (string, error)
 	GenerateGoogleToken(id int) (string, error)
-	//ParseToken(token string) (int, error)
+	// ParseToken(token string) (int, error)
 }
 
 type PortfolioService interface {
 	GetAllPortfolios(ctx context.Context, token string) ([]*models.Portfolio, error)
-	GetPortfolioDeals(ctx context.Context, token string, portfolioId int) (*models.OnePortfolioResp, []*models.DealResp, error)
-	GetPortfolioClosedDeals(ctx context.Context, token string, portfolioId int) ([]*models.DealResp, error)
+	GetPortfolioDeals(ctx context.Context, token string, portfolioID int) (*models.OnePortfolioResp, []*models.DealResp, error)
+	GetPortfolioClosedDeals(ctx context.Context, token string, portfolioID int) ([]*models.DealResp, error)
 	CreatePortfolio(ctx context.Context, token string, portfolio *models.Portfolio) (*models.Portfolio, error)
-	DeletePortfolio(ctx context.Context, token string, portfolioId int) error
+	DeletePortfolio(ctx context.Context, token string, portfolioID int) error
 }
 
 type MarketService interface {
 	GetAllStocks(ctx context.Context) ([]*models.DealResp, error)
-	GetOneStock(ctx context.Context, stockId int) (*models.DealResp, error)
-	CreateDeal(ctx context.Context, token string, stockId int, stockAmount int, portfolioId int) (int, error)
+	GetOneStock(ctx context.Context, stockID int) (*models.DealResp, error)
+	CreateDeal(ctx context.Context, token string, stockID int, stockAmount int, portfolioID int) (int, error)
 }
 
 type DealService interface {
-	GetOneDeal(ctx context.Context, token string, dealId int) (*models.DealResp, error)
-	CloseDeal(ctx context.Context, token string, dealId int) error
-	DeleteDeal(ctx context.Context, token string, dealId int) error
-	GetOneClosedDeal(ctx context.Context, token string, closedDealId int) (*models.DealResp, error)
-	DeleteClosedDeal(ctx context.Context, token string, closedDealId int) error
+	GetOneDeal(ctx context.Context, token string, dealID int) (*models.DealResp, error)
+	CloseDeal(ctx context.Context, token string, dealID int) error
+	DeleteDeal(ctx context.Context, token string, dealID int) error
+	GetOneClosedDeal(ctx context.Context, token string, closedDealID int) (*models.DealResp, error)
+	DeleteClosedDeal(ctx context.Context, token string, closedDealID int) error
 }
 
 type Services struct {

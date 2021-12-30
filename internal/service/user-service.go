@@ -2,26 +2,27 @@ package service
 
 import (
 	"context"
+	"os"
+	"time"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/pkg/errors"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/internal/repository"
 	"github.com/veremchukvv/stonks-test/pkg/hash"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
-	"os"
-	"time"
 )
 
 const (
 	tokenTTL = 12 * time.Hour
-	//TODO move to config
+	// TODO move to config.
 )
 
 var SignKey = os.Getenv("SIGN_KEY")
 
 type tokenClaims struct {
 	jwt.StandardClaims
-	UserId   int    `json:"user_id"`
+	UserID   int    `json:"user_id"`
 	AuthType string `json:"auth_type"`
 }
 
@@ -51,8 +52,8 @@ func (us *UserServiceImp) GetUser(ctx context.Context, token string) (*models.Us
 
 	claims := parsedToken.Claims.(*tokenClaims)
 
-	if claims.UserId != 0 {
-		u, err := us.repo.GetUserByID(ctx, claims.UserId, claims.AuthType)
+	if claims.UserID != 0 {
+		u, err := us.repo.GetUserByID(ctx, claims.UserID, claims.AuthType)
 		if err != nil {
 			log.Errorf("can't get user from db: %v", err)
 			return nil, err
@@ -88,7 +89,7 @@ func (us *UserServiceImp) UpdateUser(ctx context.Context, user *models.User, tok
 	}
 
 	claims := parsedToken.Claims.(*tokenClaims)
-	user.Id = claims.UserId
+	user.Id = claims.UserID
 	user.AuthType = claims.AuthType
 
 	return us.repo.UpdateUser(ctx, user)
@@ -104,7 +105,7 @@ func (us *UserServiceImp) DeleteUser(ctx context.Context, token string) error {
 
 	claims := parsedToken.Claims.(*tokenClaims)
 
-	return us.repo.DeleteUser(ctx, claims.UserId, claims.AuthType)
+	return us.repo.DeleteUser(ctx, claims.UserID, claims.AuthType)
 }
 
 func (us *UserServiceImp) CreateVKUser(ctx context.Context, user *models.User) (*models.User, error) {
@@ -127,7 +128,7 @@ func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, passw
 	if err != nil {
 		return "", err
 	}
-	if chk == false {
+	if !chk {
 		return "", err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
@@ -142,7 +143,6 @@ func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, passw
 }
 
 func (us *UserServiceImp) GenerateVKToken(id int) (string, error) {
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
@@ -156,7 +156,6 @@ func (us *UserServiceImp) GenerateVKToken(id int) (string, error) {
 }
 
 func (us *UserServiceImp) GenerateGoogleToken(id int) (string, error) {
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
@@ -169,6 +168,6 @@ func (us *UserServiceImp) GenerateGoogleToken(id int) (string, error) {
 	return token.SignedString([]byte(SignKey))
 }
 
-//func (us *UserServiceImp) ParseToken(token string) (int, error) {
+// func (us *UserServiceImp) ParseToken(token string) (int, error) {
 //	return 0, nil
-//}
+// }

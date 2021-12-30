@@ -2,30 +2,31 @@ package pg
 
 import (
 	"context"
+	"reflect"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
-	"reflect"
 )
 
 type PostgresPortfolioRepo struct {
-	db  *pgxpool.Pool
 	ctx context.Context
+	db  *pgxpool.Pool
 }
 
-func NewPostgresPortfolioRepo(pgpool *pgxpool.Pool, ctx context.Context) *PostgresPortfolioRepo {
+func NewPostgresPortfolioRepo(ctx context.Context, pgpool *pgxpool.Pool) *PostgresPortfolioRepo {
 	return &PostgresPortfolioRepo{
-		pgpool,
 		ctx,
+		pgpool,
 	}
 }
 
-func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userId int, authType string) ([]*models.Portfolio, error) {
+func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userID int, authType string) ([]*models.Portfolio, error) {
 	log := logging.FromContext(ctx)
 	const queryPortfolios string = `SELECT portfolio_id, portfolio_name, description, is_public FROM portfolios WHERE 
 									(user_id=$1 and user_auth_type=$2)`
 	var portfolios []*models.Portfolio
-	rowsPortfolios, err := pr.db.Query(ctx, queryPortfolios, userId, authType)
+	rowsPortfolios, err := pr.db.Query(ctx, queryPortfolios, userID, authType)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, err
@@ -44,16 +45,20 @@ func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userId in
 		return nil, nil
 	}
 	portfoliosWithAssets, err := pr.getPortfolioAssets(ctx, portfolios)
+	if err != nil {
+		log.Infof("Error on query assets: %v", err)
+		return nil, err
+	}
 	return portfoliosWithAssets, nil
 }
 
-func (pr *PostgresPortfolioRepo) GetPortfolioDeals(ctx context.Context, portfolioId int) (*models.OnePortfolioResp, []*models.DealResp, error) {
+func (pr *PostgresPortfolioRepo) GetPortfolioDeals(ctx context.Context, portfolioID int) (*models.OnePortfolioResp, []*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	const queryPortfolio string = `SELECT portfolio_name, description, is_public FROM portfolios WHERE portfolio_id=$1`
 	var portfolio models.OnePortfolioResp
 
-	err := pr.db.QueryRow(ctx, queryPortfolio, portfolioId).Scan(&portfolio.Name, &portfolio.Description, &portfolio.Public)
+	err := pr.db.QueryRow(ctx, queryPortfolio, portfolioID).Scan(&portfolio.Name, &portfolio.Description, &portfolio.Public)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, nil, err
@@ -65,7 +70,7 @@ func (pr *PostgresPortfolioRepo) GetPortfolioDeals(ctx context.Context, portfoli
                     INNER JOIN currencies ON currency_id = stock_currency WHERE (portfolio=$1 and stock_cost>0)`
 
 	var deals []*models.DealResp
-	rowsDeals, err := pr.db.Query(ctx, queryDeals, portfolioId)
+	rowsDeals, err := pr.db.Query(ctx, queryDeals, portfolioID)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, nil, err
@@ -74,13 +79,17 @@ func (pr *PostgresPortfolioRepo) GetPortfolioDeals(ctx context.Context, portfoli
 	for rowsDeals.Next() {
 		var deal models.DealResp
 		err = rowsDeals.Scan(&deal.Id, &deal.Ticker, &deal.Name, &deal.Type, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.OpenedAt, &deal.BuyCost, &deal.Profit, &deal.Percent)
+		if err != nil {
+			log.Infof("Error on query rows: %v", err)
+			return nil, nil, err
+		}
 		deals = append(deals, &deal)
 	}
 
 	return &portfolio, deals, nil
 }
 
-func (pr *PostgresPortfolioRepo) GetPortfolioClosedDeals(ctx context.Context, portfolioId int) ([]*models.DealResp, error) {
+func (pr *PostgresPortfolioRepo) GetPortfolioClosedDeals(ctx context.Context, portfolioID int) ([]*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	const queryClosedDeals string = `SELECT closed_deal_id, ticker, stock_name, stock_type, amount, buy_cost, sell_cost, 
@@ -89,7 +98,7 @@ func (pr *PostgresPortfolioRepo) GetPortfolioClosedDeals(ctx context.Context, po
                     INNER JOIN currencies ON currency_id = stock_currency WHERE (portfolio=$1 and stock_cost >0)`
 
 	var closedDeals []*models.DealResp
-	rowsClosedDeals, err := pr.db.Query(ctx, queryClosedDeals, portfolioId)
+	rowsClosedDeals, err := pr.db.Query(ctx, queryClosedDeals, portfolioID)
 	if err != nil {
 		log.Infof("Error on query rows: %v", err)
 		return nil, err
@@ -98,13 +107,17 @@ func (pr *PostgresPortfolioRepo) GetPortfolioClosedDeals(ctx context.Context, po
 	for rowsClosedDeals.Next() {
 		var closedDeal models.DealResp
 		err = rowsClosedDeals.Scan(&closedDeal.Id, &closedDeal.Ticker, &closedDeal.Name, &closedDeal.Type, &closedDeal.Amount, &closedDeal.BuyCost, &closedDeal.SellCost, &closedDeal.Currency, &closedDeal.OpenedAt, &closedDeal.ClosedAt, &closedDeal.Value, &closedDeal.Profit, &closedDeal.Percent)
+		if err != nil {
+			log.Infof("Error on query rows: %v", err)
+			return nil, err
+		}
 		closedDeals = append(closedDeals, &closedDeal)
 	}
 
 	return closedDeals, nil
 }
 
-func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int, authType string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
+func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userID int, authType string, newPortfolio *models.Portfolio) (*models.Portfolio, error) {
 	log := logging.FromContext(ctx)
 
 	currenciesList, err := pr.getAllCurrencies(ctx)
@@ -117,7 +130,7 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 									is_public) VALUES ($1, $2, $3, $4, $5) returning portfolio_id`
 
 	var pid int
-	err = pr.db.QueryRow(ctx, createNewPortfolio, userId, authType, newPortfolio.Name, newPortfolio.Description, newPortfolio.Public).Scan(&pid)
+	err = pr.db.QueryRow(ctx, createNewPortfolio, userID, authType, newPortfolio.Name, newPortfolio.Description, newPortfolio.Public).Scan(&pid)
 	if err != nil {
 		log.Infof("Error on processing query to DB: %v", err)
 		return nil, err
@@ -156,14 +169,14 @@ func (pr *PostgresPortfolioRepo) CreatePortfolio(ctx context.Context, userId int
 	return p, nil
 }
 
-func (pr *PostgresPortfolioRepo) DeletePortfolio(ctx context.Context, portfolioId int) error {
+func (pr *PostgresPortfolioRepo) DeletePortfolio(ctx context.Context, portfolioID int) error {
 	log := logging.FromContext(ctx)
 
 	const query string = `DELETE FROM portfolios WHERE portfolio_id =$1 returning portfolio_id`
 	var pid int
-	err := pr.db.QueryRow(ctx, query, portfolioId).Scan(&pid)
+	err := pr.db.QueryRow(ctx, query, portfolioID).Scan(&pid)
 	if err != nil {
-		log.Infof("error on deleting portfolio: %d from database %v", portfolioId, err)
+		log.Infof("error on deleting portfolio: %d from database %v", portfolioID, err)
 		return err
 	}
 	return nil
@@ -197,7 +210,7 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 	}
 	var AssetsR Assets
 
-	//TODO check if struct really needed here
+	// TODO check if struct really needed here
 
 	for _, port := range portfolios {
 		for j, cur := range currencyList {
@@ -226,7 +239,6 @@ func (pr *PostgresPortfolioRepo) getPortfolioAssets(ctx context.Context, portfol
 				return nil, err
 			}
 			reflect.ValueOf(port).Elem().FieldByName(PercentList[j]).SetFloat(AssetsR.Results)
-
 		}
 	}
 	return portfolios, nil

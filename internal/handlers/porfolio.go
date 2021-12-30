@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"context"
+	"net/http"
+	"strconv"
+
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"github.com/veremchukvv/stonks-test/internal/models"
 	"github.com/veremchukvv/stonks-test/pkg/logging"
-	"net/http"
-	"strconv"
 )
 
 func (h *Handler) createPortfolio(c echo.Context) error {
@@ -34,7 +35,6 @@ func (h *Handler) createPortfolio(c echo.Context) error {
 
 func (h *Handler) getAllPortfolios(c echo.Context) error {
 	token, err := c.Request().Cookie("jwt")
-
 	if err != nil {
 		if errors.Is(err, http.ErrNoCookie) {
 			return c.JSON(401, "not logined")
@@ -56,7 +56,6 @@ func (h *Handler) modifyPortfolio(c echo.Context) error {
 }
 
 func (h *Handler) getPortfolioDeals(c echo.Context) error {
-
 	type response struct {
 		PortfolioResp *models.OnePortfolioResp
 		DealResp      []*models.DealResp
@@ -70,12 +69,12 @@ func (h *Handler) getPortfolioDeals(c echo.Context) error {
 		}
 		return c.JSON(500, "can't parse cookie")
 	}
-	portfolioId, err := strconv.Atoi(c.Param("id"))
+	portfolioID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
-	portfolio, stocks, err := h.services.PortfolioService.GetPortfolioDeals(context.Background(), token.Value, portfolioId)
+	portfolio, stocks, err := h.services.PortfolioService.GetPortfolioDeals(context.Background(), token.Value, portfolioID)
 	if err != nil {
 		return c.JSON(500, "Can't get portfolio info")
 	}
@@ -98,12 +97,12 @@ func (h *Handler) getPortfolioClosedDeals(c echo.Context) error {
 		}
 		return c.JSON(500, "can't parse cookie")
 	}
-	portfolioId, err := strconv.Atoi(c.Param("id"))
+	portfolioID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
-	closedDeals, err := h.services.PortfolioService.GetPortfolioClosedDeals(context.Background(), token.Value, portfolioId)
+	closedDeals, err := h.services.PortfolioService.GetPortfolioClosedDeals(context.Background(), token.Value, portfolioID)
 	if err != nil {
 		return c.JSON(500, "Can't get portfolio closed deals info")
 	}
@@ -120,17 +119,17 @@ func (h *Handler) deletePortfolio(c echo.Context) error {
 		}
 		return c.JSON(500, "can't parse cookie")
 	}
-	portfolioId, err := strconv.Atoi(c.Param("id"))
+	portfolioID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		log.Info("can't parse URL params")
 		return c.JSON(500, "can't parse URL params")
 	}
 
-	err = h.services.PortfolioService.DeletePortfolio(context.Background(), token.Value, portfolioId)
+	err = h.services.PortfolioService.DeletePortfolio(context.Background(), token.Value, portfolioID)
 	if err != nil {
-		log.Infof("can't delete portfolio with ID %d", portfolioId)
+		log.Infof("can't delete portfolio with ID %d", portfolioID)
 		return c.JSON(500, "can't delete portfolio")
 	}
-	//return c.Redirect(http.StatusOK, "http://localhost:3000/")
+	// return c.Redirect(http.StatusOK, "http://localhost:3000/")
 	return c.JSON(200, "portfolio deleted")
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/veremchukvv/stonks-test/internal/service"
@@ -40,15 +41,13 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		auth.POST("/signout", h.signout)
 	}
 
-	//api := e.Group("/api/v1")
-	//{
-	//	profile := api.Group("/profile")
-	//	{
-	//		profile.POST("/", h.createProfile)
-	//		profile.PUT("/:id", h.modifyProfile)
-	//		profile.GET("/:id", h.getProfile)
-	//		profile.DELETE("/:id", h.deleteProfile)
-	//	}
+	profile := e.Group("/profile")
+	{
+		profile.POST("/", h.createProfile)
+		profile.PUT("/:id", h.modifyProfile)
+		profile.GET("/:id", h.getProfile)
+		profile.DELETE("/:id", h.deleteProfile)
+	}
 
 	portfolio := e.Group("/api/v1/portfolios")
 	{
@@ -79,7 +78,6 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		market.GET("/:id", h.getOneStock)
 		market.POST("/deal", h.makeDeal)
 		market.DELETE("/deal/:id", h.deleteDeal)
-
 	}
 
 	e.Static("/api/", "../../api")

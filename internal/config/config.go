@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
 	"sync"
 	"time"
+
+	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Server struct {
@@ -35,9 +36,11 @@ type Config struct {
 	DB           DB           `yaml:"db"`
 }
 
-var instance *Config
-var once sync.Once
-var configErr error
+var (
+	instance  *Config
+	once      sync.Once
+	configErr error
+)
 
 func GetConfig() (*Config, error) {
 	once.Do(func() {

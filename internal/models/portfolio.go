@@ -14,8 +14,8 @@ type Portfolio struct {
 	PercentRUB  float64 `json:"percent_rub"`
 	PercentUSD  float64 `json:"percent_usd"`
 	PercentEUR  float64 `json:"percent_eur"`
-	//Stocks      map[Stock]int        `json:"stocks"`
-	//Cash        map[Currency]float32 `json:"cash"`
+	// Stocks      map[Stock]int        `json:"stocks"`
+	// Cash        map[Currency]float32 `json:"cash"`
 }
 
 type OnePortfolioResp struct {

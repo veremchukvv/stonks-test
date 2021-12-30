@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/veremchukvv/stonks-test/internal/repository/pg"
 )
@@ -13,11 +14,11 @@ type Store struct {
 	DealRepository
 }
 
-func NewStore(db *pgxpool.Pool, ctx context.Context) *Store {
+func NewStore(ctx context.Context, db *pgxpool.Pool) *Store {
 	return &Store{
-		pg.NewPostgresUserRepo(db, ctx),
-		pg.NewPostgresPortfolioRepo(db, ctx),
-		pg.NewPostgresMarketRepo(db, ctx),
-		pg.NewPostgresDealRepo(db, ctx),
+		pg.NewPostgresUserRepo(ctx, db),
+		pg.NewPostgresPortfolioRepo(ctx, db),
+		pg.NewPostgresMarketRepo(ctx, db),
+		pg.NewPostgresDealRepo(ctx, db),
 	}
 }

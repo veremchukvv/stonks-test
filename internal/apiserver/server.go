@@ -1,17 +1,20 @@
-package api_server
+package apiserver
 
 import (
 	"context"
-	"github.com/veremchukvv/stonks-test/pkg/logging"
 	"net/http"
 	"time"
+
+	"github.com/pkg/errors"
+
+	"github.com/veremchukvv/stonks-test/pkg/logging"
 )
 
 type Server struct {
 	httpServer *http.Server
 }
 
-//TODO add structure for logger package to inject zap
+// TODO add structure for logger package to inject zap
 
 func NewServer(port string, handler http.Handler) *Server {
 	httpServer := &http.Server{
@@ -26,10 +29,10 @@ func NewServer(port string, handler http.Handler) *Server {
 
 func (s *Server) Run(ctx context.Context) {
 	logger := logging.FromContext(ctx)
-	//TODO think about making channel for errors
+	// TODO think about making channel for errors
 	go func() {
 		err := s.httpServer.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Fatalf("error starting server %v", err)
 		}
 	}()

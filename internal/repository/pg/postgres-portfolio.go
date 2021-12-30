@@ -45,6 +45,10 @@ func (pr *PostgresPortfolioRepo) GetAllPortfolios(ctx context.Context, userID in
 		return nil, nil
 	}
 	portfoliosWithAssets, err := pr.getPortfolioAssets(ctx, portfolios)
+	if err != nil {
+		log.Infof("Error on query assets: %v", err)
+		return nil, err
+	}
 	return portfoliosWithAssets, nil
 }
 
@@ -75,6 +79,10 @@ func (pr *PostgresPortfolioRepo) GetPortfolioDeals(ctx context.Context, portfoli
 	for rowsDeals.Next() {
 		var deal models.DealResp
 		err = rowsDeals.Scan(&deal.Id, &deal.Ticker, &deal.Name, &deal.Type, &deal.Amount, &deal.Cost, &deal.Value, &deal.Currency, &deal.OpenedAt, &deal.BuyCost, &deal.Profit, &deal.Percent)
+		if err != nil {
+			log.Infof("Error on query rows: %v", err)
+			return nil, nil, err
+		}
 		deals = append(deals, &deal)
 	}
 
@@ -99,6 +107,10 @@ func (pr *PostgresPortfolioRepo) GetPortfolioClosedDeals(ctx context.Context, po
 	for rowsClosedDeals.Next() {
 		var closedDeal models.DealResp
 		err = rowsClosedDeals.Scan(&closedDeal.Id, &closedDeal.Ticker, &closedDeal.Name, &closedDeal.Type, &closedDeal.Amount, &closedDeal.BuyCost, &closedDeal.SellCost, &closedDeal.Currency, &closedDeal.OpenedAt, &closedDeal.ClosedAt, &closedDeal.Value, &closedDeal.Profit, &closedDeal.Percent)
+		if err != nil {
+			log.Infof("Error on query rows: %v", err)
+			return nil, err
+		}
 		closedDeals = append(closedDeals, &closedDeal)
 	}
 

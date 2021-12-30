@@ -139,7 +139,7 @@ linters:
     - gosimple
     - govet
     - ineffassign
-    - ifshort
+#    - ifshort
     #- interfacer # WARN [runner] The linter 'interfacer' is deprecated (since v1.38.0)
 #    - lll
     - misspell

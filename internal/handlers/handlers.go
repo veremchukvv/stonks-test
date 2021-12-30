@@ -41,15 +41,13 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		auth.POST("/signout", h.signout)
 	}
 
-	// api := e.Group("/api/v1")
-	// {
-	//	profile := api.Group("/profile")
-	//	{
-	//		profile.POST("/", h.createProfile)
-	//		profile.PUT("/:id", h.modifyProfile)
-	//		profile.GET("/:id", h.getProfile)
-	//		profile.DELETE("/:id", h.deleteProfile)
-	//	}
+	profile := e.Group("/profile")
+	{
+		profile.POST("/", h.createProfile)
+		profile.PUT("/:id", h.modifyProfile)
+		profile.GET("/:id", h.getProfile)
+		profile.DELETE("/:id", h.deleteProfile)
+	}
 
 	portfolio := e.Group("/api/v1/portfolios")
 	{

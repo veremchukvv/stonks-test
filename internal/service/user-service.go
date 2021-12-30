@@ -128,7 +128,7 @@ func (us *UserServiceImp) GenerateToken(ctx context.Context, email string, passw
 	if err != nil {
 		return "", err
 	}
-	if chk == false {
+	if !chk {
 		return "", err
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{

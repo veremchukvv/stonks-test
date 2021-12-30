@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 )
 
@@ -30,7 +32,7 @@ func (s *Server) Run(ctx context.Context) {
 	// TODO think about making channel for errors
 	go func() {
 		err := s.httpServer.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Fatalf("error starting server %v", err)
 		}
 	}()

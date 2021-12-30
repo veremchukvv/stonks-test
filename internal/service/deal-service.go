@@ -9,17 +9,17 @@ import (
 	"github.com/veremchukvv/stonks-test/pkg/logging"
 )
 
-type dealServiceImp struct {
+type DealServiceImp struct {
 	repo repository.DealRepository
 }
 
-func NewDealServiceImp(repo repository.DealRepository) *dealServiceImp {
-	return &dealServiceImp{
+func NewDealServiceImp(repo repository.DealRepository) *DealServiceImp {
+	return &DealServiceImp{
 		repo,
 	}
 }
 
-func (dsi *dealServiceImp) GetOneDeal(ctx context.Context, token string, dealID int) (*models.DealResp, error) {
+func (dsi *DealServiceImp) GetOneDeal(ctx context.Context, token string, dealID int) (*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
@@ -33,7 +33,7 @@ func (dsi *dealServiceImp) GetOneDeal(ctx context.Context, token string, dealID 
 	return dsi.repo.GetOneDeal(ctx, dealID)
 }
 
-func (dsi *dealServiceImp) GetOneClosedDeal(ctx context.Context, token string, closedDealID int) (*models.DealResp, error) {
+func (dsi *DealServiceImp) GetOneClosedDeal(ctx context.Context, token string, closedDealID int) (*models.DealResp, error) {
 	log := logging.FromContext(ctx)
 
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
@@ -47,7 +47,7 @@ func (dsi *dealServiceImp) GetOneClosedDeal(ctx context.Context, token string, c
 	return dsi.repo.GetOneClosedDeal(ctx, closedDealID)
 }
 
-func (dsi *dealServiceImp) CloseDeal(ctx context.Context, token string, dealID int) error {
+func (dsi *DealServiceImp) CloseDeal(ctx context.Context, token string, dealID int) error {
 	log := logging.FromContext(ctx)
 
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
@@ -61,7 +61,7 @@ func (dsi *dealServiceImp) CloseDeal(ctx context.Context, token string, dealID i
 	return dsi.repo.CloseDeal(ctx, dealID)
 }
 
-func (dsi *dealServiceImp) DeleteDeal(ctx context.Context, token string, dealID int) error {
+func (dsi *DealServiceImp) DeleteDeal(ctx context.Context, token string, dealID int) error {
 	log := logging.FromContext(ctx)
 
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {
@@ -75,7 +75,7 @@ func (dsi *dealServiceImp) DeleteDeal(ctx context.Context, token string, dealID 
 	return dsi.repo.DeleteDeal(ctx, dealID)
 }
 
-func (dsi *dealServiceImp) DeleteClosedDeal(ctx context.Context, token string, closedDealID int) error {
+func (dsi *DealServiceImp) DeleteClosedDeal(ctx context.Context, token string, closedDealID int) error {
 	log := logging.FromContext(ctx)
 
 	_, err := jwt.ParseWithClaims(token, &tokenClaims{}, func(key *jwt.Token) (interface{}, error) {

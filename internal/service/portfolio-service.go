@@ -31,6 +31,10 @@ func (ps *PortfolioServiceImp) GetAllPortfolios(ctx context.Context, token strin
 	claims := parsedToken.Claims.(*tokenClaims)
 
 	portfolios, err := ps.repo.GetAllPortfolios(ctx, claims.UserID, claims.AuthType)
+	if err != nil {
+		log.Infof("Error on query portfolios: %v", err)
+		return nil, err
+	}
 
 	_, err = json.Marshal(portfolios)
 	if err != nil {

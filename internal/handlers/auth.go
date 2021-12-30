@@ -55,6 +55,10 @@ func (h *Handler) user(c echo.Context) error {
 	}
 
 	u, err := h.services.UserService.GetUser(c.Request().Context(), cookie.Value)
+	if err != nil {
+		log.Infof("Error on query user: %v", err)
+		return err
+	}
 	log.Info(u)
 	if u != nil {
 		return c.JSON(200, u)
@@ -79,6 +83,8 @@ func (h *Handler) oauthVK(c echo.Context) error {
 }
 
 func (h *Handler) updateUser(c echo.Context) error {
+	log := logging.FromContext(h.ctx)
+
 	var u models.User
 
 	err := c.Bind(&u)
@@ -95,6 +101,10 @@ func (h *Handler) updateUser(c echo.Context) error {
 	}
 
 	uu, err := h.services.UserService.UpdateUser(c.Request().Context(), &u, cookie.Value)
+	if err != nil {
+		log.Infof("Error on update user: %v", err)
+		return err
+	}
 	if uu != nil {
 		return c.JSON(200, uu)
 	}
@@ -235,6 +245,10 @@ func (h *Handler) callbackVK(c echo.Context) error {
 	}
 
 	token, err := h.services.UserService.GenerateVKToken(input.Response[0].ID)
+	if err != nil {
+		log.Errorf("Can't generate VK token: %v", err)
+		return err
+	}
 
 	c.SetCookie(&http.Cookie{Name: "jwt", Value: token, HttpOnly: true, Path: "/"})
 

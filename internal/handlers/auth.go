@@ -163,6 +163,7 @@ func (h *Handler) callbackGoogle(c echo.Context) error {
 				Email:    input.Email,
 			}
 
+			var err error
 			ngu, err := h.services.UserService.CreateGoogleUser(h.ctx, newGoogleUser)
 			if err != nil {
 				log.Errorf("Can't create Google user: %v", err)

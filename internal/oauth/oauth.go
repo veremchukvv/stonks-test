@@ -61,7 +61,7 @@ func GetUserVKInfo(ctx context.Context, state string, oauthState string, code st
 
 	token, err := conf.Exchange(ctx, code)
 	if err != nil {
-		return nil, fmt.Errorf("code exchange failed: %v", err.Error())
+		return nil, fmt.Errorf("code exchange failed: %v", err)
 	}
 
 	newurl := "https://api.vk.com/method/getProfiles?v=5.131&access_token=" + token.AccessToken
@@ -69,7 +69,7 @@ func GetUserVKInfo(ctx context.Context, state string, oauthState string, code st
 	// nolint:gosec
 	response, err := http.Get(newurl)
 	if err != nil {
-		return nil, fmt.Errorf("failed getting user info: %v", err.Error())
+		return nil, fmt.Errorf("failed getting user info: %v", err)
 	}
 	defer func() {
 		_ = response.Body.Close()
@@ -77,7 +77,7 @@ func GetUserVKInfo(ctx context.Context, state string, oauthState string, code st
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed reading response body: %v", err.Error())
+		return nil, fmt.Errorf("failed reading response body: %v", err)
 	}
 
 	return contents, nil
@@ -111,14 +111,14 @@ func GetUserGoogleInfo(ctx context.Context, state string, oauthState string, cod
 	// nolint:gosec
 	response, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("failed getting user info: %v", err.Error())
+		return nil, fmt.Errorf("failed getting user info: %v", err)
 	}
 	defer func() {
 		_ = response.Body.Close()
 	}()
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed reading response body: %v", err.Error())
+		return nil, fmt.Errorf("failed reading response body: %v", err)
 	}
 	return contents, nil
 }

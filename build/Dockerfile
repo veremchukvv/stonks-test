@@ -4,6 +4,12 @@ ADD go.mod go.sum ./
 RUN go mod download
 ADD . ./
 
+RUN apk update && apk add date
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
+    go build -a -tags netgo -ldflags "-s -w -extldflags '-static'" \
+    -o stonks-server ./cmd/stonks-server
+
+FROM scratch as app
 ARG BUILD_NUMBER
 ARG GITSHA
 ARG IS_PRODUCTION
@@ -14,13 +20,6 @@ ARG GOOGLE_CLIENT_ID
 ARG GOOGLE_CLIENT_SECRET
 ARG GOOGLE_REDIRECT_URL
 ARG PG_DB_URL
-
-RUN apk update && apk add date
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
-    go build -a -tags netgo -ldflags "-s -w -extldflags '-static'" \
-    -o stonks-server ./cmd/stonks-server
-
-FROM scratch as app
 ENV PORT=8000
 ENV BUILD_NUMBER ${BUILD_NUMBER}
 ENV GITSHA ${GITSHA}

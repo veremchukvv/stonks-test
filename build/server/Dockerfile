@@ -3,7 +3,7 @@ WORKDIR /app
 COPY go.* ./
 COPY ./configs/config_example.yml ./configs/
 RUN go mod download
-ADD . ./
+ADD .. ./
 
 RUN apk update && apk add date
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \

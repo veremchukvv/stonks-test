@@ -25,12 +25,13 @@ func main() {
 	log.Info("Starting the app")
 	log.Info("Logger initialized ... (1/4)")
 
+	pg1 := os.Getenv("PG_DB_URL")
+	log.Info(pg1)
 	e := os.Getenv("IS_PRODUCTION")
-	log.Info(e)
-	vk1 := os.Getenv("VK_CLIENT_ID")
-	vk2 := os.Getenv("VK_CLIENT_SECRET")
-	log.Info(vk1)
-	log.Info(vk2)
+	if e == "true" {
+		log.Info("app started in production environment")
+	}
+	log.Info("app started in dev environment")
 
 	cfg, err := config.GetConfig()
 	if err != nil {

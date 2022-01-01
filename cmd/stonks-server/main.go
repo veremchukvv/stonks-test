@@ -63,13 +63,6 @@ func main() {
 
 	log.Info("App started!")
 
-	// fs := http.FileServer(http.Dir("../../api"))
-	// http.Handle("/api/", http.StripPrefix("/api", fs))
-	//
-	// go http.ListenAndServe(":8001", nil)
-	//
-	// log.Info("swaggerUI started!")
-
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 

@@ -1,7 +1,7 @@
 FROM golang:1.16.8-alpine as builder
 WORKDIR /app
 COPY go.* ./
-COPY ./configs/config_example.yml ./configs
+COPY ./configs/config_example.yml ./configs/
 RUN go mod download
 ADD . ./
 
@@ -34,5 +34,6 @@ ENV GOOGLE_REDIRECT_URL ${GOOGLE_REDIRECT_URL}
 ENV PG_DB_URL ${PG_DB_URL}
 WORKDIR /app
 COPY --from=builder /app/stonks-server /app/stonks-server
+COPY --from=builder /app/configs/config_example.yml /app/stonks-server/
 ENTRYPOINT ["./stonks-server"]
 EXPOSE $PORT

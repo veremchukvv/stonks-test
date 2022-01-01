@@ -1,11 +1,18 @@
 package config
 
 import (
+	"os"
 	"sync"
 	"time"
 
+	"github.com/veremchukvv/stonks-test/pkg/logging"
+
 	"github.com/ilyakaznacheev/cleanenv"
 )
+
+// type Environment struct {
+//	IsProduction bool `yaml:"is_production" env:"IS_PRODUCTION" env-default:"false"`
+// }
 
 type Server struct {
 	Port            string        `yaml:"port" env:"PORT" env-default:"8000"`
@@ -43,9 +50,19 @@ var (
 )
 
 func GetConfig() (*Config, error) {
+	log := logging.NewLogger(false, "console")
+
 	once.Do(func() {
-		instance = &Config{}
-		configErr = cleanenv.ReadConfig("../../configs/config.yml", instance)
+		e := os.Getenv("IS_PRODUCTION")
+		if e == "" {
+			instance = &Config{}
+			configErr = cleanenv.ReadConfig("../../configs/config.yml", instance)
+			log.Info("Loading config from /configs/config.yml")
+		} else {
+			instance = &Config{}
+			configErr = cleanenv.ReadConfig("../../configs/config_example.yml", instance)
+			log.Info("Loading config from /configs/config_example.yml")
+		}
 	})
 	return instance, configErr
 }

@@ -8,3 +8,13 @@ client_server:
   client_port: "8001"
 
 oauth:
+  vk_client_id: ""
+  vk_client_secret: ""
+  vk_redirect_url: ""
+  google_client_id: ""
+  google_client_secret: ""
+  google_redirect_url: ""
+
+db:
+  url: ""
+

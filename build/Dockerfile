@@ -15,6 +15,13 @@ ARG GOOGLE_CLIENT_SECRET
 ARG GOOGLE_REDIRECT_URL
 ARG PG_DB_URL
 
+RUN apk update && apk add date
+RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
+    go build -a -tags netgo -ldflags "-s -w -extldflags '-static'" \
+    -o stonks-server ./cmd/stonks-server
+
+FROM scratch as app
+ENV PORT=8000
 ENV BUILD_NUMBER ${BUILD_NUMBER}
 ENV GITSHA ${GITSHA}
 ENV IS_PRODUCTION ${IS_PRODUCTION}
@@ -25,14 +32,6 @@ ENV GOOGLE_CLIENT_ID ${GOOGLE_CLIENT_ID}
 ENV GOOGLE_CLIENT_SECRET ${GOOGLE_CLIENT_SECRET}
 ENV GOOGLE_REDIRECT_URL ${GOOGLE_REDIRECT_URL}
 ENV PG_DB_URL ${PG_DB_URL}
-
-RUN apk update && apk add date
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
-    go build -a -tags netgo -ldflags "-s -w -extldflags '-static'" \
-    -o stonks-server ./cmd/stonks-server
-
-FROM scratch as app
-ENV PORT=8000
 WORKDIR /app
 COPY --from=builder /app/stonks-server /app/stonks-server
 ENTRYPOINT ["./stonks-server"]

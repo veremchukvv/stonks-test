@@ -1,6 +1,7 @@
 FROM golang:1.16.8-alpine as builder
 WORKDIR /app
-ADD go.mod go.sum ./
+COPY go.* ./
+COPY ./configs/config_example.yml ./configs
 RUN go mod download
 ADD . ./
 

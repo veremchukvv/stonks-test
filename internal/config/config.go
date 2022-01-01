@@ -60,7 +60,7 @@ func GetConfig() (*Config, error) {
 			log.Info("Loading config from /configs/config.yml")
 		} else {
 			instance = &Config{}
-			configErr = cleanenv.ReadConfig("../../configs/config_example.yml", instance)
+			configErr = cleanenv.ReadConfig("./configs/config_example.yml", instance)
 			log.Info("Loading config from /configs/config_example.yml")
 		}
 	})

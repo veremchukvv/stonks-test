@@ -25,6 +25,13 @@ func main() {
 	log.Info("Starting the app")
 	log.Info("Logger initialized ... (1/4)")
 
+	e := os.Getenv("IS_PRODUCTION")
+	log.Info(e)
+	vk1 := os.Getenv("VK_CLIENT_ID")
+	vk2 := os.Getenv("VK_CLIENT_SECRET")
+	log.Info(vk1)
+	log.Info(vk2)
+
 	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Fatalf("error occurred when loading configuration: %v", err)

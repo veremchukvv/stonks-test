@@ -74,7 +74,7 @@ jobs:
         with:
           push: true
           context: .
-          file: ./build/Dockerfile
+          file: ./build/server/Dockerfile
           tags: ghcr.io/veremchukvv/stonks-test/stonks-server:latest
           build-args: |
             BUILD_NUMBER=${{ github.run_number }}

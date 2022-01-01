@@ -34,6 +34,6 @@ ENV GOOGLE_REDIRECT_URL ${GOOGLE_REDIRECT_URL}
 ENV PG_DB_URL ${PG_DB_URL}
 WORKDIR /app
 COPY --from=builder /app/stonks-server /app/stonks-server
-COPY --from=builder /app/configs/config_example.yml /app/stonks-server/
+COPY --from=builder /app/configs/config_example.yml /app/configs/
 ENTRYPOINT ["./stonks-server"]
 EXPOSE $PORT

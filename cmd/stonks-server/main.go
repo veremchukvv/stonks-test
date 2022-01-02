@@ -25,13 +25,12 @@ func main() {
 	log.Info("Starting the app")
 	log.Info("Logger initialized ... (1/4)")
 
-	pg1 := os.Getenv("PG_DB_URL")
-	log.Info(pg1)
 	e := os.Getenv("IS_PRODUCTION")
-	if e == "true" {
+	if e == "" {
+		log.Info("app started in dev environment")
+	} else {
 		log.Info("app started in production environment")
 	}
-	log.Info("app started in dev environment")
 
 	cfg, err := config.GetConfig()
 	if err != nil {

@@ -10,10 +10,6 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-// type Environment struct {
-//	IsProduction bool `yaml:"is_production" env:"IS_PRODUCTION" env-default:"false"`
-// }
-
 type Server struct {
 	Port            string        `yaml:"port" env:"PORT" env-default:"8000"`
 	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" env:"SHUTDOWN_TIMEOUT" env-default:"5000000000"`

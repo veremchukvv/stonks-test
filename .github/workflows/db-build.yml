@@ -1,8 +1,7 @@
 name: Database build docker image
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [opened]
 jobs:
   build_and_push:
     name: Push Docker image to GitHub Container Registry
@@ -26,7 +25,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
       - name: Set env
-        run: echo "TAG_VERSION=$(ls ./database/migrations/*.sql | tail -1 | cut -d'_' -f2 | sed 's/schema\//v/g' | sed 's/0//g')" >> $GITHUB_ENV
+        run: echo "TAG_VERSION=$(ls ./database/migrations/*.sql | tail -1 | cut -d'/' -f4 | cut -d'_' -f1 | sed 's/00/v00/')" >> $GITHUB_ENV
       - name: Test
         run: echo ${{ env.TAG_VERSION }}
       - name: Login to GitHub Container Registry

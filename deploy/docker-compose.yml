@@ -1,0 +1,18 @@
+version: '3'
+services:
+  stonks-db:
+    image: "ghcr.io/veremchukvv/stonks-test/stonks-db:latest"
+    restart: always
+    container_name: stonks_db
+    ports:
+      - "54321:5432"
+  stonks-server:
+    image: "ghcr.io/veremchukvv/stonks-test/stonks-server:latest"
+    links:
+      - stonks-db
+    restart: on-failure
+    container_name: stonks_server
+    depends_on:
+      - stonks-db
+    ports:
+      - "8000:8000"

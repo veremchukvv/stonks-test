@@ -29,7 +29,7 @@ type OAuth struct {
 }
 
 type DB struct {
-	URL string `yaml:"url" env:"PG_DB_URL"`
+	URL string `yaml:"url" env:"DATABASE_URL"`
 }
 
 type Config struct {

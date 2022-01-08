@@ -38,8 +38,6 @@ func main() {
 	}
 	log.Info("Configuration successfully loaded ... (2/4)")
 
-	log.Info(cfg.Server.CORS)
-
 	db, err := pg.NewPG(ctx, cfg.DB.URL)
 	if err != nil {
 		log.Fatalf("Can't connect to database %v", err)
@@ -55,7 +53,7 @@ func main() {
 	repo := repository.NewStore(ctx, db)
 	hasher := hash.NewBCPasswordHasher(ctx)
 	services := service.NewService(repo, hasher)
-	handler := handlers.NewHandlers(ctx, services)
+	handler := handlers.NewHandlers(ctx, services, cfg)
 	srv := apiserver.NewServer(cfg.Server.Port, handler.InitRoutes())
 
 	go srv.Run(ctx)

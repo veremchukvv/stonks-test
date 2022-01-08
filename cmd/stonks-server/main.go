@@ -38,6 +38,8 @@ func main() {
 	}
 	log.Info("Configuration successfully loaded ... (2/4)")
 
+	log.Info(cfg.Server.CORS)
+
 	db, err := pg.NewPG(ctx, cfg.DB.URL)
 	if err != nil {
 		log.Fatalf("Can't connect to database %v", err)

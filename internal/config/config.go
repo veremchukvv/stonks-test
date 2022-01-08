@@ -13,6 +13,7 @@ import (
 type Server struct {
 	Port            string        `yaml:"port" env:"PORT" env-default:"8000"`
 	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" env:"SHUTDOWN_TIMEOUT" env-default:"5000000000"`
+	CORS            []string      `yaml:"cors" env:"CORS" env-default:"http://127.0.0.1:3000 http://localhost:3000"`
 }
 
 type ClientServer struct {

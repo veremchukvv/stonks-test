@@ -25,8 +25,8 @@ func NewHandlers(ctx context.Context, services *service.Services, cfg *config.Co
 
 func (h *Handler) InitRoutes() *echo.Echo {
 	e := echo.New()
+
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		// AllowOrigins:     []string{"http://127.0.0.1:3000", "http://localhost:3000"},
 		AllowOrigins:     h.cfg.Server.CORS,
 		AllowCredentials: true,
 	}))

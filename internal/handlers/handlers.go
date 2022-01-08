@@ -5,25 +5,29 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/veremchukvv/stonks-test/internal/config"
 	"github.com/veremchukvv/stonks-test/internal/service"
 )
 
 type Handler struct {
 	ctx      context.Context
 	services *service.Services
+	cfg      *config.Config
 }
 
-func NewHandlers(ctx context.Context, services *service.Services) *Handler {
+func NewHandlers(ctx context.Context, services *service.Services, cfg *config.Config) *Handler {
 	return &Handler{
 		ctx,
 		services,
+		cfg,
 	}
 }
 
 func (h *Handler) InitRoutes() *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins:     []string{"http://127.0.0.1:3000", "http://localhost:3000"},
+		// AllowOrigins:     []string{"http://127.0.0.1:3000", "http://localhost:3000"},
+		AllowOrigins:     h.cfg.Server.CORS,
 		AllowCredentials: true,
 	}))
 

@@ -7,8 +7,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/veremchukvv/stonks-test/internal/config"
 	"github.com/veremchukvv/stonks-test/internal/service"
-
-	"github.com/veremchukvv/stonks-test/pkg/logging"
 )
 
 type Handler struct {
@@ -27,8 +25,7 @@ func NewHandlers(ctx context.Context, services *service.Services, cfg *config.Co
 
 func (h *Handler) InitRoutes() *echo.Echo {
 	e := echo.New()
-	log := logging.NewLogger(false, "console")
-	log.Info(h.cfg.Server.CORS)
+
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     h.cfg.Server.CORS,
 		AllowCredentials: true,

@@ -9,6 +9,7 @@ server:
 
 client_server:
   client_port: "8001"
+  react_client_url: "http://localhost:3000"
 
 oauth:
   vk_client_id: ""

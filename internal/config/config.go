@@ -16,8 +16,9 @@ type Server struct {
 	CORS            []string      `yaml:"cors" env:"CORS" env-separator:"," env-default:"http://127.0.0.1:3000 http://localhost:3000"`
 }
 
-type ClientServer struct {
-	Port string `yaml:"client_port" env:"CLIENT_PORT" env-default:"8001"`
+type Client struct {
+	Port           string `yaml:"client_port" env:"CLIENT_PORT" env-default:"8001"`
+	ReactClientURL string `yaml:"react_client_url" env:"REACT_URL" env-default:"http://localhost:3000"`
 }
 
 type OAuth struct {
@@ -34,10 +35,10 @@ type DB struct {
 }
 
 type Config struct {
-	Server       Server       `yaml:"server"`
-	ClientServer ClientServer `yaml:"client_server"`
-	OAuth        OAuth        `yaml:"oauth"`
-	DB           DB           `yaml:"db"`
+	Server Server `yaml:"server"`
+	Client Client `yaml:"client_server"`
+	OAuth  OAuth  `yaml:"oauth"`
+	DB     DB     `yaml:"db"`
 }
 
 var (

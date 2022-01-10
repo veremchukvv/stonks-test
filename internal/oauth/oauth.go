@@ -53,8 +53,6 @@ func GetRandomState() string {
 }
 
 func GetUserVKInfo(ctx context.Context, state string, oauthState string, code string, conf *oauth2.Config) ([]byte, error) {
-	log := logging.FromContext(ctx)
-
 	if state != oauthState {
 		return nil, fmt.Errorf("invalid oauth state")
 	}
@@ -65,7 +63,6 @@ func GetUserVKInfo(ctx context.Context, state string, oauthState string, code st
 	}
 
 	newurl := "https://api.vk.com/method/getProfiles?v=5.131&access_token=" + token.AccessToken
-	log.Info(newurl)
 	// nolint:gosec
 	response, err := http.Get(newurl)
 	if err != nil {

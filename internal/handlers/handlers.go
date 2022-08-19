@@ -82,6 +82,7 @@ func (h *Handler) InitRoutes() *echo.Echo {
 		market.GET("/:id", h.getOneStock)
 		market.POST("/deal", h.makeDeal)
 		market.DELETE("/deal/:id", h.deleteDeal)
+		market.GET("/rates", h.rates)
 	}
 
 	e.Static("/api/", "../../api")

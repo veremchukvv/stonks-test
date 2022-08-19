@@ -2,6 +2,11 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/veremchukvv/stonks-test/internal/models"
@@ -35,6 +40,38 @@ func (msi *MarketServiceImp) CreateDeal(ctx context.Context, token string, stock
 	}
 
 	return msi.repo.CreateDeal(ctx, stockID, stockAmount, portfolioID)
+}
+
+func (msi *MarketServiceImp) GetCurrencies(ctx context.Context) (*models.CurrencyRates, error) {
+	resp, err := http.Get("https://iss.moex.com/iss/statistics/engines/currency/markets/selt/rates.json?iss.only=wap_rates")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	readResp, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var respJSON *models.Outer
+
+	err = json.Unmarshal(readResp, &respJSON)
+	if err != nil {
+		log.Println("can't: ", err)
+	}
+
+	a := respJSON.Wap.Data
+
+	fmt.Println(a)
+	fmt.Println(a[1][1], a[2][1])
+
+	cr := &models.CurrencyRates{
+		a[0][4].(float64),
+		a[0][5].(float64),
+		a[1][4].(float64),
+		a[1][5].(float64),
+	}
+	fmt.Println(cr)
+	return cr, nil
 }
 
 // func (msi *MarketServiceImp) DeleteDeal(ctx context.Context, token string, dealID int) error {

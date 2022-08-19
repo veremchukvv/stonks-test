@@ -35,6 +35,7 @@ type MarketService interface {
 	GetAllStocks(ctx context.Context) ([]*models.DealResp, error)
 	GetOneStock(ctx context.Context, stockID int) (*models.DealResp, error)
 	CreateDeal(ctx context.Context, token string, stockID int, stockAmount int, portfolioID int) (int, error)
+	GetCurrencies(ctx context.Context) (*models.CurrencyRates, error)
 }
 
 type DealService interface {

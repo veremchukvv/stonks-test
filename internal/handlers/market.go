@@ -60,3 +60,11 @@ func (h *Handler) makeDeal(c echo.Context) error {
 	}
 	return c.JSON(200, "Successful deal!")
 }
+
+func (h *Handler) rates(c echo.Context) error {
+	s, err := h.services.MarketService.GetCurrencies(context.Background())
+	if err != nil {
+		return c.JSON(500, err)
+	}
+	return c.JSON(200, s)
+}

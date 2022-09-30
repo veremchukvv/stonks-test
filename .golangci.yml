@@ -135,7 +135,7 @@ linters:
     - gocyclo
     #- godox
     #- golint #The linter 'golint' is deprecated (since v1.41.0) due to: The repository of the linter has been archived by the owner.  Replaced by revive.
-    - gosec
+    # - gosec
     - gosimple
     - govet
     - ineffassign
@@ -149,7 +149,7 @@ linters:
     - rowserrcheck
     # - scopelint WARN [runner] The linter 'scopelint' is deprecated (since v1.39.0)
     - sqlclosecheck
-    - staticcheck
+    # - staticcheck
     - structcheck
     - stylecheck
     - typecheck

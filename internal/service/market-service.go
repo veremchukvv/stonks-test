@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -56,21 +55,15 @@ func (msi *MarketServiceImp) GetCurrencies(ctx context.Context) (*models.Currenc
 
 	err = json.Unmarshal(readResp, &respJSON)
 	if err != nil {
-		log.Println("can't: ", err)
+		log.Println("can't unmarshal response from IMOEX: ", err)
 	}
-
-	a := respJSON.Wap.Data
-
-	fmt.Println(a)
-	fmt.Println(a[1][1], a[2][1])
 
 	cr := &models.CurrencyRates{
-		a[0][4].(float64),
-		a[0][5].(float64),
-		a[1][4].(float64),
-		a[1][5].(float64),
+		respJSON.Wap.Data[0][4].(float64),
+		respJSON.Wap.Data[0][5].(float64),
+		respJSON.Wap.Data[1][4].(float64),
+		respJSON.Wap.Data[1][5].(float64),
 	}
-	fmt.Println(cr)
 	return cr, nil
 }
 
